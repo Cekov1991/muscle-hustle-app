@@ -8,7 +8,7 @@
           <ion-label>Dashboard</ion-label>
         </ion-tab-button>
         
-        <ion-tab-button @click="comingSoon" tab="workouts">
+        <ion-tab-button tab="workouts" href="/tabs/workouts">
           <ion-icon :icon="barbellOutline" />
           <ion-label>Workouts</ion-label>
         </ion-tab-button>

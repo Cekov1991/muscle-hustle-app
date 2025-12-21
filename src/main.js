@@ -1,8 +1,13 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import axios from 'axios'
 
 import { IonicVue } from '@ionic/vue'
+
+// Configure axios defaults for ngrok
+// This header bypasses ngrok's browser warning page
+axios.defaults.headers.common['ngrok-skip-browser-warning'] = 'true'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css'

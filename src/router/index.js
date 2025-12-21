@@ -33,6 +33,30 @@ const routes = [
         meta: { 
           title: 'Dashboard'
         }
+      },
+      {
+        path: 'workouts',
+        name: 'Workouts',
+        component: () => import('../features/workouts/views/WorkoutsList.vue'),
+        meta: { 
+          title: 'Workouts'
+        }
+      },
+      {
+        path: 'workouts/new',
+        name: 'WorkoutNew',
+        component: () => import('../features/workouts/views/WorkoutForm.vue'),
+        meta: { 
+          title: 'New Workout'
+        }
+      },
+      {
+        path: 'workouts/:id/edit',
+        name: 'WorkoutEdit',
+        component: () => import('../features/workouts/views/WorkoutForm.vue'),
+        meta: { 
+          title: 'Edit Workout'
+        }
       }
     ]
   },
