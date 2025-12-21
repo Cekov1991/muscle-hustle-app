@@ -5,16 +5,34 @@
 /* Default fitness app branding */
 :root {
   /* Brand Colors - Can be overridden for white-labeling */
-  --brand-primary: #3880ff;
-  --brand-secondary: #0cd1e8;
-  --brand-success: #10dc60;
-  --brand-warning: #ffce00;
-  --brand-danger: #f04141;
+  --brand-primary: #a44200;              /* rust-brown */
+  --brand-secondary: #d58936;            /* bronze */
+  --brand-success: #10dc60;              /* standard green */
+  --brand-warning: #fff94f;              /* canary-yellow */
+  --brand-danger: #69140e;               /* dark-garnet */
+  
+  /* Background Colors */
+  --brand-background-color: #ffffff;      /* white */
+  --brand-card-background-color: #f8f9fa; /* light gray */
+  
+  /* Text Colors */
+  --brand-text-primary-color: #3c1518;   /* rich-mahogany */
+  --brand-text-secondary-color: #69140e;  /* dark-garnet */
+  --brand-text-on-primary-color: #ffffff; /* white */
+  
+  /* Semantic Colors */
+  --brand-success-color: #10dc60;        /* standard green */
+  --brand-warning-color: #fff94f;        /* canary-yellow */
+  --brand-danger-color: #69140e;         /* dark-garnet */
+  --brand-accent-color: #fff94f;         /* canary-yellow */
+  
+  /* Other Colors */
+  --brand-border-color: #dee2e6;          /* light gray */
   
   /* Brand Assets */
   --brand-logo-url: none; /* Will be set dynamically */
   --brand-background-pattern: none;
-  --brand-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  --brand-font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   
   /* Brand Specific Spacing */
   --brand-header-height: 56px;
@@ -101,6 +119,26 @@
 /* Custom font integration */
 .gym-custom-font {
   font-family: var(--brand-font-family);
+}
+
+/* Apply Nunito font globally by default (login page, etc.) */
+html,
+body:not(.gym-branded),
+ion-app {
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Ensure Ionic components inherit font */
+ion-app ion-page,
+ion-app ion-content,
+ion-app ion-header,
+ion-app ion-toolbar {
+  font-family: inherit;
+}
+
+/* Partner font when branding is active (can override default) */
+body.gym-branded {
+  font-family: var(--brand-font-family, 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
 }
 
 /* Toolbar branding */
@@ -216,6 +254,87 @@
 .brand-bg-secondary { background-color: var(--brand-secondary); }
 .brand-border-primary { border-color: var(--brand-primary); }
 .brand-border-secondary { border-color: var(--brand-secondary); }
+
+/* Background color usage */
+.gym-branded ion-content {
+  --background: var(--brand-background-color, #ffffff);
+}
+
+.gym-branded ion-card {
+  --background: var(--brand-card-background-color, #f8f9fa);
+}
+
+/* Text color usage */
+.gym-branded h1,
+.gym-branded h2,
+.gym-branded h3,
+.gym-branded h4,
+.gym-branded h5,
+.gym-branded h6 {
+  color: var(--brand-text-primary-color, #3c1518);
+}
+
+.gym-branded p,
+.gym-branded span,
+.gym-branded ion-label {
+  color: var(--brand-text-primary-color, #3c1518);
+}
+
+.gym-branded .text-secondary {
+  color: var(--brand-text-secondary-color, #69140e);
+}
+
+/* Text on primary backgrounds */
+.gym-branded ion-toolbar,
+.gym-branded ion-button {
+  --color: var(--brand-text-on-primary-color, #ffffff);
+}
+
+/* Semantic color usage */
+.gym-branded .success {
+  color: var(--brand-success-color, #10dc60);
+  background-color: var(--brand-success-color, #10dc60);
+}
+
+.gym-branded .warning {
+  color: var(--brand-warning-color, #fff94f);
+  background-color: var(--brand-warning-color, #fff94f);
+}
+
+.gym-branded .danger {
+  color: var(--brand-danger-color, #69140e);
+  background-color: var(--brand-danger-color, #69140e);
+}
+
+.gym-branded ion-button.button-success {
+  --background: var(--brand-success-color, #10dc60);
+  --color: white;
+}
+
+.gym-branded ion-button.button-warning {
+  --background: var(--brand-warning-color, #fff94f);
+  --color: var(--brand-text-primary-color, #3c1518);
+}
+
+.gym-branded ion-button.button-danger {
+  --background: var(--brand-danger-color, #69140e);
+  --color: var(--brand-text-on-primary-color, #ffffff);
+}
+
+/* Border color usage */
+.gym-branded ion-card {
+  border-color: var(--brand-border-color, #dee2e6);
+}
+
+.gym-branded ion-item {
+  --border-color: var(--brand-border-color, #dee2e6);
+}
+
+/* Accent color usage */
+.gym-branded .accent {
+  color: var(--brand-accent-color, #fff94f);
+  background-color: var(--brand-accent-color, #fff94f);
+}
 
 /* Responsive adjustments for branding */
 @media (max-width: 768px) {
