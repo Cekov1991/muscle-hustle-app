@@ -1,4 +1,11 @@
 import { toastController } from '@ionic/vue'
+import {
+  checkmarkCircleOutline,
+  alertCircleOutline,
+  warningOutline,
+  informationCircleOutline,
+  hourglassOutline
+} from 'ionicons/icons'
 
 export const useToast = () => {
   
@@ -23,7 +30,7 @@ export const useToast = () => {
     return showToast(message, {
       color: 'success',
       duration,
-      icon: 'checkmark-circle-outline'
+      icon: checkmarkCircleOutline
     })
   }
 
@@ -31,7 +38,7 @@ export const useToast = () => {
     return showToast(message, {
       color: 'danger',
       duration,
-      icon: 'alert-circle-outline'
+      icon: alertCircleOutline
     })
   }
 
@@ -39,7 +46,7 @@ export const useToast = () => {
     return showToast(message, {
       color: 'warning',
       duration,
-      icon: 'warning-outline'
+      icon: warningOutline
     })
   }
 
@@ -47,7 +54,7 @@ export const useToast = () => {
     return showToast(message, {
       color: 'tertiary',
       duration,
-      icon: 'information-circle-outline'
+      icon: informationCircleOutline
     })
   }
 
@@ -69,7 +76,7 @@ export const useToast = () => {
     return showToast(message, {
       duration: 0,
       color: 'medium',
-      icon: 'hourglass-outline'
+      icon: hourglassOutline
     })
   }
 

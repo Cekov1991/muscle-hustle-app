@@ -21,8 +21,89 @@
         <p>Loading workout...</p>
       </div>
 
-      <!-- Form -->
-      <form v-else @submit.prevent="handleSave">
+      <!-- Workout Summary Card -->
+      <div v-else class="workout-summary-card">
+        <div class="summary-header">
+          <div class="summary-icons-left">
+            <ion-button fill="clear" size="medium">
+              <ion-icon :icon="informationCircleOutline" />
+            </ion-button>
+            <ion-button fill="clear" size="medium">
+              <ion-icon :icon="shareOutline" />
+            </ion-button>
+          </div>
+          <ion-button fill="clear" size="medium">
+            <ion-icon :icon="ellipsisVertical" />
+          </ion-button>
+        </div>
+        <div class="summary-content">
+          <h1 class="workout-title">{{ formData.name || 'New Workout' }}</h1>
+          <p class="workout-meta">{{ workoutMeta }}</p>
+        </div>
+      </div>
+
+      <!-- Exercises Section -->
+      <div class="exercises-section">
+        <div class="section-header">
+          <h2>Exercises</h2>
+          <ion-button 
+            size="small" 
+            @click="showExerciseSelection = true"
+            :disabled="loading"
+          >
+            <ion-icon :icon="addOutline" slot="start" />
+            Add Exercise
+          </ion-button>
+        </div>
+
+        <!-- Exercises List -->
+        <div v-if="workoutExercises.length === 0" class="empty-exercises">
+          <ion-icon :icon="barbellOutline" />
+          <p>No exercises added yet</p>
+          <ion-button 
+            size="small" 
+            fill="outline"
+            @click="showExerciseSelection = true"
+          >
+            Add First Exercise
+          </ion-button>
+        </div>
+
+        <div v-else class="exercises-list">
+          <ion-card 
+            v-for="(exercise, index) in sortedExercises" 
+            :key="`${exercise.id}-${index}`"
+            class="exercise-card-compact"
+          >
+            <ion-card-content>
+              <div class="exercise-row">
+                <!-- Muscle Group Icon -->
+                <MuscleGroupIcon :category="exercise.category" />
+                
+                <!-- Exercise Info -->
+                <div class="exercise-info">
+                  <h3>{{ exercise.name }}</h3>
+                  <p class="exercise-sets-reps">
+                    {{ formatSetsReps(exercise.pivot) }}
+                  </p>
+                </div>
+                
+                <!-- Three-dot Menu -->
+                <ion-button 
+                  fill="clear" 
+                  size="small"
+                  @click="showExerciseMenu(exercise)"
+                >
+                  <ion-icon :icon="ellipsisVertical" slot="icon-only" />
+                </ion-button>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </div>
+
+      <!-- Form for editing (hidden by default, can be shown with edit button) -->
+      <form @submit.prevent="handleSave" style="display: none;" ref="editForm">
         <ion-list>
           <!-- Workout Name -->
           <ion-item>
@@ -66,102 +147,7 @@
           </ion-item>
         </ion-list>
 
-        <!-- Exercises Section -->
-        <div class="exercises-section">
-          <div class="section-header">
-            <h2>Exercises</h2>
-            <ion-button 
-              size="small" 
-              @click="showExerciseSelection = true"
-              :disabled="loading"
-            >
-              <ion-icon :icon="addOutline" slot="start" />
-              Add Exercise
-            </ion-button>
-          </div>
-
-          <!-- Exercises List -->
-          <div v-if="workoutExercises.length === 0" class="empty-exercises">
-            <ion-icon :icon="barbellOutline" />
-            <p>No exercises added yet</p>
-            <ion-button 
-              size="small" 
-              fill="outline"
-              @click="showExerciseSelection = true"
-            >
-              Add First Exercise
-            </ion-button>
-          </div>
-
-          <ion-reorder-group 
-            v-else
-            :disabled="loading"
-            @ionItemReorder="handleReorder"
-          >
-            <ion-card 
-              v-for="(exercise, index) in sortedExercises" 
-              :key="`${exercise.id}-${index}`"
-              class="exercise-card"
-            >
-              <ion-card-content>
-                <div class="exercise-header">
-                  <div class="exercise-info">
-                    <h3>{{ exercise.name }}</h3>
-                    <p v-if="exercise.category" class="exercise-category">
-                      {{ exercise.category.name }}
-                    </p>
-                  </div>
-                  <ion-reorder slot="end"></ion-reorder>
-                </div>
-
-                <div class="exercise-details">
-                  <div class="detail-item">
-                    <span class="detail-label">Sets:</span>
-                    <span class="detail-value">{{ exercise.pivot?.target_sets || 'N/A' }}</span>
-                  </div>
-                  <div class="detail-item">
-                    <span class="detail-label">Reps:</span>
-                    <span class="detail-value">{{ exercise.pivot?.target_reps || 'N/A' }}</span>
-                  </div>
-                  <div class="detail-item">
-                    <span class="detail-label">Weight:</span>
-                    <span class="detail-value">
-                      {{ formatWeight(exercise.pivot?.target_weight) }}
-                    </span>
-                  </div>
-                  <div class="detail-item">
-                    <span class="detail-label">Rest:</span>
-                    <span class="detail-value">
-                      {{ formatRestTime(exercise.pivot?.rest_seconds) }}
-                    </span>
-                  </div>
-                </div>
-
-                <div class="exercise-actions">
-                  <ion-button 
-                    fill="clear" 
-                    size="small"
-                    @click="handleEditExercise(exercise)"
-                  >
-                    <ion-icon :icon="createOutline" slot="start" />
-                    Edit
-                  </ion-button>
-                  <ion-button 
-                    fill="clear" 
-                    size="small"
-                    color="danger"
-                    @click="handleRemoveExercise(exercise)"
-                  >
-                    <ion-icon :icon="trashOutline" slot="start" />
-                    Remove
-                  </ion-button>
-                </div>
-              </ion-card-content>
-            </ion-card>
-          </ion-reorder-group>
-        </div>
-
-        <!-- Action Buttons -->
+        <!-- Action Buttons (only show when in edit mode) -->
         <div class="action-buttons">
           <ion-button
             expand="block"
@@ -201,6 +187,14 @@
       @close="handleExerciseFormClose"
       @submit="handleExerciseFormSubmit"
     />
+
+    <!-- Exercise Menu Action Sheet -->
+    <ion-action-sheet
+      :is-open="showActionSheet"
+      header="Exercise Actions"
+      :buttons="actionSheetButtons"
+      @didDismiss="showActionSheet = false"
+    ></ion-action-sheet>
   </ion-page>
 </template>
 
@@ -224,23 +218,26 @@ import {
   IonSelectOption,
   IonCard,
   IonCardContent,
-  IonReorder,
-  IonReorderGroup,
-  IonSpinner
+  IonSpinner,
+  IonActionSheet
 } from '@ionic/vue'
 import {
   checkmarkOutline,
   addOutline,
   barbellOutline,
   createOutline,
-  trashOutline
+  trashOutline,
+  ellipsisVertical,
+  informationCircleOutline,
+  shareOutline
 } from 'ionicons/icons'
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useWorkouts } from '../composables/useWorkouts'
-import { formatWeight, formatRestTime, getPivotId } from '../utils/workoutHelpers'
+import { formatWeight, formatRestTime, getPivotId, formatSetsReps } from '../utils/workoutHelpers'
 import ExerciseSelectionModal from '../components/ExerciseSelectionModal.vue'
 import ExerciseFormModal from '../components/ExerciseFormModal.vue'
+import MuscleGroupIcon from '../../../shared/components/MuscleGroupIcon.vue'
 
 export default {
   name: 'WorkoutForm',
@@ -263,11 +260,11 @@ export default {
     IonSelectOption,
     IonCard,
     IonCardContent,
-    IonReorder,
-    IonReorderGroup,
     IonSpinner,
+    IonActionSheet,
     ExerciseSelectionModal,
-    ExerciseFormModal
+    ExerciseFormModal,
+    MuscleGroupIcon
   },
   setup() {
     console.log('WorkoutForm component loaded')
@@ -282,8 +279,7 @@ export default {
       fetchExercises,
       addExerciseToWorkout,
       updateExerciseInWorkout,
-      removeExerciseFromWorkout,
-      reorderExercises
+      removeExerciseFromWorkout
     } = useWorkouts()
 
     const workoutId = computed(() => route.params.id ? parseInt(route.params.id) : null)
@@ -293,6 +289,13 @@ export default {
     const showExerciseForm = ref(false)
     const selectedExercise = ref(null)
     const currentWorkout = ref(null)
+    const showActionSheet = ref(false)
+    const menuExercise = ref(null)
+    
+    // Workout meta info for display
+    const workoutMeta = computed(() => {
+      return formData.value.description || 'New Workout'
+    })
 
     // Form data
     const formData = ref({
@@ -391,6 +394,40 @@ export default {
       router.back()
     }
 
+    // Show exercise menu
+    const showExerciseMenu = (exercise) => {
+      menuExercise.value = exercise
+      showActionSheet.value = true
+    }
+
+    // Action sheet buttons
+    const actionSheetButtons = computed(() => [
+      {
+        text: 'Edit',
+        icon: createOutline,
+        handler: () => {
+          if (menuExercise.value) {
+            selectedExercise.value = menuExercise.value
+            showExerciseForm.value = true
+          }
+        }
+      },
+      {
+        text: 'Remove',
+        icon: trashOutline,
+        role: 'destructive',
+        handler: async () => {
+          if (menuExercise.value) {
+            await handleRemoveExercise(menuExercise.value)
+          }
+        }
+      },
+      {
+        text: 'Cancel',
+        role: 'cancel'
+      }
+    ])
+
     // Handle exercise selected from modal
     const handleExerciseSelected = async (exercise) => {
       // Store the selected exercise (for adding new exercise to workout)
@@ -421,7 +458,7 @@ export default {
             workoutExercises.value = updated.exercises || []
           }
         } else {
-          if (selectedExercise.value) {
+          if (selectedExercise.value && selectedExercise.value.pivot) {
             // Edit mode - update existing exercise
             // Use the pivot ID (WorkoutTemplateExercise record ID)
             const pivotId = getPivotId(selectedExercise.value)
@@ -477,47 +514,6 @@ export default {
       }
     }
 
-    // Handle reorder
-    const handleReorder = async (event) => {
-      const templateId = isEditMode.value ? workoutId.value : currentWorkout.value?.id
-
-      if (!templateId) {
-        // If workout not saved yet, just reorder locally
-        const item = workoutExercises.value.splice(event.detail.from, 1)[0]
-        workoutExercises.value.splice(event.detail.to, 0, item)
-        event.detail.complete()
-        return
-      }
-
-      try {
-        // Reorder locally first for immediate feedback
-        const item = workoutExercises.value.splice(event.detail.from, 1)[0]
-        workoutExercises.value.splice(event.detail.to, 0, item)
-        event.detail.complete()
-
-        // Get pivot IDs in new order
-        const orderArray = sortedExercises.value.map(ex => {
-          const pivotId = getPivotId(ex)
-          if (!pivotId) {
-            console.warn('Exercise missing pivot ID, skipping:', ex)
-            return null
-          }
-          return pivotId
-        }).filter(id => id !== null) // Remove any null values
-
-        await reorderExercises(templateId, orderArray)
-        
-        // Refresh workout to get updated exercises
-        const updated = await fetchWorkout(templateId)
-        workoutExercises.value = updated.exercises || []
-      } catch (error) {
-        // Error already handled in composable
-        // Revert on error
-        const updated = await fetchWorkout(templateId)
-        workoutExercises.value = updated.exercises || []
-      }
-    }
-
     // Initialize on mount
     onMounted(() => {
       console.log('WorkoutForm onMounted called')
@@ -536,6 +532,9 @@ export default {
       showExerciseSelection,
       showExerciseForm,
       selectedExercise,
+      showActionSheet,
+      actionSheetButtons,
+      workoutMeta,
       handleSave,
       handleCancel,
       handleExerciseSelected,
@@ -543,15 +542,19 @@ export default {
       handleExerciseFormSubmit,
       handleEditExercise,
       handleRemoveExercise,
-      handleReorder,
+      showExerciseMenu,
       formatWeight,
       formatRestTime,
+      formatSetsReps,
       // Icons
       checkmarkOutline,
       addOutline,
       barbellOutline,
       createOutline,
-      trashOutline
+      trashOutline,
+      ellipsisVertical,
+      informationCircleOutline,
+      shareOutline
     }
   }
 }
@@ -617,6 +620,77 @@ ion-item {
   margin-bottom: 1rem;
 }
 
+/* Workout Summary Card */
+.workout-summary-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.workout-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--ion-color-dark);
+  line-height: 1.2;
+}
+
+.workout-meta {
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+/* Exercises List Container */
+.exercises-list {
+  margin-bottom: 1rem;
+}
+
+/* Compact Exercise Cards */
+.exercise-card-compact {
+  margin-bottom: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.exercise-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.exercise-info {
+  flex: 1;
+  min-width: 0; /* Allow text to truncate */
+}
+
+.exercise-info h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ion-color-dark);
+  line-height: 1.2;
+}
+
+.exercise-sets-reps {
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: 0.875rem;
+  line-height: 1.2;
+}
+
+/* Legacy styles for any remaining detailed cards */
 .exercise-card {
   margin-bottom: 1rem;
 }
@@ -626,13 +700,6 @@ ion-item {
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 1rem;
-}
-
-.exercise-info h3 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--ion-color-dark);
 }
 
 .exercise-category {

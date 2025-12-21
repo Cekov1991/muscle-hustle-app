@@ -58,3 +58,20 @@ export const getPivotId = (exercise) => {
   return exercise.pivot.id
 }
 
+/**
+ * Format sets and reps for compact display
+ * @param {object} pivot - Exercise pivot data
+ * @returns {string} Formatted string (e.g., "3 sets x 6-8 reps")
+ */
+export const formatSetsReps = (pivot) => {
+  if (!pivot) return 'No sets/reps'
+  
+  const sets = pivot.target_sets || 0
+  const reps = pivot.target_reps || ''
+  
+  if (!sets) return 'No sets/reps'
+  if (!reps) return `${sets} sets`
+  
+  return `${sets} sets x ${reps} reps`
+}
+
