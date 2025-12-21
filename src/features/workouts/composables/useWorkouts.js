@@ -170,90 +170,66 @@ export const useWorkouts = () => {
     }
   }
 
-  // Add exercise to workout template
-  const addExerciseToWorkout = async (templateId, exerciseData) => {
+  // Helper function to update workout in local state
+  const updateWorkoutInState = (templateId, updatedWorkout) => {
+    const index = workoutsState.workouts.findIndex(w => w.id === templateId)
+    if (index !== -1) {
+      workoutsState.workouts[index] = updatedWorkout
+    }
+  }
+
+  // Generic exercise operation handler
+  const handleExerciseOperation = async (operation, templateId, exerciseId = null, data = null, successMessage = 'Operation completed') => {
     workoutsState.loading = true
     workoutsState.error = null
     
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/workout-templates/${templateId}/exercises`,
-        exerciseData
-      )
-      const updatedWorkout = response.data.data
+      let response
+      const baseUrl = `${API_BASE_URL}/workout-templates/${templateId}/exercises`
       
-      // Update workout in local state
-      const index = workoutsState.workouts.findIndex(w => w.id === templateId)
-      if (index !== -1) {
-        workoutsState.workouts[index] = updatedWorkout
+      switch (operation) {
+        case 'add':
+          response = await axios.post(baseUrl, data)
+          break
+        case 'update':
+          response = await axios.put(`${baseUrl}/${exerciseId}`, data)
+          break
+        case 'remove':
+          response = await axios.delete(`${baseUrl}/${exerciseId}`)
+          break
+        default:
+          throw new Error(`Unknown operation: ${operation}`)
       }
       
-      showSuccess('Exercise added successfully')
+      const updatedWorkout = response.data.data
+      updateWorkoutInState(templateId, updatedWorkout)
+      showSuccess(successMessage)
       return updatedWorkout
     } catch (error) {
       workoutsState.error = error
-      handleError(error, 'Failed to add exercise')
+      const errorMessage = operation === 'add' ? 'Failed to add exercise' 
+        : operation === 'update' ? 'Failed to update exercise'
+        : 'Failed to remove exercise'
+      handleError(error, errorMessage)
       throw error
     } finally {
       workoutsState.loading = false
     }
+  }
+
+  // Add exercise to workout template
+  const addExerciseToWorkout = async (templateId, exerciseData) => {
+    return await handleExerciseOperation('add', templateId, null, exerciseData, 'Exercise added successfully')
   }
 
   // Update exercise in workout template
   const updateExerciseInWorkout = async (templateId, exerciseId, data) => {
-    workoutsState.loading = true
-    workoutsState.error = null
-    
-    try {
-      const response = await axios.put(
-        `${API_BASE_URL}/workout-templates/${templateId}/exercises/${exerciseId}`,
-        data
-      )
-      const updatedWorkout = response.data.data
-      
-      // Update workout in local state
-      const index = workoutsState.workouts.findIndex(w => w.id === templateId)
-      if (index !== -1) {
-        workoutsState.workouts[index] = updatedWorkout
-      }
-      
-      showSuccess('Exercise updated successfully')
-      return updatedWorkout
-    } catch (error) {
-      workoutsState.error = error
-      handleError(error, 'Failed to update exercise')
-      throw error
-    } finally {
-      workoutsState.loading = false
-    }
+    return await handleExerciseOperation('update', templateId, exerciseId, data, 'Exercise updated successfully')
   }
 
   // Remove exercise from workout template
   const removeExerciseFromWorkout = async (templateId, exerciseId) => {
-    workoutsState.loading = true
-    workoutsState.error = null
-    
-    try {
-      const response = await axios.delete(
-        `${API_BASE_URL}/workout-templates/${templateId}/exercises/${exerciseId}`
-      )
-      const updatedWorkout = response.data.data
-      
-      // Update workout in local state
-      const index = workoutsState.workouts.findIndex(w => w.id === templateId)
-      if (index !== -1) {
-        workoutsState.workouts[index] = updatedWorkout
-      }
-      
-      showSuccess('Exercise removed successfully')
-      return updatedWorkout
-    } catch (error) {
-      workoutsState.error = error
-      handleError(error, 'Failed to remove exercise')
-      throw error
-    } finally {
-      workoutsState.loading = false
-    }
+    return await handleExerciseOperation('remove', templateId, exerciseId, null, 'Exercise removed successfully')
   }
 
   // Reorder exercises in workout template

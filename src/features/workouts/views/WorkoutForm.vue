@@ -22,179 +22,43 @@
       </div>
 
       <!-- Workout Summary Card -->
-      <div v-else class="workout-summary-card">
-        <div class="summary-header">
-          <div class="summary-icons-left">
-            <ion-button fill="clear" size="medium">
-              <ion-icon :icon="informationCircleOutline" />
-            </ion-button>
-            <ion-button fill="clear" size="medium">
-              <ion-icon :icon="shareOutline" />
-            </ion-button>
-          </div>
-          <ion-button fill="clear" size="medium">
-            <ion-icon :icon="ellipsisVertical" />
-          </ion-button>
-        </div>
-        <div class="summary-content">
-          <h1 class="workout-title">{{ formData.name || 'New Workout' }}</h1>
-          <p class="workout-meta">{{ workoutMeta }}</p>
-        </div>
-      </div>
+      <WorkoutSummaryCard 
+        v-if="!initialLoading && !editMode"
+        :workout="{ ...currentWorkout, ...formData }"
+        @show-menu="handleShowWorkoutMenu"
+      />
+
+      <!-- Workout Details Form -->
+      <WorkoutDetailsForm
+        v-if="!initialLoading && editMode"
+        v-model="formData"
+        :loading="loading"
+        :is-edit-mode="isEditMode"
+        :is-valid="isFormValid"
+        @submit="handleSave"
+        @cancel="handleCancel"
+      />
 
       <!-- Exercises Section -->
-      <div class="exercises-section">
-        <div class="section-header">
-          <h2>Exercises</h2>
-          <ion-button 
-            size="small" 
-            @click="showExerciseSelection = true"
-            :disabled="loading"
-          >
-            <ion-icon :icon="addOutline" slot="start" />
-            Add Exercise
-          </ion-button>
-        </div>
-
-        <!-- Exercises List -->
-        <div v-if="workoutExercises.length === 0" class="empty-exercises">
-          <ion-icon :icon="barbellOutline" />
-          <p>No exercises added yet</p>
-          <ion-button 
-            size="small" 
-            fill="outline"
-            @click="showExerciseSelection = true"
-          >
-            Add First Exercise
-          </ion-button>
-        </div>
-
-        <div v-else class="exercises-list">
-          <ion-card 
-            v-for="(exercise, index) in sortedExercises" 
-            :key="`${exercise.id}-${index}`"
-            class="exercise-card-compact"
-          >
-            <ion-card-content>
-              <div class="exercise-row">
-                <!-- Muscle Group Icon -->
-                <MuscleGroupIcon :category="exercise.category" />
-                
-                <!-- Exercise Info -->
-                <div class="exercise-info">
-                  <h3>{{ exercise.name }}</h3>
-                  <p class="exercise-sets-reps">
-                    {{ formatSetsReps(exercise.pivot) }}
-                  </p>
-                </div>
-                
-                <!-- Three-dot Menu -->
-                <ion-button 
-                  fill="clear" 
-                  size="small"
-                  @click="showExerciseMenu(exercise)"
-                >
-                  <ion-icon :icon="ellipsisVertical" slot="icon-only" />
-                </ion-button>
-              </div>
-            </ion-card-content>
-          </ion-card>
-        </div>
-      </div>
-
-      <!-- Form for editing (hidden by default, can be shown with edit button) -->
-      <form @submit.prevent="handleSave" style="display: none;" ref="editForm">
-        <ion-list>
-          <!-- Workout Name -->
-          <ion-item>
-            <ion-label position="stacked">Workout Name *</ion-label>
-            <ion-input
-              v-model="formData.name"
-              placeholder="e.g., Push Day"
-              :disabled="loading"
-              required
-            ></ion-input>
-          </ion-item>
-
-          <!-- Description -->
-          <ion-item>
-            <ion-label position="stacked">Description</ion-label>
-            <ion-textarea
-              v-model="formData.description"
-              placeholder="Optional description"
-              rows="3"
-              :disabled="loading"
-            ></ion-textarea>
-          </ion-item>
-
-          <!-- Day of Week -->
-          <ion-item>
-            <ion-label position="stacked">Day of Week</ion-label>
-            <ion-select
-              v-model="formData.day_of_week"
-              placeholder="Select day (optional)"
-              :disabled="loading"
-            >
-              <ion-select-option :value="null">None</ion-select-option>
-              <ion-select-option :value="0">Sunday</ion-select-option>
-              <ion-select-option :value="1">Monday</ion-select-option>
-              <ion-select-option :value="2">Tuesday</ion-select-option>
-              <ion-select-option :value="3">Wednesday</ion-select-option>
-              <ion-select-option :value="4">Thursday</ion-select-option>
-              <ion-select-option :value="5">Friday</ion-select-option>
-              <ion-select-option :value="6">Saturday</ion-select-option>
-            </ion-select>
-          </ion-item>
-        </ion-list>
-
-        <!-- Action Buttons (only show when in edit mode) -->
-        <div class="action-buttons">
-          <ion-button
-            expand="block"
-            type="submit"
-            :disabled="loading || !isFormValid"
-          >
-            <ion-spinner v-if="loading" name="crescent" slot="start" />
-            <ion-icon v-else :icon="checkmarkOutline" slot="start" />
-            {{ isEditMode ? 'Update' : 'Create' }} Workout
-          </ion-button>
-          
-          <ion-button
-            expand="block"
-            fill="outline"
-            @click="handleCancel"
-            :disabled="loading"
-          >
-            Cancel
-          </ion-button>
-        </div>
-      </form>
+      <WorkoutExercisesList
+        v-if="!initialLoading"
+        :exercises="workoutExercises"
+        :loading="loading"
+        @add-exercise="exerciseModalsRef?.openSelection"
+        @show-exercise-menu="exerciseModalsRef?.showExerciseMenu"
+      />
     </ion-content>
 
-    <!-- Exercise Selection Modal -->
-    <ExerciseSelectionModal
-      :is-open="showExerciseSelection"
-      :exclude-exercise-ids="workoutExercises.map(ex => ex.id)"
-      @close="showExerciseSelection = false"
-      @select="handleExerciseSelected"
-    />
-
-    <!-- Exercise Form Modal -->
-    <ExerciseFormModal
-      :is-open="showExerciseForm"
-      :exercise="selectedExercise"
+    <!-- Exercise Modals -->
+    <ExerciseModals
+      ref="exerciseModalsRef"
+      :workout-id="workoutId"
+      :current-workout="currentWorkout"
+      :workout-exercises="workoutExercises"
       :available-exercises="availableExercises"
-      @close="handleExerciseFormClose"
-      @submit="handleExerciseFormSubmit"
+      :exclude-exercise-ids="workoutExercises.map(ex => ex.id)"
+      @exercise-updated="handleExerciseUpdated"
     />
-
-    <!-- Exercise Menu Action Sheet -->
-    <ion-action-sheet
-      :is-open="showActionSheet"
-      header="Exercise Actions"
-      :buttons="actionSheetButtons"
-      @didDismiss="showActionSheet = false"
-    ></ion-action-sheet>
   </ion-page>
 </template>
 
@@ -209,35 +73,19 @@ import {
   IonButtons,
   IonIcon,
   IonBackButton,
-  IonList,
-  IonItem,
-  IonLabel,
-  IonInput,
-  IonTextarea,
-  IonSelect,
-  IonSelectOption,
-  IonCard,
-  IonCardContent,
-  IonSpinner,
-  IonActionSheet
+  IonSpinner
 } from '@ionic/vue'
 import {
-  checkmarkOutline,
-  addOutline,
-  barbellOutline,
-  createOutline,
-  trashOutline,
-  ellipsisVertical,
-  informationCircleOutline,
-  shareOutline
+  checkmarkOutline
 } from 'ionicons/icons'
 import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useWorkouts } from '../composables/useWorkouts'
-import { formatWeight, formatRestTime, getPivotId, formatSetsReps } from '../utils/workoutHelpers'
-import ExerciseSelectionModal from '../components/ExerciseSelectionModal.vue'
-import ExerciseFormModal from '../components/ExerciseFormModal.vue'
-import MuscleGroupIcon from '../../../shared/components/MuscleGroupIcon.vue'
+import { useWorkoutForm } from '../composables/useWorkoutForm'
+import WorkoutSummaryCard from '../components/WorkoutSummaryCard.vue'
+import WorkoutDetailsForm from '../components/WorkoutDetailsForm.vue'
+import WorkoutExercisesList from '../components/WorkoutExercisesList.vue'
+import ExerciseModals from '../components/ExerciseModals.vue'
 
 export default {
   name: 'WorkoutForm',
@@ -251,82 +99,43 @@ export default {
     IonButtons,
     IonIcon,
     IonBackButton,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonInput,
-    IonTextarea,
-    IonSelect,
-    IonSelectOption,
-    IonCard,
-    IonCardContent,
     IonSpinner,
-    IonActionSheet,
-    ExerciseSelectionModal,
-    ExerciseFormModal,
-    MuscleGroupIcon
+    WorkoutSummaryCard,
+    WorkoutDetailsForm,
+    WorkoutExercisesList,
+    ExerciseModals
   },
   setup() {
     console.log('WorkoutForm component loaded')
     const route = useRoute()
-    const router = useRouter()
-    const {
-      exercises,
-      loading,
-      fetchWorkout,
-      createWorkout,
-      updateWorkout,
-      fetchExercises,
-      addExerciseToWorkout,
-      updateExerciseInWorkout,
-      removeExerciseFromWorkout
-    } = useWorkouts()
-
-    const workoutId = computed(() => route.params.id ? parseInt(route.params.id) : null)
-    const isEditMode = computed(() => !!workoutId.value)
-    const initialLoading = ref(true)
-    const showExerciseSelection = ref(false)
-    const showExerciseForm = ref(false)
-    const selectedExercise = ref(null)
-    const currentWorkout = ref(null)
-    const showActionSheet = ref(false)
-    const menuExercise = ref(null)
+    const { exercises, loading, fetchExercises, fetchWorkout } = useWorkouts()
     
-    // Workout meta info for display
-    const workoutMeta = computed(() => {
-      return formData.value.description || 'New Workout'
-    })
-
-    // Form data
-    const formData = ref({
-      name: '',
-      description: '',
-      day_of_week: null
-    })
+    const workoutId = computed(() => route.params.id ? parseInt(route.params.id) : null)
+    
+    // Use workout form composable
+    const {
+      editMode,
+      initialLoading,
+      currentWorkout,
+      formData,
+      isEditMode,
+      isFormValid,
+      initializeForm,
+      saveWorkout,
+      cancelForm
+    } = useWorkoutForm(workoutId)
 
     // Workout exercises
     const workoutExercises = ref([])
+    
+    // Exercise modals ref
+    const exerciseModalsRef = ref(null)
 
     // Available exercises for selection
     const availableExercises = computed(() => exercises?.value || [])
 
-    // Sorted exercises by order
-    const sortedExercises = computed(() => {
-      return [...workoutExercises.value].sort((a, b) => {
-        const orderA = a.pivot?.order || 0
-        const orderB = b.pivot?.order || 0
-        return orderA - orderB
-      })
-    })
-
-    // Form validation
-    const isFormValid = computed(() => {
-      return formData.value.name.trim().length > 0
-    })
-
-    // Initialize form
-    const initializeForm = async () => {
-      console.log('initializeForm called, isEditMode:', isEditMode.value)
+    // Initialize form and fetch data
+    const initialize = async () => {
       initialLoading.value = true
 
       try {
@@ -337,224 +146,89 @@ export default {
           console.log('Exercises fetched:', exercises?.value?.length || 0)
         }
 
-        // If edit mode, fetch workout data
-        if (isEditMode.value) {
-          console.log('Edit mode: fetching workout', workoutId.value)
-          const workout = await fetchWorkout(workoutId.value)
-          currentWorkout.value = workout
-          
-          formData.value = {
-            name: workout.name || '',
-            description: workout.description || '',
-            day_of_week: workout.day_of_week
-          }
-          
-          workoutExercises.value = workout.exercises || []
-        } else {
-          console.log('Create mode: no workout to fetch')
+        // Initialize form data and fetch workout if editing
+        await initializeForm()
+        
+        // Set workout exercises if we have a current workout
+        if (currentWorkout.value) {
+          workoutExercises.value = currentWorkout.value.exercises || []
         }
       } catch (error) {
-        // Error already handled in composable
-        console.error('InitializeForm error:', error)
-        console.log('Navigating back due to error')
-        router.back()
+        console.error('Initialize error:', error)
       } finally {
-        console.log('initializeForm completed')
         initialLoading.value = false
       }
     }
 
     // Handle save
     const handleSave = async () => {
-      if (!isFormValid.value) return
-
       try {
-        const data = {
-          name: formData.value.name.trim(),
-          description: formData.value.description.trim() || null,
-          day_of_week: formData.value.day_of_week
-        }
-
-        if (isEditMode.value) {
-          await updateWorkout(workoutId.value, data)
-        } else {
-          const newWorkout = await createWorkout(data)
-          // Navigate to edit mode for the new workout
-          router.replace(`/tabs/workouts/${newWorkout.id}/edit`)
-          currentWorkout.value = newWorkout
-          workoutExercises.value = newWorkout.exercises || []
+        const result = await saveWorkout()
+        if (result) {
+          currentWorkout.value = result
+          workoutExercises.value = result.exercises || []
+          editMode.value = false
         }
       } catch (error) {
-        // Error already handled in composable
+        console.error('Save error:', error)
       }
     }
 
     // Handle cancel
     const handleCancel = () => {
-      router.back()
-    }
-
-    // Show exercise menu
-    const showExerciseMenu = (exercise) => {
-      menuExercise.value = exercise
-      showActionSheet.value = true
-    }
-
-    // Action sheet buttons
-    const actionSheetButtons = computed(() => [
-      {
-        text: 'Edit',
-        icon: createOutline,
-        handler: () => {
-          if (menuExercise.value) {
-            selectedExercise.value = menuExercise.value
-            showExerciseForm.value = true
-          }
-        }
-      },
-      {
-        text: 'Remove',
-        icon: trashOutline,
-        role: 'destructive',
-        handler: async () => {
-          if (menuExercise.value) {
-            await handleRemoveExercise(menuExercise.value)
-          }
-        }
-      },
-      {
-        text: 'Cancel',
-        role: 'cancel'
+      if (editMode.value) {
+        editMode.value = false
+      } else {
+        cancelForm()
       }
-    ])
-
-    // Handle exercise selected from modal
-    const handleExerciseSelected = async (exercise) => {
-      // Store the selected exercise (for adding new exercise to workout)
-      selectedExercise.value = exercise
-      showExerciseSelection.value = false
-      showExerciseForm.value = true
     }
 
-    // Handle exercise form close
-    const handleExerciseFormClose = () => {
-      showExerciseForm.value = false
-      selectedExercise.value = null
+    // Handle workout menu
+    const handleShowWorkoutMenu = () => {
+      editMode.value = true
     }
 
-    // Handle exercise form submit
-    const handleExerciseFormSubmit = async (exerciseData) => {
-      try {
-        const templateId = isEditMode.value ? workoutId.value : currentWorkout.value?.id
-
-        if (!templateId) {
-          // If creating new workout, save it first
-          await handleSave()
-          // After save, currentWorkout should be set, try again
-          if (currentWorkout.value?.id) {
-            await addExerciseToWorkout(currentWorkout.value.id, exerciseData)
-            // Refresh workout to get updated exercises
-            const updated = await fetchWorkout(currentWorkout.value.id)
-            workoutExercises.value = updated.exercises || []
-          }
-        } else {
-          if (selectedExercise.value && selectedExercise.value.pivot) {
-            // Edit mode - update existing exercise
-            // Use the pivot ID (WorkoutTemplateExercise record ID)
-            const pivotId = getPivotId(selectedExercise.value)
-            if (!pivotId) {
-              throw new Error('Cannot update exercise: pivot ID not found')
-            }
-            await updateExerciseInWorkout(templateId, pivotId, exerciseData)
-          } else {
-            // Add mode - add new exercise
-            await addExerciseToWorkout(templateId, exerciseData)
-          }
-          
-          // Refresh workout to get updated exercises
-          const updated = await fetchWorkout(templateId)
+    // Handle exercise updated
+    const handleExerciseUpdated = async () => {
+      // Refresh workout to get updated exercises
+      if (currentWorkout.value?.id) {
+        try {
+          const updated = await fetchWorkout(currentWorkout.value.id)
           workoutExercises.value = updated.exercises || []
+        } catch (error) {
+          console.error('Error refreshing workout:', error)
         }
-      } catch (error) {
-        // Error already handled in composable
-      } finally {
-        handleExerciseFormClose()
-      }
-    }
-
-    // Handle edit exercise
-    const handleEditExercise = (exercise) => {
-      selectedExercise.value = exercise
-      showExerciseForm.value = true
-    }
-
-    // Handle remove exercise
-    const handleRemoveExercise = async (exercise) => {
-      const templateId = isEditMode.value ? workoutId.value : currentWorkout.value?.id
-
-      if (!templateId) {
-        // If workout not saved yet, just remove from local array
-        workoutExercises.value = workoutExercises.value.filter(ex => ex.id !== exercise.id)
-        return
-      }
-
-      try {
-        // Use the pivot ID (WorkoutTemplateExercise record ID)
-        const pivotId = getPivotId(exercise)
-        if (!pivotId) {
-          throw new Error('Cannot remove exercise: pivot ID not found')
-        }
-        await removeExerciseFromWorkout(templateId, pivotId)
-        
-        // Refresh workout to get updated exercises
-        const updated = await fetchWorkout(templateId)
-        workoutExercises.value = updated.exercises || []
-      } catch (error) {
-        // Error already handled in composable
       }
     }
 
     // Initialize on mount
     onMounted(() => {
       console.log('WorkoutForm onMounted called')
-      initializeForm()
+      initialize()
     })
 
     return {
+      // State
       loading,
       initialLoading,
       isEditMode,
+      editMode,
       formData,
       workoutExercises,
       availableExercises,
-      sortedExercises,
+      currentWorkout,
       isFormValid,
-      showExerciseSelection,
-      showExerciseForm,
-      selectedExercise,
-      showActionSheet,
-      actionSheetButtons,
-      workoutMeta,
+      exerciseModalsRef,
+      workoutId,
+      
+      // Methods
       handleSave,
       handleCancel,
-      handleExerciseSelected,
-      handleExerciseFormClose,
-      handleExerciseFormSubmit,
-      handleEditExercise,
-      handleRemoveExercise,
-      showExerciseMenu,
-      formatWeight,
-      formatRestTime,
-      formatSetsReps,
+      handleShowWorkoutMenu,
+      handleExerciseUpdated,
+      
       // Icons
-      checkmarkOutline,
-      addOutline,
-      barbellOutline,
-      createOutline,
-      trashOutline,
-      ellipsisVertical,
-      informationCircleOutline,
-      shareOutline
+      checkmarkOutline
     }
   }
 }
@@ -573,191 +247,6 @@ export default {
 .loading-container p {
   margin-top: 1rem;
   color: var(--ion-color-medium);
-}
-
-ion-item {
-  --padding-start: 1rem;
-}
-
-.exercises-section {
-  margin-top: 2rem;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.section-header h2 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--ion-color-dark);
-}
-
-.empty-exercises {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 1rem;
-  text-align: center;
-  background: var(--ion-color-light);
-  border-radius: 12px;
-  margin-bottom: 1rem;
-}
-
-.empty-exercises ion-icon {
-  font-size: 3rem;
-  color: var(--ion-color-medium);
-  margin-bottom: 1rem;
-}
-
-.empty-exercises p {
-  color: var(--ion-color-medium);
-  margin-bottom: 1rem;
-}
-
-/* Workout Summary Card */
-.workout-summary-card {
-  background: white;
-  border-radius: 12px;
-  padding: 1.2rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
-
-.summary-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.workout-title {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--ion-color-dark);
-  line-height: 1.2;
-}
-
-.workout-meta {
-  margin: 0;
-  color: var(--ion-color-medium);
-  font-size: 1rem;
-  line-height: 1.3;
-}
-
-/* Exercises List Container */
-.exercises-list {
-  margin-bottom: 1rem;
-}
-
-/* Compact Exercise Cards */
-.exercise-card-compact {
-  margin-bottom: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.exercise-row {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.5rem 0;
-}
-
-.exercise-info {
-  flex: 1;
-  min-width: 0; /* Allow text to truncate */
-}
-
-.exercise-info h3 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--ion-color-dark);
-  line-height: 1.2;
-}
-
-.exercise-sets-reps {
-  margin: 0;
-  color: var(--ion-color-medium);
-  font-size: 0.875rem;
-  line-height: 1.2;
-}
-
-/* Legacy styles for any remaining detailed cards */
-.exercise-card {
-  margin-bottom: 1rem;
-}
-
-.exercise-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-}
-
-.exercise-category {
-  margin: 0;
-  color: var(--ion-color-medium);
-  font-size: 0.9rem;
-}
-
-.exercise-details {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-  padding: 1rem;
-  background: var(--ion-color-light);
-  border-radius: 8px;
-}
-
-.detail-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.detail-label {
-  font-size: 0.8rem;
-  color: var(--ion-color-medium);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.detail-value {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--ion-color-dark);
-}
-
-.exercise-actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-  border-top: 1px solid var(--ion-color-light-shade);
-  padding-top: 0.75rem;
-}
-
-.action-buttons {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-}
-
-.action-buttons ion-button {
-  margin-bottom: 0.5rem;
-}
-
-@media (max-width: 768px) {
-  .exercise-details {
-    grid-template-columns: 1fr;
-  }
 }
 </style>
 
