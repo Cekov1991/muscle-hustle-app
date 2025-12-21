@@ -1,10 +1,6 @@
 import { ref, reactive, toRefs } from 'vue'
-import axios from 'axios'
-import appConfig from '../../../config/app'
-import { useToast } from '../../../shared/composables/useToast'
-
-// Configuration from app config
-const API_BASE_URL = appConfig.api.baseURL
+import { workoutsAPI } from '../../../shared/services/apiClient'
+import { useApiError } from '../../../shared/composables/useApiError'
 
 // Global state - shared across all components using this composable
 const workoutsState = reactive({
@@ -15,39 +11,7 @@ const workoutsState = reactive({
 })
 
 export const useWorkouts = () => {
-  const { showError, showSuccess } = useToast()
-
-  // Helper function to handle API errors
-  const handleError = (error, defaultMessage = 'An error occurred') => {
-    console.error('Workouts API error:', error)
-    
-    let message = defaultMessage
-    
-    if (error.response?.status === 401) {
-      message = 'Unauthorized. Please log in again.'
-    } else if (error.response?.status === 403) {
-      message = 'You do not have permission to perform this action.'
-    } else if (error.response?.status === 404) {
-      message = 'Resource not found.'
-    } else if (error.response?.status === 422) {
-      const validationErrors = error.response.data?.errors
-      if (validationErrors) {
-        const firstError = Object.values(validationErrors)[0][0]
-        message = firstError
-      } else {
-        message = error.response.data?.message || 'Validation error'
-      }
-    } else if (error.response?.status >= 500) {
-      message = 'Server error. Please try again later.'
-    } else if (error.code === 'NETWORK_ERROR' || !error.response) {
-      message = 'Network error. Please check your connection.'
-    } else if (error.message) {
-      message = error.message
-    }
-    
-    showError(message)
-    throw new Error(message)
-  }
+  const { handleApiError } = useApiError()
 
   // Fetch all workout templates
   const fetchWorkouts = async () => {
@@ -55,7 +19,7 @@ export const useWorkouts = () => {
     workoutsState.error = null
     
     try {
-      const response = await axios.get(`${API_BASE_URL}/workout-templates`)
+      const response = await workoutsAPI.getWorkouts()
       console.log('fetchWorkouts: API response:', response.data)
       workoutsState.workouts = response.data.data || []
       console.log('fetchWorkouts: Set workouts to:', workoutsState.workouts)
@@ -63,7 +27,20 @@ export const useWorkouts = () => {
       return workoutsState.workouts
     } catch (error) {
       workoutsState.error = error
-      handleError(error, 'Failed to fetch workouts')
+      
+      // Check if it's an ngrok error - if so, don't throw and just continue with empty state
+      const isNgrokError = error.message?.includes('ngrok') || 
+                          error.config?.url?.includes('ngrok') ||
+                          error.code === 'ERR_NETWORK' ||
+                          error.message?.includes('ERR_NGROK')
+      
+      if (isNgrokError) {
+        console.warn('Ngrok connectivity issue, showing empty state instead of error')
+        workoutsState.workouts = []
+        return workoutsState.workouts
+      }
+      
+      handleApiError(error, 'workouts', 'Failed to fetch workouts')
       throw error
     } finally {
       workoutsState.loading = false
@@ -76,11 +53,11 @@ export const useWorkouts = () => {
     workoutsState.error = null
     
     try {
-      const response = await axios.get(`${API_BASE_URL}/workout-templates/${id}`)
+      const response = await workoutsAPI.getWorkout(id)
       return response.data.data
     } catch (error) {
       workoutsState.error = error
-      handleError(error, 'Failed to fetch workout')
+      handleApiError(error, 'workouts', 'Failed to fetch workout')
       throw error
     } finally {
       workoutsState.loading = false
@@ -93,17 +70,16 @@ export const useWorkouts = () => {
     workoutsState.error = null
     
     try {
-      const response = await axios.post(`${API_BASE_URL}/workout-templates`, data)
+      const response = await workoutsAPI.createWorkout(data)
       const newWorkout = response.data.data
       
       // Add to local state
       workoutsState.workouts.push(newWorkout)
       
-      showSuccess('Workout created successfully')
       return newWorkout
     } catch (error) {
       workoutsState.error = error
-      handleError(error, 'Failed to create workout')
+      handleApiError(error, 'workouts', 'Failed to create workout')
       throw error
     } finally {
       workoutsState.loading = false
@@ -116,7 +92,7 @@ export const useWorkouts = () => {
     workoutsState.error = null
     
     try {
-      const response = await axios.put(`${API_BASE_URL}/workout-templates/${id}`, data)
+      const response = await workoutsAPI.updateWorkout(id, data)
       const updatedWorkout = response.data.data
       
       // Update in local state
@@ -125,11 +101,10 @@ export const useWorkouts = () => {
         workoutsState.workouts[index] = updatedWorkout
       }
       
-      showSuccess('Workout updated successfully')
       return updatedWorkout
     } catch (error) {
       workoutsState.error = error
-      handleError(error, 'Failed to update workout')
+      handleApiError(error, 'workouts', 'Failed to update workout')
       throw error
     } finally {
       workoutsState.loading = false
@@ -142,16 +117,15 @@ export const useWorkouts = () => {
     workoutsState.error = null
     
     try {
-      await axios.delete(`${API_BASE_URL}/workout-templates/${id}`)
+      await workoutsAPI.deleteWorkout(id)
       
       // Remove from local state
       workoutsState.workouts = workoutsState.workouts.filter(w => w.id !== id)
       
-      showSuccess('Workout deleted successfully')
       return true
     } catch (error) {
       workoutsState.error = error
-      handleError(error, 'Failed to delete workout')
+      handleApiError(error, 'workouts', 'Failed to delete workout')
       throw error
     } finally {
       workoutsState.loading = false
@@ -161,11 +135,11 @@ export const useWorkouts = () => {
   // Fetch all exercises
   const fetchExercises = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/exercises`)
+      const response = await workoutsAPI.getExercises()
       workoutsState.exercises = response.data.data || []
       return workoutsState.exercises
     } catch (error) {
-      handleError(error, 'Failed to fetch exercises')
+      handleApiError(error, 'exercises', 'Failed to fetch exercises')
       throw error
     }
   }
@@ -179,23 +153,22 @@ export const useWorkouts = () => {
   }
 
   // Generic exercise operation handler
-  const handleExerciseOperation = async (operation, templateId, exerciseId = null, data = null, successMessage = 'Operation completed') => {
+  const handleExerciseOperation = async (operation, templateId, exerciseId = null, data = null) => {
     workoutsState.loading = true
     workoutsState.error = null
     
     try {
       let response
-      const baseUrl = `${API_BASE_URL}/workout-templates/${templateId}/exercises`
       
       switch (operation) {
         case 'add':
-          response = await axios.post(baseUrl, data)
+          response = await workoutsAPI.addExerciseToWorkout(templateId, data)
           break
         case 'update':
-          response = await axios.put(`${baseUrl}/${exerciseId}`, data)
+          response = await workoutsAPI.updateExerciseInWorkout(templateId, exerciseId, data)
           break
         case 'remove':
-          response = await axios.delete(`${baseUrl}/${exerciseId}`)
+          response = await workoutsAPI.removeExerciseFromWorkout(templateId, exerciseId)
           break
         default:
           throw new Error(`Unknown operation: ${operation}`)
@@ -203,14 +176,13 @@ export const useWorkouts = () => {
       
       const updatedWorkout = response.data.data
       updateWorkoutInState(templateId, updatedWorkout)
-      showSuccess(successMessage)
       return updatedWorkout
     } catch (error) {
       workoutsState.error = error
       const errorMessage = operation === 'add' ? 'Failed to add exercise' 
         : operation === 'update' ? 'Failed to update exercise'
         : 'Failed to remove exercise'
-      handleError(error, errorMessage)
+      handleApiError(error, 'workouts', errorMessage)
       throw error
     } finally {
       workoutsState.loading = false
@@ -219,17 +191,17 @@ export const useWorkouts = () => {
 
   // Add exercise to workout template
   const addExerciseToWorkout = async (templateId, exerciseData) => {
-    return await handleExerciseOperation('add', templateId, null, exerciseData, 'Exercise added successfully')
+    return await handleExerciseOperation('add', templateId, null, exerciseData)
   }
 
   // Update exercise in workout template
   const updateExerciseInWorkout = async (templateId, exerciseId, data) => {
-    return await handleExerciseOperation('update', templateId, exerciseId, data, 'Exercise updated successfully')
+    return await handleExerciseOperation('update', templateId, exerciseId, data)
   }
 
   // Remove exercise from workout template
   const removeExerciseFromWorkout = async (templateId, exerciseId) => {
-    return await handleExerciseOperation('remove', templateId, exerciseId, null, 'Exercise removed successfully')
+    return await handleExerciseOperation('remove', templateId, exerciseId, null)
   }
 
   // Reorder exercises in workout template
@@ -238,23 +210,16 @@ export const useWorkouts = () => {
     workoutsState.error = null
     
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/workout-templates/${templateId}/order`,
-        { order: orderArray }
-      )
+      const response = await workoutsAPI.reorderExercises(templateId, orderArray)
       const updatedWorkout = response.data.data
       
       // Update workout in local state
-      const index = workoutsState.workouts.findIndex(w => w.id === templateId)
-      if (index !== -1) {
-        workoutsState.workouts[index] = updatedWorkout
-      }
+      updateWorkoutInState(templateId, updatedWorkout)
       
-      showSuccess('Exercise order updated successfully')
       return updatedWorkout
     } catch (error) {
       workoutsState.error = error
-      handleError(error, 'Failed to reorder exercises')
+      handleApiError(error, 'workouts', 'Failed to reorder exercises')
       throw error
     } finally {
       workoutsState.loading = false
@@ -278,4 +243,3 @@ export const useWorkouts = () => {
     reorderExercises
   }
 }
-

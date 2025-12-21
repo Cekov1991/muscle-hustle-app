@@ -21,38 +21,38 @@
           <ion-card-content>
             <form @submit.prevent="handleLogin">
               <ion-item 
-                :class="{ 'ion-invalid': emailError }" 
+                :class="{ 'ion-invalid': hasFieldError('email') }" 
                 fill="outline"
                 class="login-input"
               >
                 <ion-label position="stacked">Email</ion-label>
                 <ion-input
-                  v-model="form.email"
+                  v-model="formData.email"
                   type="email"
                   placeholder="Enter your email"
                   autocomplete="email"
                   :disabled="isLoading"
-                  @ion-blur="validateEmail"
+                  @ion-blur="handleEmailBlur"
                   @ion-input="clearEmailError"
                 />
-                <ion-note v-if="emailError" slot="error" color="danger">
-                  {{ emailError }}
+                <ion-note v-if="getFieldError('email')" slot="error" color="danger">
+                  {{ getFieldError('email') }}
                 </ion-note>
               </ion-item>
               
               <ion-item 
-                :class="{ 'ion-invalid': passwordError }" 
+                :class="{ 'ion-invalid': hasFieldError('password') }" 
                 fill="outline"
                 class="login-input"
               >
                 <ion-label position="stacked">Password</ion-label>
                 <ion-input
-                  v-model="form.password"
+                  v-model="formData.password"
                   :type="showPassword ? 'text' : 'password'"
                   placeholder="Enter your password"
                   autocomplete="current-password"
                   :disabled="isLoading"
-                  @ion-blur="validatePassword"
+                  @ion-blur="handlePasswordBlur"
                   @ion-input="clearPasswordError"
                 />
                 <ion-button
@@ -66,8 +66,8 @@
                     slot="icon-only"
                   />
                 </ion-button>
-                <ion-note v-if="passwordError" slot="error" color="danger">
-                  {{ passwordError }}
+                <ion-note v-if="getFieldError('password')" slot="error" color="danger">
+                  {{ getFieldError('password') }}
                 </ion-note>
               </ion-item>
 
@@ -120,10 +120,12 @@ import {
   eyeOffOutline, 
   fitnessOutline 
 } from 'ionicons/icons'
-import { ref, reactive, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
 import { useToast } from '../../../shared/composables/useToast'
+import { useFormValidation } from '../../../shared/composables/useFormValidation'
+import { useAsyncAction } from '../../../shared/composables/useAsyncAction'
 
 export default {
   name: 'LoginView',
@@ -147,115 +149,118 @@ export default {
   setup() {
     const router = useRouter()
     const { login } = useAuth()
-    const { showSuccess, showError } = useToast()
+    const { showSuccess } = useToast()
     
-    // Form state
-    const form = reactive({
-      email: '',
-      password: ''
-    })
+    // Form validation setup
+    const validationRules = {
+      email: ['required', 'email'],
+      password: ['required', { type: 'minLength', value: 6 }]
+    }
+    
+    const {
+      formData,
+      isFormValid,
+      validateField,
+      validateForm,
+      touchField,
+      getFieldError,
+      hasFieldError,
+      initializeForm
+    } = useFormValidation(validationRules)
+    
+    // Async login action
+    const {
+      loading: isLoading,
+      execute: executeLogin
+    } = useAsyncAction(
+      async (credentials) => {
+        const result = await login(credentials)
+        await showSuccess('Login successful! Welcome back.')
+        router.replace('/tabs/dashboard')
+        return result
+      },
+      {
+        throwOnError: true // Let component handle the error display
+      }
+    )
     
     // UI state
-    const isLoading = ref(false)
     const showPassword = ref(false)
-    const emailError = ref('')
-    const passwordError = ref('')
     
-    // Validation
-    const isValidEmail = (email) => {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      return emailRegex.test(email)
-    }
-    
-    const validateEmail = () => {
-      if (!form.email) {
-        emailError.value = 'Email is required'
-        return false
-      }
-      if (!isValidEmail(form.email)) {
-        emailError.value = 'Please enter a valid email'
-        return false
-      }
-      emailError.value = ''
-      return true
-    }
-    
-    const validatePassword = () => {
-      if (!form.password) {
-        passwordError.value = 'Password is required'
-        return false
-      }
-      if (form.password.length < 6) {
-        passwordError.value = 'Password must be at least 6 characters'
-        return false
-      }
-      passwordError.value = ''
-      return true
-    }
-    
-    const isFormValid = computed(() => {
-      return form.email && 
-             form.password && 
-             !emailError.value && 
-             !passwordError.value &&
-             isValidEmail(form.email)
+    // Initialize form
+    onMounted(() => {
+      initializeForm({
+        email: { value: '' },
+        password: { value: '' }
+      })
     })
     
     // Event handlers
     const clearEmailError = () => {
-      emailError.value = ''
+      if (hasFieldError('email')) {
+        formData.email = formData.email // Trigger reactivity
+      }
     }
     
     const clearPasswordError = () => {
-      passwordError.value = ''
+      if (hasFieldError('password')) {
+        formData.password = formData.password // Trigger reactivity
+      }
     }
     
     const togglePasswordVisibility = () => {
       showPassword.value = !showPassword.value
     }
     
+    const handleEmailBlur = () => {
+      touchField('email')
+      validateField('email')
+    }
+    
+    const handlePasswordBlur = () => {
+      touchField('password')
+      validateField('password')
+    }
+    
     const handleLogin = async () => {
-      // Validate form
-      const isEmailValid = validateEmail()
-      const isPasswordValid = validatePassword()
+      // Touch all fields and validate
+      touchField('email')
+      touchField('password')
       
-      if (!isEmailValid || !isPasswordValid) {
+      if (!validateForm()) {
         return
       }
       
-      isLoading.value = true
-      
       try {
-        await login({
-          email: form.email.trim(),
-          password: form.password
+        await executeLogin({
+          email: formData.email.trim(),
+          password: formData.password
         })
-        
-        await showSuccess('Login successful! Welcome back.')
-        
-        // Navigate to dashboard
-        router.replace('/tabs/dashboard')
       } catch (error) {
         console.error('Login failed:', error)
-        await showError(error.message)
-      } finally {
-        isLoading.value = false
+        // Error is already displayed by useApiError
       }
     }
     
     return {
-      form,
+      // Form data and validation
+      formData,
+      isFormValid,
+      getFieldError,
+      hasFieldError,
+      
+      // UI state
       isLoading,
       showPassword,
-      emailError,
-      passwordError,
-      isFormValid,
-      validateEmail,
-      validatePassword,
+      
+      // Event handlers
       clearEmailError,
       clearPasswordError,
       togglePasswordVisibility,
+      handleEmailBlur,
+      handlePasswordBlur,
       handleLogin,
+      
       // Icons
       eyeOutline,
       eyeOffOutline,

@@ -1,9 +1,7 @@
 import { ref, reactive, computed } from 'vue'
-import axios from 'axios'
-import appConfig from '../../../config/app'
+import { authAPI, apiHelpers } from '../../../shared/services/apiClient'
+import { useApiError } from '../../../shared/composables/useApiError'
 
-// Configuration from app config
-const API_BASE_URL = appConfig.api.baseURL
 
 // Global state - shared across all components using this composable
 const authState = reactive({
@@ -19,7 +17,7 @@ const initializeAuth = () => {
   
   if (storedToken) {
     authState.token = storedToken
-    axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
+    apiHelpers.setAuthToken(storedToken)
   }
   
   if (storedUser) {
@@ -38,6 +36,8 @@ const initializeAuth = () => {
 initializeAuth()
 
 export const useAuth = () => {
+  const { getApiErrorMessage } = useApiError()
+  
   // Computed properties for reactive state
   const isAuthenticated = computed(() => !!authState.token && !!authState.user)
   const user = computed(() => authState.user)
@@ -47,7 +47,7 @@ export const useAuth = () => {
   // Login function
   const login = async (credentials) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/login`, {
+      const response = await authAPI.login({
         email: credentials.email,
         password: credentials.password
       })
@@ -62,34 +62,14 @@ export const useAuth = () => {
       authState.token = authToken
       authState.user = userData
       
-      // Store in localStorage for persistence
-      localStorage.setItem('auth_token', authToken)
+      // Store in localStorage and set auth header
       localStorage.setItem('user_data', JSON.stringify(userData))
-      
-      // Set default authorization header for future requests
-      axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`
+      apiHelpers.setAuthToken(authToken)
       
       return { token: authToken, user: userData }
     } catch (error) {
-      console.error('Login error:', error)
-      
-      // Handle different types of errors
-      if (error.response?.status === 401) {
-        throw new Error('Invalid email or password')
-      } else if (error.response?.status === 422) {
-        const validationErrors = error.response.data?.errors
-        if (validationErrors) {
-          const firstError = Object.values(validationErrors)[0][0]
-          throw new Error(firstError)
-        }
-        throw new Error('Please check your input')
-      } else if (error.response?.status >= 500) {
-        throw new Error('Server error. Please try again later.')
-      } else if (error.code === 'NETWORK_ERROR' || !error.response) {
-        throw new Error('Network error. Please check your connection.')
-      }
-      
-      throw new Error('Login failed. Please try again.')
+      const message = getApiErrorMessage(error, 'login', 'Login failed. Please try again.')
+      throw new Error(message)
     }
   }
 
@@ -98,7 +78,7 @@ export const useAuth = () => {
     try {
       // Optionally call logout endpoint on server
       if (authState.token) {
-        await axios.post(`${API_BASE_URL}/logout`)
+        await authAPI.logout()
       }
     } catch (error) {
       console.warn('Error during server logout:', error)
@@ -108,12 +88,8 @@ export const useAuth = () => {
       authState.token = null
       authState.user = null
       
-      // Clear localStorage
-      localStorage.removeItem('auth_token')
-      localStorage.removeItem('user_data')
-      
-      // Clear authorization header
-      delete axios.defaults.headers.common['Authorization']
+      // Clear auth token and localStorage
+      apiHelpers.clearAuthToken()
     }
   }
 
@@ -122,7 +98,7 @@ export const useAuth = () => {
     if (!authState.token) return false
     
     try {
-      const response = await axios.get(`${API_BASE_URL}/user`)
+      const response = await authAPI.getUser()
       // Update user data if successful
       authState.user = response.data
       localStorage.setItem('user_data', JSON.stringify(response.data))
@@ -140,13 +116,13 @@ export const useAuth = () => {
     if (!isAuthenticated.value) return null
     
     try {
-      const response = await axios.get(`${API_BASE_URL}/user`)
+      const response = await authAPI.getUser()
       authState.user = response.data
       localStorage.setItem('user_data', JSON.stringify(response.data))
       return response.data
     } catch (error) {
-      console.error('Error refreshing user data:', error)
-      throw error
+      const message = getApiErrorMessage(error, 'refresh user', 'Failed to refresh user data')
+      throw new Error(message)
     }
   }
 

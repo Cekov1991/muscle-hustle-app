@@ -13,7 +13,7 @@
 
 <script>
 import { IonApp, IonRouterOutlet, IonLoading } from '@ionic/vue'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useAuth } from './features/auth/composables/useAuth'
 import { useBranding } from './shared/composables/useBranding'
 
@@ -29,16 +29,18 @@ export default {
     const { isInitialized: isBrandingInitialized } = useBranding()
     const isInitializing = ref(true)
     
-    onMounted(() => {
-      // Wait for auth to initialize, then hide loading
-      const checkInitialized = () => {
-        if (isInitialized.value) {
-          isInitializing.value = false
-        } else {
-          setTimeout(checkInitialized, 100)
-        }
+    // Watch for auth initialization instead of polling
+    watch(isInitialized, (initialized) => {
+      if (initialized) {
+        isInitializing.value = false
       }
-      checkInitialized()
+    }, { immediate: true })
+    
+    onMounted(() => {
+      // If auth is already initialized on mount, hide loading immediately
+      if (isInitialized.value) {
+        isInitializing.value = false
+      }
     })
     
     // Global error handler
