@@ -1,0 +1,237 @@
+/* White-label branding CSS
+ * This file can be dynamically loaded or modified for different gym brands
+ */
+
+/* Default fitness app branding */
+:root {
+  /* Brand Colors - Can be overridden for white-labeling */
+  --brand-primary: #3880ff;
+  --brand-secondary: #0cd1e8;
+  --brand-success: #10dc60;
+  --brand-warning: #ffce00;
+  --brand-danger: #f04141;
+  
+  /* Brand Assets */
+  --brand-logo-url: none; /* Will be set dynamically */
+  --brand-background-pattern: none;
+  --brand-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  
+  /* Brand Specific Spacing */
+  --brand-header-height: 56px;
+  --brand-footer-height: 0px;
+}
+
+/* Gym-specific branding classes */
+.gym-branding {
+  --ion-color-primary: var(--brand-primary);
+  --ion-color-primary-rgb: var(--brand-primary-rgb, 56, 128, 255);
+  --ion-color-secondary: var(--brand-secondary);
+  --ion-color-secondary-rgb: var(--brand-secondary-rgb, 12, 209, 232);
+}
+
+/* Enhanced gym-branded class for dynamic branding */
+.gym-branded {
+  --ion-color-primary: var(--brand-primary);
+  --ion-color-primary-rgb: var(--brand-primary-rgb);
+  --ion-color-primary-shade: var(--brand-primary-shade);
+  --ion-color-primary-tint: var(--brand-primary-tint, var(--brand-primary));
+  
+  --ion-color-secondary: var(--brand-secondary);
+  --ion-color-secondary-rgb: var(--brand-secondary-rgb);
+  --ion-color-secondary-shade: var(--brand-secondary-shade);
+  --ion-color-secondary-tint: var(--brand-secondary-tint, var(--brand-secondary));
+}
+
+/* Logo styling */
+.gym-logo {
+  max-height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
+.gym-logo-large {
+  max-height: 80px;
+  width: auto;
+  object-fit: contain;
+  margin: 1rem 0;
+}
+
+/* Custom gym colors for different franchises */
+
+/* Example: PowerFit Gym Branding */
+.gym-powerfit {
+  --brand-primary: #ff6b35;
+  --brand-primary-rgb: 255, 107, 53;
+  --brand-secondary: #f7931e;
+  --brand-secondary-rgb: 247, 147, 30;
+}
+
+/* Example: FlexZone Gym Branding */
+.gym-flexzone {
+  --brand-primary: #00bcd4;
+  --brand-primary-rgb: 0, 188, 212;
+  --brand-secondary: #4caf50;
+  --brand-secondary-rgb: 76, 175, 80;
+}
+
+/* Example: IronCore Gym Branding */
+.gym-ironcore {
+  --brand-primary: #424242;
+  --brand-primary-rgb: 66, 66, 66;
+  --brand-secondary: #ff5722;
+  --brand-secondary-rgb: 255, 87, 34;
+}
+
+/* Example: FitLife Gym Branding */
+.gym-fitlife {
+  --brand-primary: #8bc34a;
+  --brand-primary-rgb: 139, 195, 74;
+  --brand-secondary: #cddc39;
+  --brand-secondary-rgb: 205, 220, 57;
+}
+
+/* Branded background patterns */
+.gym-background-pattern {
+  background-image: var(--brand-background-pattern);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Custom font integration */
+.gym-custom-font {
+  font-family: var(--brand-font-family);
+}
+
+/* Toolbar branding */
+.gym-branded ion-toolbar {
+  --background: var(--brand-primary);
+  --color: white;
+}
+
+/* Button branding */
+.gym-branded ion-button {
+  --background: var(--brand-primary);
+  --background-activated: var(--brand-primary-shade);
+  --background-focused: var(--brand-primary-shade);
+  --background-hover: var(--brand-primary-shade);
+  --color: white;
+}
+
+.gym-branded ion-button.button-outline {
+  --border-color: var(--brand-primary);
+  --color: var(--brand-primary);
+  --background-activated: var(--brand-primary);
+  --background-focused: var(--brand-primary);
+  --color-activated: white;
+  --color-focused: white;
+}
+
+.gym-branded ion-button.button-clear {
+  --color: var(--brand-primary);
+  --color-activated: var(--brand-primary-shade);
+  --color-focused: var(--brand-primary-shade);
+}
+
+/* Card branding */
+.gym-branded ion-card {
+  border-top: 3px solid var(--brand-primary);
+}
+
+/* Tab bar branding */
+.gym-branded ion-tab-bar {
+  --background: var(--brand-primary);
+  --color-selected: white;
+  --color: rgba(255, 255, 255, 0.7);
+}
+
+.gym-branded ion-tab-button.tab-selected {
+  --color: white;
+}
+
+/* Progress bar branding */
+.gym-branded .progress-bar {
+  background: linear-gradient(90deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+}
+
+.gym-branded ion-progress-bar {
+  --progress-background: var(--brand-primary);
+}
+
+/* Loading spinner branding */
+.gym-branded ion-loading {
+  --spinner-color: var(--brand-primary);
+}
+
+/* Toast branding */
+.gym-branded ion-toast.toast-primary {
+  --background: var(--brand-primary);
+  --color: white;
+}
+
+/* Segment branding */
+.gym-branded ion-segment {
+  --background: transparent;
+}
+
+.gym-branded ion-segment-button {
+  --color: var(--brand-primary);
+  --color-checked: white;
+  --background-checked: var(--brand-primary);
+  --indicator-color: var(--brand-primary);
+}
+
+/* Checkbox and radio branding */
+.gym-branded ion-checkbox {
+  --background-checked: var(--brand-primary);
+  --border-color-checked: var(--brand-primary);
+  --checkmark-color: white;
+}
+
+.gym-branded ion-radio {
+  --color-checked: var(--brand-primary);
+}
+
+/* Toggle branding */
+.gym-branded ion-toggle {
+  --background-checked: var(--brand-primary);
+  --handle-background-checked: white;
+}
+
+/* Range slider branding */
+.gym-branded ion-range {
+  --bar-background-active: var(--brand-primary);
+  --knob-background: var(--brand-primary);
+}
+
+/* Searchbar branding */
+.gym-branded ion-searchbar {
+  --icon-color: var(--brand-primary);
+}
+
+/* Utility classes for dynamic branding */
+.brand-text-primary { color: var(--brand-primary); }
+.brand-text-secondary { color: var(--brand-secondary); }
+.brand-bg-primary { background-color: var(--brand-primary); }
+.brand-bg-secondary { background-color: var(--brand-secondary); }
+.brand-border-primary { border-color: var(--brand-primary); }
+.brand-border-secondary { border-color: var(--brand-secondary); }
+
+/* Responsive adjustments for branding */
+@media (max-width: 768px) {
+  .gym-logo {
+    max-height: 32px;
+  }
+  
+  .gym-logo-large {
+    max-height: 60px;
+  }
+}
+
+/* Dark mode brand adjustments */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brand-primary: var(--brand-primary-dark, var(--brand-primary));
+    --brand-secondary: var(--brand-secondary-dark, var(--brand-secondary));
+  }
+}

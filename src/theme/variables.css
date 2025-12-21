@@ -1,2 +1,219 @@
-/* For information on how to create your own theme, please refer to:
+/* Ionic Variables and Theming. For more info, please see:
 http://ionicframework.com/docs/theming/ */
+
+/** Ionic CSS Variables **/
+:root {
+  /** Primary color - Fitness blue **/
+  --ion-color-primary: #3880ff;
+  --ion-color-primary-rgb: 56, 128, 255;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #3171e0;
+  --ion-color-primary-tint: #4c8dff;
+
+  /** Secondary color - Fitness teal **/
+  --ion-color-secondary: #0cd1e8;
+  --ion-color-secondary-rgb: 12, 209, 232;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #0bb8cc;
+  --ion-color-secondary-tint: #24d6ea;
+
+  /** Tertiary color - Fitness purple **/
+  --ion-color-tertiary: #7044ff;
+  --ion-color-tertiary-rgb: 112, 68, 255;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #633ce0;
+  --ion-color-tertiary-tint: #7e57ff;
+
+  /** Success color - Fitness green **/
+  --ion-color-success: #10dc60;
+  --ion-color-success-rgb: 16, 220, 96;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #0ec254;
+  --ion-color-success-tint: #28e070;
+
+  /** Warning color - Fitness orange **/
+  --ion-color-warning: #ffce00;
+  --ion-color-warning-rgb: 255, 206, 0;
+  --ion-color-warning-contrast: #000000;
+  --ion-color-warning-contrast-rgb: 0, 0, 0;
+  --ion-color-warning-shade: #e0b500;
+  --ion-color-warning-tint: #ffd31a;
+
+  /** Danger color - Fitness red **/
+  --ion-color-danger: #f04141;
+  --ion-color-danger-rgb: 245, 61, 61;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #d33939;
+  --ion-color-danger-tint: #f25454;
+
+  /** Dark color **/
+  --ion-color-dark: #222428;
+  --ion-color-dark-rgb: 34, 36, 40;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #1e2023;
+  --ion-color-dark-tint: #383a3e;
+
+  /** Medium color **/
+  --ion-color-medium: #92949c;
+  --ion-color-medium-rgb: 146, 148, 156;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #808289;
+  --ion-color-medium-tint: #9d9fa6;
+
+  /** Light color **/
+  --ion-color-light: #f4f5f8;
+  --ion-color-light-rgb: 244, 245, 248;
+  --ion-color-light-contrast: #000000;
+  --ion-color-light-contrast-rgb: 0, 0, 0;
+  --ion-color-light-shade: #d7d8da;
+  --ion-color-light-tint: #f5f6f9;
+
+  /* Fitness App Custom Variables */
+  --fitness-gradient-primary: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-secondary) 100%);
+  --fitness-gradient-secondary: linear-gradient(135deg, var(--ion-color-secondary) 0%, var(--ion-color-tertiary) 100%);
+  --fitness-gradient-success: linear-gradient(135deg, var(--ion-color-success) 0%, #00d4aa 100%);
+  
+  /* Card and Component Styling */
+  --fitness-card-border-radius: 12px;
+  --fitness-button-border-radius: 8px;
+  --fitness-input-border-radius: 8px;
+  
+  /* Spacing */
+  --fitness-spacing-xs: 4px;
+  --fitness-spacing-sm: 8px;
+  --fitness-spacing-md: 16px;
+  --fitness-spacing-lg: 24px;
+  --fitness-spacing-xl: 32px;
+  
+  /* Shadows */
+  --fitness-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --fitness-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --fitness-shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.15);
+  
+  /* Typography */
+  --fitness-font-weight-normal: 400;
+  --fitness-font-weight-medium: 500;
+  --fitness-font-weight-semibold: 600;
+  --fitness-font-weight-bold: 700;
+}
+
+/* White-label theming support */
+.fitness-branded {
+  --ion-color-primary: var(--brand-primary, #3880ff);
+  --ion-color-secondary: var(--brand-secondary, #0cd1e8);
+}
+
+/* Component-specific theming */
+
+/* Cards */
+ion-card {
+  border-radius: var(--fitness-card-border-radius);
+  box-shadow: var(--fitness-shadow-md);
+  margin: var(--fitness-spacing-md);
+}
+
+/* Buttons */
+ion-button {
+  --border-radius: var(--fitness-button-border-radius);
+  font-weight: var(--fitness-font-weight-medium);
+}
+
+ion-button.fitness-gradient-primary {
+  --background: var(--fitness-gradient-primary);
+  --color: white;
+}
+
+/* Inputs */
+ion-input, ion-textarea {
+  --border-radius: var(--fitness-input-border-radius);
+}
+
+/* Items */
+ion-item {
+  --border-radius: var(--fitness-input-border-radius);
+  --inner-border-width: 0;
+}
+
+/* Toolbar */
+ion-toolbar {
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-primary-contrast);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  ion-card {
+    margin: var(--fitness-spacing-sm);
+  }
+}
+
+/* Dark mode specific styles */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Adjust colors for better dark mode contrast */
+    --ion-color-primary: #4c8dff;
+    --ion-color-secondary: #24d6ea;
+    --ion-color-tertiary: #7e57ff;
+    
+    /* Custom shadows for dark mode */
+    --fitness-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --fitness-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+    --fitness-shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.4);
+  }
+  
+  ion-card {
+    --background: var(--ion-color-step-50);
+    border: 1px solid var(--ion-color-step-100);
+  }
+}
+
+/* Utility classes for fitness app */
+.fitness-text-center { text-align: center; }
+.fitness-text-bold { font-weight: var(--fitness-font-weight-bold); }
+.fitness-text-semibold { font-weight: var(--fitness-font-weight-semibold); }
+.fitness-text-medium { font-weight: var(--fitness-font-weight-medium); }
+
+.fitness-margin-sm { margin: var(--fitness-spacing-sm); }
+.fitness-margin-md { margin: var(--fitness-spacing-md); }
+.fitness-margin-lg { margin: var(--fitness-spacing-lg); }
+
+.fitness-padding-sm { padding: var(--fitness-spacing-sm); }
+.fitness-padding-md { padding: var(--fitness-spacing-md); }
+.fitness-padding-lg { padding: var(--fitness-spacing-lg); }
+
+.fitness-rounded { border-radius: var(--fitness-card-border-radius); }
+.fitness-shadow-sm { box-shadow: var(--fitness-shadow-sm); }
+.fitness-shadow-md { box-shadow: var(--fitness-shadow-md); }
+.fitness-shadow-lg { box-shadow: var(--fitness-shadow-lg); }
+
+/* Animation utilities */
+.fitness-fade-in {
+  animation: fitnesssFadeIn 0.3s ease-in-out;
+}
+
+.fitness-slide-up {
+  animation: fitnessSlideUp 0.3s ease-out;
+}
+
+@keyframes fitnesssFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fitnessSlideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
