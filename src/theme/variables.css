@@ -3,21 +3,21 @@ http://ionicframework.com/docs/theming/ */
 
 /** Ionic CSS Variables **/
 :root {
-  /** Primary color - Rust brown (default palette) **/
-  --ion-color-primary: #a44200;
-  --ion-color-primary-rgb: 164, 66, 0;
+  /** Primary color - Pulse orange (Ulpift) **/
+  --ion-color-primary: #f97316;
+  --ion-color-primary-rgb: 249, 115, 22;
   --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #8a3700;
-  --ion-color-primary-tint: #b85a1a;
+  --ion-color-primary-shade: #d86513;
+  --ion-color-primary-tint: #fa812d;
 
-  /** Secondary color - Bronze (default palette) **/
-  --ion-color-secondary: #d58936;
-  --ion-color-secondary-rgb: 213, 137, 54;
+  /** Secondary color - Sandow gray 100 (Ulpift) **/
+  --ion-color-secondary: #111214;
+  --ion-color-secondary-rgb: 17, 18, 20;
   --ion-color-secondary-contrast: #ffffff;
   --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #b8752e;
-  --ion-color-secondary-tint: #e09a4e;
+  --ion-color-secondary-shade: #0f1011;
+  --ion-color-secondary-tint: #292a2c;
 
   /** Tertiary color - Fitness purple **/
   --ion-color-tertiary: #7044ff;
@@ -51,29 +51,29 @@ http://ionicframework.com/docs/theming/ */
   --ion-color-danger-shade: #5a110c;
   --ion-color-danger-tint: #7a1a16;
 
-  /** Dark color - Rich mahogany (default palette text primary) **/
-  --ion-color-dark: #3c1518;
-  --ion-color-dark-rgb: 60, 21, 24;
+  /** Dark color - Sandow gray 100 (Ulpift text primary) **/
+  --ion-color-dark: #111214;
+  --ion-color-dark-rgb: 17, 18, 20;
   --ion-color-dark-contrast: #ffffff;
   --ion-color-dark-contrast-rgb: 255, 255, 255;
-  --ion-color-dark-shade: #331214;
-  --ion-color-dark-tint: #502c2f;
+  --ion-color-dark-shade: #0f1011;
+  --ion-color-dark-tint: #292a2c;
 
-  /** Medium color - Dark garnet (default palette text secondary) **/
-  --ion-color-medium: #69140e;
-  --ion-color-medium-rgb: 105, 20, 14;
+  /** Medium color - Sandow gray 80 (Ulpift text secondary) **/
+  --ion-color-medium: #393c43;
+  --ion-color-medium-rgb: 57, 60, 67;
   --ion-color-medium-contrast: #ffffff;
   --ion-color-medium-contrast-rgb: 255, 255, 255;
-  --ion-color-medium-shade: #5a110c;
-  --ion-color-medium-tint: #7a1a16;
+  --ion-color-medium-shade: #32353a;
+  --ion-color-medium-tint: #4d5059;
 
-  /** Light color **/
-  --ion-color-light: #f4f5f8;
-  --ion-color-light-rgb: 244, 245, 248;
+  /** Light color - Sandow gray 10 (Ulpift) **/
+  --ion-color-light: #f3f3f4;
+  --ion-color-light-rgb: 243, 243, 244;
   --ion-color-light-contrast: #000000;
   --ion-color-light-contrast-rgb: 0, 0, 0;
-  --ion-color-light-shade: #d7d8da;
-  --ion-color-light-tint: #f5f6f9;
+  --ion-color-light-shade: #d6d6d7;
+  --ion-color-light-tint: #f4f4f5;
 
   /* Fitness App Custom Variables */
   --fitness-gradient-primary: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-secondary) 100%);
@@ -109,8 +109,8 @@ http://ionicframework.com/docs/theming/ */
 
 /* White-label theming support */
 .fitness-branded {
-  --ion-color-primary: var(--brand-primary, #3880ff);
-  --ion-color-secondary: var(--brand-secondary, #0cd1e8);
+  --ion-color-primary: var(--brand-primary, #f97316);
+  --ion-color-secondary: var(--brand-secondary, #111214);
 }
 
 /* Component-specific theming */
@@ -160,9 +160,9 @@ ion-toolbar {
 /* Dark mode specific styles */
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Adjust colors for better dark mode contrast - use lighter tints from palette */
-    --ion-color-primary: #b85a1a;  /* Lighter tint of rust-brown */
-    --ion-color-secondary: #e09a4e; /* Lighter tint of bronze */
+    /* Adjust colors for better dark mode contrast - Ulpift palette */
+    --ion-color-primary: #fa812d;  /* Lighter tint of pulse-orange */
+    --ion-color-secondary: #292a2c; /* Lighter tint of sandow-gray-100 */
     --ion-color-tertiary: #7e57ff;
     
     /* Custom shadows for dark mode */

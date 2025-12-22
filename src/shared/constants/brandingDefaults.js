@@ -3,20 +3,20 @@
  * Extracted from useBranding.js for better organization and testability
  */
 
-// Default color palette (hex format)
+// Default color palette (hex format) - Ulpift design
 export const DEFAULT_PALETTE = {
-  primary: '#a44200',              // rust-brown
-  secondary: '#d58936',            // bronze
-  textPrimary: '#3c1518',          // rich-mahogany
-  textSecondary: '#69140e',        // dark-garnet
+  primary: '#f97316',              // pulse-orange
+  secondary: '#111214',            // sandow-gray-100
+  textPrimary: '#111214',          // sandow-gray-100
+  textSecondary: '#393c43',        // sandow-gray-80
   textOnPrimary: '#ffffff',        // white
   warning: '#fff94f',              // canary-yellow
   danger: '#69140e',               // dark-garnet
   accent: '#fff94f',               // canary-yellow
-  background: '#ffffff',          // white
-  cardBackground: '#f8f9fa',       // light gray
-  border: '#dee2e6',              // light gray
-  success: '#10dc60'              // standard green (not in palette)
+  background: '#ffffff',           // white
+  cardBackground: '#f3f3f4',       // sandow-gray-10
+  border: '#babbbe',               // sandow-gray-30
+  success: '#10dc60'               // standard green
 }
 
 // Default branding configuration

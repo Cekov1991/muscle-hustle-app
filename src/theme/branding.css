@@ -45,6 +45,30 @@
   /* Brand Specific Spacing */
   --brand-header-height: 56px;
   --brand-footer-height: 0px;
+  
+  /* Typography - Font Sizes */
+  --brand-font-size-xs: 10px;
+  --brand-font-size-sm: 12px;
+  --brand-font-size-base: 14px;
+  --brand-font-size-lg: 16px;
+  --brand-font-size-xl: 18px;
+  --brand-font-size-2xl: 20px;
+  --brand-font-size-3xl: 22px;
+  --brand-font-size-4xl: 24px;
+  --brand-font-size-5xl: 26px;
+  --brand-font-size-6xl: 28px;
+  
+  /* Background Images */
+  --brand-background-image-profile: url('/assets/fitness-bg-profile.png');
+  --brand-background-image-login: url('/assets/gym-equipment-bg.png');
+  
+  /* Additional Gray Scale Colors */
+  --brand-gray-10: #ededed;    /* for card backgrounds */
+  --brand-gray-20: #babbbe;    /* for borders/icons */
+  --brand-gray-30: #7a7a7a;    /* for secondary text */
+  --brand-gray-40: #707070;    /* for labels */
+  --brand-gray-50: #989898;    /* for tertiary text */
+  --brand-black: #000000;      /* pure black */
 }
 
 /* Gym-specific branding classes */

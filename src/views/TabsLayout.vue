@@ -76,15 +76,29 @@ export default {
 
 <style scoped>
 ion-tab-bar {
-  --background: var(--ion-color-light);
-  --color: var(--ion-color-medium);
-  --color-selected: var(--ion-color-primary);
-  border-top: 1px solid var(--ion-color-light-shade);
+  --background: var(--brand-background-color);
+  --color: var(--brand-gray-40);
+  --color-selected: var(--brand-primary);
+  border-top: none;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  padding-top: 8px;
+  height: 80px;
 }
 
 ion-tab-button {
-  --color: var(--ion-color-medium);
-  --color-selected: var(--ion-color-primary);
+  --color: var(--brand-gray-40);
+  --color-selected: var(--brand-primary);
+  font-family: var(--brand-font-family);
+}
+
+ion-tab-button ion-label {
+  font-size: var(--brand-font-size-xs);
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+ion-tab-button ion-icon {
+  font-size: var(--brand-font-size-2xl);
 }
 </style>
 

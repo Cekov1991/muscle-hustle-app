@@ -284,12 +284,9 @@ export default {
 </script>
 
 <style scoped>
-/* Import Work Sans font */
-@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap');
-
 .ulpift-login {
-  font-family: 'Work Sans', var(--brand-font-family);
-  background: #ffffff;
+  font-family: var(--brand-font-family);
+  background: var(--brand-background-color);
   overflow: hidden;
 }
 
@@ -311,7 +308,7 @@ export default {
 /* Header Background Section */
 .login-header-bg {
   position: relative;
-  background-image: url('/assets/gym-equipment-bg.png');
+  background-image: var(--brand-background-image-login);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -339,7 +336,7 @@ export default {
   left: 0;
   right: 0;
   height: 100%;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #ffffff 100%);
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, var(--brand-background-color) 100%);
 }
 
 /* Header Content */
@@ -407,17 +404,17 @@ export default {
 }
 
 .main-title {
-  font-family: 'Work Sans', sans-serif;
+  font-family: var(--brand-font-family);
   font-weight: 700;
   letter-spacing: -0.3px;
-  color: #111214;
+  color: var(--brand-text-primary-color);
   margin: 0 0 8px 0;
 }
 
 /* Mobile: original size */
 @media (max-width: 768px) {
   .main-title {
-    font-size: 30px;
+    font-size: var(--brand-font-size-5xl);
     line-height: 38px;
   }
 }
@@ -425,23 +422,23 @@ export default {
 /* Desktop: larger, more prominent */
 @media (min-width: 769px) {
   .main-title {
-    font-size: 42px;
+    font-size: var(--brand-font-size-6xl);
     line-height: 52px;
   }
 }
 
 .subtitle {
-  font-family: 'Work Sans', sans-serif;
+  font-family: var(--brand-font-family);
   font-weight: 400;
   letter-spacing: -0.048px;
-  color: #393c43;
+  color: var(--brand-text-secondary-color);
   margin: 0;
 }
 
 /* Mobile: original size */
 @media (max-width: 768px) {
   .subtitle {
-    font-size: 16px;
+    font-size: var(--brand-font-size-base);
     line-height: 1.6;
   }
 }
@@ -449,7 +446,7 @@ export default {
 /* Desktop: slightly larger for better readability */
 @media (min-width: 769px) {
   .subtitle {
-    font-size: 18px;
+    font-size: var(--brand-font-size-lg);
     line-height: 1.7;
   }
 }
@@ -518,18 +515,18 @@ export default {
 }
 
 .input-label {
-  font-family: 'Work Sans', sans-serif;
+  font-family: var(--brand-font-family);
   font-weight: 700;
-  font-size: 14px;
+  font-size: var(--brand-font-size-sm);
   letter-spacing: -0.028px;
-  color: #111214;
+  color: var(--brand-text-primary-color);
 }
 
 .input-wrapper {
   position: relative;
-  background: #f3f3f4;
+  background: var(--brand-input-background-color);
   border: 1px solid transparent;
-  border-radius: 19px;
+  border-radius: var(--brand-input-border-radius);
   padding: 16px;
   display: flex;
   align-items: center;
@@ -547,8 +544,8 @@ export default {
 }
 
 .input-icon {
-  font-size: 24px;
-  color: #111214;
+  font-size: var(--brand-font-size-2xl);
+  color: var(--brand-text-primary-color);
   flex-shrink: 0;
 }
 
@@ -557,16 +554,16 @@ export default {
   border: none;
   outline: none;
   background: transparent;
-  font-family: 'Work Sans', sans-serif;
+  font-family: var(--brand-font-family);
   font-weight: 500;
-  font-size: 16px;
+  font-size: var(--brand-font-size-base);
   letter-spacing: -0.048px;
-  color: #393c43;
+  color: var(--brand-text-secondary-color);
   padding: 0;
 }
 
 .custom-input::placeholder {
-  color: #393c43;
+  color: var(--brand-text-secondary-color);
 }
 
 .password-toggle {
@@ -581,22 +578,22 @@ export default {
 }
 
 .password-toggle ion-icon {
-  font-size: 24px;
-  color: #babbbe;
+  font-size: var(--brand-font-size-2xl);
+  color: var(--brand-gray-20, var(--brand-border-color));
 }
 
 .error-message {
-  font-family: 'Work Sans', sans-serif;
-  font-size: 12px;
+  font-family: var(--brand-font-family);
+  font-size: var(--brand-font-size-xs);
   color: var(--ion-color-danger);
   margin-top: 4px;
 }
 
 /* Sign In Button */
 .signin-button {
-  background: #111214;
+  background: var(--brand-secondary);
   border: none;
-  border-radius: 19px;
+  border-radius: var(--brand-button-border-radius);
   height: 56px;
   padding: 16px 28px;
   display: flex;
@@ -605,15 +602,15 @@ export default {
   gap: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: 'Work Sans', sans-serif;
+  font-family: var(--brand-font-family);
   font-weight: 600;
-  font-size: 16px;
+  font-size: var(--brand-font-size-base);
   letter-spacing: -0.048px;
-  color: white;
+  color: var(--brand-text-on-primary-color);
 }
 
 .signin-button:hover:not(:disabled) {
-  background: #000000;
+  background: var(--brand-black);
   transform: translateY(-1px);
 }
 
@@ -627,11 +624,11 @@ export default {
 }
 
 .button-spinner {
-  --color: white;
+  --color: var(--brand-text-on-primary-color);
 }
 
 .button-arrow {
-  font-size: 24px;
+  font-size: var(--brand-font-size-2xl);
 }
 
 /* Home Indicator - Mobile only */
@@ -643,7 +640,7 @@ export default {
     transform: translateX(-50%);
     width: 134px;
     height: 5px;
-    background: #000000;
+    background: var(--brand-black);
     border-radius: 3px;
   }
 }
