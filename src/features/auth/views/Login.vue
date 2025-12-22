@@ -1,98 +1,91 @@
 <template>
-  <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Fitness App</ion-title>
-      </ion-toolbar>
-    </ion-header>
-    
-    <ion-content fullscreen class="ion-padding">
-      <div class="login-container">
-        <div class="login-header">
-          <ion-icon 
-            :icon="fitnessOutline" 
-            class="app-icon"
-          />
-          <h1>Welcome Back</h1>
-          <p>Sign in to your fitness account</p>
+  <ion-page class="ulpift-login">
+    <!-- Header with background image -->
+    <div class="login-header-bg">
+      <div class="header-gradient-overlay"></div>
+      
+      <!-- Logo and title section -->
+      <div class="header-content">
+        <div class="logo-container">
+          <div class="logo-badge">
+            <img src="/assets/ulpift-logo.png" alt="Ulpift Logo" class="logo" />
+          </div>
         </div>
-
-        <ion-card class="login-card">
-          <ion-card-content>
-            <form @submit.prevent="handleLogin">
-              <ion-item 
-                :class="{ 'ion-invalid': hasFieldError('email') }" 
-                fill="outline"
-                class="login-input"
-              >
-                <ion-label position="stacked">Email</ion-label>
-                <ion-input
-                  v-model="formData.email"
-                  type="email"
-                  placeholder="Enter your email"
-                  autocomplete="email"
-                  :disabled="isLoading"
-                  @ion-blur="handleEmailBlur"
-                  @ion-input="clearEmailError"
-                />
-                <ion-note v-if="getFieldError('email')" slot="error" color="danger">
-                  {{ getFieldError('email') }}
-                </ion-note>
-              </ion-item>
-              
-              <ion-item 
-                :class="{ 'ion-invalid': hasFieldError('password') }" 
-                fill="outline"
-                class="login-input"
-              >
-                <ion-label position="stacked">Password</ion-label>
-                <ion-input
-                  v-model="formData.password"
-                  :type="showPassword ? 'text' : 'password'"
-                  placeholder="Enter your password"
-                  autocomplete="current-password"
-                  :disabled="isLoading"
-                  @ion-blur="handlePasswordBlur"
-                  @ion-input="clearPasswordError"
-                />
-                <ion-button
-                  fill="clear"
-                  slot="end"
-                  @click="togglePasswordVisibility"
-                  :disabled="isLoading"
-                >
-                  <ion-icon 
-                    :icon="showPassword ? eyeOffOutline : eyeOutline" 
-                    slot="icon-only"
-                  />
-                </ion-button>
-                <ion-note v-if="getFieldError('password')" slot="error" color="danger">
-                  {{ getFieldError('password') }}
-                </ion-note>
-              </ion-item>
-
-              <ion-button
-                expand="block"
-                type="submit"
-                :disabled="isLoading || !isFormValid"
-                class="login-button"
-              >
-                <ion-spinner v-if="isLoading" name="crescent" slot="start" />
-                {{ isLoading ? 'Signing in...' : 'Sign In' }}
-              </ion-button>
-            </form>
-
-            <!-- Demo credentials info -->
-            <div class="demo-info">
-              <ion-text color="medium">
-                <p><small>Demo credentials for testing:</small></p>
-                <p><small>Email: demo@example.com</small></p>
-                <p><small>Password: password123</small></p>
-              </ion-text>
-            </div>
-          </ion-card-content>
-        </ion-card>
+        <div class="header-text">
+          <h1 class="main-title">Sign In To Ulpift</h1>
+          <p class="subtitle">Let's personalize your fitness with AI</p>
+        </div>
       </div>
+    </div>
+    
+    <ion-content class="login-content">
+      <div class="form-container">
+        <form @submit.prevent="handleLogin" class="login-form">
+          <!-- Email Input -->
+          <div class="input-group">
+            <label class="input-label">Email Address</label>
+            <div class="input-wrapper" :class="{ 'focused': emailFocused, 'error': hasFieldError('email') }">
+              <ion-icon :icon="mailOutline" class="input-icon" />
+              <input
+                v-model="formData.email"
+                type="email"
+                placeholder="elementary221b@gmail.co"
+                class="custom-input"
+                :disabled="isLoading"
+                @focus="emailFocused = true"
+                @blur="handleEmailBlur"
+                @input="clearEmailError"
+              />
+            </div>
+            <div v-if="getFieldError('email')" class="error-message">
+              {{ getFieldError('email') }}
+            </div>
+          </div>
+
+          <!-- Password Input -->
+          <div class="input-group">
+            <label class="input-label">Password</label>
+            <div class="input-wrapper" :class="{ 'focused': passwordFocused, 'error': hasFieldError('password') }">
+              <ion-icon :icon="lockClosedOutline" class="input-icon" />
+              <input
+                v-model="formData.password"
+                :type="showPassword ? 'text' : 'password'"
+                placeholder="***********"
+                class="custom-input"
+                :disabled="isLoading"
+                @focus="passwordFocused = true"
+                @blur="handlePasswordBlur"
+                @input="clearPasswordError"
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                @click="togglePasswordVisibility"
+                :disabled="isLoading"
+              >
+                <ion-icon :icon="showPassword ? eyeOffOutline : eyeOutline" />
+              </button>
+            </div>
+            <div v-if="getFieldError('password')" class="error-message">
+              {{ getFieldError('password') }}
+            </div>
+          </div>
+
+          <!-- Sign In Button -->
+          <button
+            type="submit"
+            class="signin-button"
+            :disabled="isLoading || !isFormValid"
+          >
+            <span v-if="!isLoading">Sign In</span>
+            <ion-spinner v-if="isLoading" name="crescent" class="button-spinner" />
+            <ion-icon v-if="!isLoading" :icon="arrowForwardOutline" class="button-arrow" />
+          </button>
+        </form>
+      </div>
+
+      <!-- Home Indicator -->
+      <div class="home-indicator"></div>
     </ion-content>
   </ion-page>
 </template>
@@ -100,56 +93,38 @@
 <script>
 import { 
   IonPage, 
-  IonHeader, 
-  IonToolbar, 
-  IonTitle, 
   IonContent, 
-  IonCard, 
-  IonCardContent, 
-  IonItem, 
-  IonLabel, 
-  IonInput, 
-  IonButton, 
   IonIcon,
-  IonSpinner,
-  IonNote,
-  IonText
+  IonSpinner
 } from '@ionic/vue'
 import { 
   eyeOutline, 
   eyeOffOutline, 
-  fitnessOutline 
+  mailOutline,
+  lockClosedOutline,
+  arrowForwardOutline
 } from 'ionicons/icons'
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
 import { useToast } from '../../../shared/composables/useToast'
 import { useFormValidation } from '../../../shared/composables/useFormValidation'
 import { useAsyncAction } from '../../../shared/composables/useAsyncAction'
+import { useApiError } from '../../../shared/composables/useApiError'
 
 export default {
   name: 'LoginView',
   components: {
     IonPage,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
-    IonCard,
-    IonCardContent,
-    IonItem,
-    IonLabel,
-    IonInput,
-    IonButton,
     IonIcon,
-    IonSpinner,
-    IonNote,
-    IonText
+    IonSpinner
   },
   setup() {
     const router = useRouter()
     const { login } = useAuth()
-    const { showSuccess } = useToast()
+    const { showSuccess, showError } = useToast()
+    const { getValidationErrors, isValidationError } = useApiError()
     
     // Form validation setup
     const validationRules = {
@@ -165,7 +140,8 @@ export default {
       touchField,
       getFieldError,
       hasFieldError,
-      initializeForm
+      initializeForm,
+      setFieldErrors
     } = useFormValidation(validationRules)
     
     // Async login action
@@ -186,6 +162,8 @@ export default {
     
     // UI state
     const showPassword = ref(false)
+    const emailFocused = ref(false)
+    const passwordFocused = ref(false)
     
     // Initialize form
     onMounted(() => {
@@ -198,13 +176,13 @@ export default {
     // Event handlers
     const clearEmailError = () => {
       if (hasFieldError('email')) {
-        formData.email = formData.email // Trigger reactivity
+        validateField('email')
       }
     }
     
     const clearPasswordError = () => {
       if (hasFieldError('password')) {
-        formData.password = formData.password // Trigger reactivity
+        validateField('password')
       }
     }
     
@@ -213,16 +191,22 @@ export default {
     }
     
     const handleEmailBlur = () => {
+      emailFocused.value = false
       touchField('email')
       validateField('email')
     }
     
     const handlePasswordBlur = () => {
+      passwordFocused.value = false
       touchField('password')
       validateField('password')
     }
     
+    
     const handleLogin = async () => {
+      // Clear any previous field errors to allow retry
+      setFieldErrors({})
+      
       // Touch all fields and validate
       touchField('email')
       touchField('password')
@@ -238,7 +222,32 @@ export default {
         })
       } catch (error) {
         console.error('Login failed:', error)
-        // Error is already displayed by useApiError
+        
+        // Check if this is a validation error (422) from backend
+        if (isValidationError(error)) {
+          const validationErrors = getValidationErrors(error)
+          if (validationErrors) {
+            // Only set field errors for actual validation issues (malformed data)
+            // Not for authentication failures (wrong password, etc.)
+            const isAuthError = error.response?.data?.message?.toLowerCase().includes('invalid') || 
+                               error.response?.data?.message?.toLowerCase().includes('incorrect') ||
+                               error.response?.data?.message?.toLowerCase().includes('wrong') ||
+                               error.response?.status === 401
+            
+            if (!isAuthError) {
+              // Set backend validation errors on form fields for data validation issues
+              setFieldErrors(validationErrors)
+              return // Don't show generic toast, field errors are now visible
+            }
+          }
+        }
+        
+        // For authentication errors and other failures, show a toast notification
+        // This allows the user to retry immediately without form being disabled
+        const errorMessage = error.response?.data?.message || 
+                             error.message || 
+                             'Login failed. Please check your credentials and try again.'
+        showError(errorMessage)
       }
     }
     
@@ -252,6 +261,8 @@ export default {
       // UI state
       isLoading,
       showPassword,
+      emailFocused,
+      passwordFocused,
       
       // Event handlers
       clearEmailError,
@@ -264,93 +275,414 @@ export default {
       // Icons
       eyeOutline,
       eyeOffOutline,
-      fitnessOutline
+      mailOutline,
+      lockClosedOutline,
+      arrowForwardOutline
     }
   }
 }
 </script>
 
 <style scoped>
-.login-container {
+/* Import Work Sans font */
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap');
+
+.ulpift-login {
+  font-family: 'Work Sans', var(--brand-font-family);
+  background: #ffffff;
+  overflow: hidden;
+}
+
+/* Mobile-first: rounded design for small screens */
+@media (max-width: 768px) {
+  .ulpift-login {
+    border-radius: 40px;
+  }
+}
+
+/* Desktop: full-width design */
+@media (min-width: 769px) {
+  .ulpift-login {
+    border-radius: 0;
+    min-height: 100vh;
+  }
+}
+
+/* Header Background Section */
+.login-header-bg {
+  position: relative;
+  background-image: url('/assets/gym-equipment-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+/* Mobile: fixed height */
+@media (max-width: 768px) {
+  .login-header-bg {
+    height: 256px;
+  }
+}
+
+/* Desktop: larger header for better proportions */
+@media (min-width: 769px) {
+  .login-header-bg {
+    height: 40vh;
+    min-height: 300px;
+  }
+}
+
+.header-gradient-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #ffffff 100%);
+}
+
+/* Header Content */
+.header-content {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  z-index: 2;
+}
+
+.logo-container {
+  display: flex;
   justify-content: center;
-  min-height: 100%;
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 20px 0;
 }
 
-.login-header {
+.logo-badge {
+  background: var(--brand-primary);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+.logo {
+  object-fit: contain;
+}
+
+/* Mobile: original size */
+@media (max-width: 768px) {
+  .logo-badge {
+    width: 63px;
+    height: 63px;
+  }
+  
+  .logo {
+    width: 47px;
+    height: 47px;
+  }
+}
+
+/* Desktop: larger logo for better presence */
+@media (min-width: 769px) {
+  .logo-badge {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .logo {
+    width: 64px;
+    height: 64px;
+  }
+}
+
+.header-text {
   text-align: center;
-  margin-bottom: 2rem;
+  width: 100%;
 }
 
-.app-icon {
-  font-size: 4rem;
-  color: var(--ion-color-primary);
-  margin-bottom: 1rem;
+.main-title {
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: #111214;
+  margin: 0 0 8px 0;
 }
 
-.login-header h1 {
-  color: var(--ion-color-dark);
-  margin: 0.5rem 0;
+/* Mobile: original size */
+@media (max-width: 768px) {
+  .main-title {
+    font-size: 30px;
+    line-height: 38px;
+  }
 }
 
-.login-header p {
-  color: var(--ion-color-medium);
+/* Desktop: larger, more prominent */
+@media (min-width: 769px) {
+  .main-title {
+    font-size: 42px;
+    line-height: 52px;
+  }
+}
+
+.subtitle {
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.048px;
+  color: #393c43;
   margin: 0;
 }
 
-.login-card {
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-}
-
-.login-input {
-  margin-bottom: 1rem;
-}
-
-.login-input ion-input {
-  --padding-start: 16px;
-  --padding-end: 16px;
-}
-
-.login-button {
-  margin-top: 1.5rem;
-  height: 48px;
-  font-weight: 600;
-}
-
-.demo-info {
-  margin-top: 2rem;
-  padding: 1rem;
-  background: var(--ion-color-light);
-  border-radius: 8px;
-  text-align: center;
-}
-
-.demo-info p {
-  margin: 0.25rem 0;
-}
-
-/* Responsive adjustments */
+/* Mobile: original size */
 @media (max-width: 768px) {
-  .login-container {
-    padding: 10px;
+  .subtitle {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+}
+
+/* Desktop: slightly larger for better readability */
+@media (min-width: 769px) {
+  .subtitle {
+    font-size: 18px;
+    line-height: 1.7;
+  }
+}
+
+/* Content */
+.login-content {
+  --background: transparent;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+/* Mobile: compact padding */
+@media (max-width: 768px) {
+  .form-container {
+    padding: 24px 16px;
+    min-height: auto;
+  }
+}
+
+/* Desktop: centered with max-width */
+@media (min-width: 769px) {
+  .form-container {
+    padding: 48px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}
+
+/* Large desktop: even more generous spacing */
+@media (min-width: 1200px) {
+  .form-container {
+    max-width: 600px;
+    padding: 64px;
+  }
+}
+
+/* Form */
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Mobile: compact spacing */
+@media (max-width: 768px) {
+  .login-form {
+    gap: 24px;
+  }
+}
+
+/* Desktop: more generous spacing */
+@media (min-width: 769px) {
+  .login-form {
+    gap: 32px;
+  }
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-label {
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: -0.028px;
+  color: #111214;
+}
+
+.input-wrapper {
+  position: relative;
+  background: #f3f3f4;
+  border: 1px solid transparent;
+  border-radius: 19px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.input-wrapper.focused {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 4px var(--brand-focus-ring-color);
+}
+
+.input-wrapper.error {
+  border-color: var(--ion-color-danger);
+}
+
+.input-icon {
+  font-size: 24px;
+  color: #111214;
+  flex-shrink: 0;
+}
+
+.custom-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: -0.048px;
+  color: #393c43;
+  padding: 0;
+}
+
+.custom-input::placeholder {
+  color: #393c43;
+}
+
+.password-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.password-toggle ion-icon {
+  font-size: 24px;
+  color: #babbbe;
+}
+
+.error-message {
+  font-family: 'Work Sans', sans-serif;
+  font-size: 12px;
+  color: var(--ion-color-danger);
+  margin-top: 4px;
+}
+
+/* Sign In Button */
+.signin-button {
+  background: #111214;
+  border: none;
+  border-radius: 19px;
+  height: 56px;
+  padding: 16px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: -0.048px;
+  color: white;
+}
+
+.signin-button:hover:not(:disabled) {
+  background: #000000;
+  transform: translateY(-1px);
+}
+
+.signin-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.signin-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button-spinner {
+  --color: white;
+}
+
+.button-arrow {
+  font-size: 24px;
+}
+
+/* Home Indicator - Mobile only */
+@media (max-width: 768px) {
+  .home-indicator {
+    position: fixed;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 134px;
+    height: 5px;
+    background: #000000;
+    border-radius: 3px;
+  }
+}
+
+/* Desktop: hide home indicator */
+@media (min-width: 769px) {
+  .home-indicator {
+    display: none;
+  }
+}
+
+/* Desktop: Add subtle shadow for web presentation */
+@media (min-width: 769px) {
+  .ulpift-login {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   }
   
-  .app-icon {
-    font-size: 3rem;
+  /* Add a subtle backdrop for better desktop presentation */
+  .ulpift-login::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    z-index: -1;
   }
 }
 
-/* Focus and error states */
-.login-input.ion-invalid {
-  --border-color: var(--ion-color-danger);
+/* Focus states for accessibility */
+.signin-button:focus,
+.password-toggle:focus {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
 }
 
-.login-input ion-item.item-has-focus {
-  --border-color: var(--ion-color-primary);
+.custom-input:focus {
+  outline: none;
 }
 </style>
+

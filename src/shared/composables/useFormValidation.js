@@ -230,6 +230,25 @@ export const useFormValidation = (validationRules = {}) => {
     return touched[fieldName] && !!errors[fieldName]
   }
 
+  /**
+   * Set field errors from backend validation (useful for 422 responses)
+   * @param {Object} backendErrors - Errors object from backend (e.g., { email: ["Error message"] })
+   */
+  const setFieldErrors = (backendErrors) => {
+    Object.keys(backendErrors).forEach(fieldName => {
+      if (Object.prototype.hasOwnProperty.call(formData, fieldName)) {
+        const errorMessages = backendErrors[fieldName]
+        if (Array.isArray(errorMessages) && errorMessages.length > 0) {
+          errors[fieldName] = errorMessages[0] // Use first error message
+          touched[fieldName] = true // Mark as touched to show error
+        } else if (typeof errorMessages === 'string') {
+          errors[fieldName] = errorMessages
+          touched[fieldName] = true
+        }
+      }
+    })
+  }
+
   return {
     // Reactive state
     formData,
@@ -251,6 +270,7 @@ export const useFormValidation = (validationRules = {}) => {
     getFormData,
     getFieldError,
     hasFieldError,
+    setFieldErrors,
     
     // Built-in rules (for reference or extension)
     builtInRules

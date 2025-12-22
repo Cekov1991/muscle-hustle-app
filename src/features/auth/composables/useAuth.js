@@ -68,6 +68,12 @@ export const useAuth = () => {
       
       return { token: authToken, user: userData }
     } catch (error) {
+      // For validation errors (422), preserve the original error object
+      // so the component can extract validation errors from error.response.data.errors
+      if (error.response?.status === 422) {
+        throw error // Re-throw original error with response data intact
+      }
+      
       const message = getApiErrorMessage(error, 'login', 'Login failed. Please try again.')
       throw new Error(message)
     }
