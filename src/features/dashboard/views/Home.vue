@@ -23,86 +23,42 @@
     <ion-content class="dashboard-content">
      
       <div style="padding: 10px !important;">
-      <div class="workouts-card">
-        <div class="card-header">
-          <div class="title-section">
-            <div class="icon-badge">
-              <img src="/assets/ulpift-logo.png" alt="Icon" class="badge-icon" />
-            </div>
-            <h2 class="card-title">Performed Workouts</h2>
-          </div>
+        <!-- Weekly Calendar Component -->
+        <div class="calendar-wrapper">
+          <WeeklyCalendar :workouts="workoutsByDate" />
         </div>
 
-       
-        <div class="chart-container">
-          <div class="chart-wrapper">
-           
-            <div class="y-axis">
-              <span class="y-label">60</span>
-              <span class="y-label">45</span>
-              <span class="y-label">30</span>
-              <span class="y-label">15</span>
-              <span class="y-label">0</span>
-            </div>
-
-           
-            <div class="bars-container">
-              <div 
-                v-for="(workout, index) in workoutLengths" 
-                :key="index"
-                class="bar-wrapper"
-              >
-                <div 
-                  class="bar"
-                  :class="{ 'highest': workout.minutes === maxWorkoutLength }"
-                  :style="{ height: `${(workout.minutes / maxWorkoutLength) * 100}%` }"
-                >
       
-                </div>
-              </div>
+        <div class="metrics-container">
+          <div class="metric-card">
+            <div class="metric-icon">
+              <ion-icon :icon="personOutline" />
             </div>
+            <div class="metric-value">{{ fitnessMetrics.age }}yr</div>
+            <div class="metric-label">Current Age</div>
           </div>
 
-         
-          <div class="day-labels">
-            <span v-for="(workout, index) in workoutLengths" :key="index" class="day-label">
-              {{ workout.day }}
-            </span>
+          <div class="metric-card">
+            <div class="metric-icon">
+              <ion-icon :icon="scaleOutline" />
+            </div>
+            <div class="metric-value">{{ fitnessMetrics.weight }}kg</div>
+            <div class="metric-label">Weight</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon">
+              <ion-icon :icon="flameOutline" />
+            </div>
+            <div class="metric-value">{{ fitnessMetrics.caloriesBurned }} kcal</div>
+            <div class="metric-label">Calories Burned</div>
           </div>
         </div>
-      </div>
 
-     
-      <div class="metrics-container">
-        <div class="metric-card">
-          <div class="metric-icon">
-            <ion-icon :icon="personOutline" />
-          </div>
-          <div class="metric-value">{{ fitnessMetrics.age }}yr</div>
-          <div class="metric-label">Current Age</div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-icon">
-            <ion-icon :icon="scaleOutline" />
-          </div>
-          <div class="metric-value">{{ fitnessMetrics.weight }}kg</div>
-          <div class="metric-label">Weight</div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-icon">
-            <ion-icon :icon="flameOutline" />
-          </div>
-          <div class="metric-value">{{ fitnessMetrics.caloriesBurned }} kcal</div>
-          <div class="metric-label">Calories Burned</div>
-        </div>
-      </div>
-
-      <button class="start-workout-button" @click="handleStartWorkout">
-        <!-- <ion-icon :icon="playOutline" /> -->
-        <span style="font-size: var(--brand-font-size-base); font-weight: 600; color: var(--brand-text-on-primary-color);">Start Workout</span>
-      </button>
+        <button class="start-workout-button" @click="handleStartWorkout">
+          <!-- <ion-icon :icon="playOutline" /> -->
+          <span style="font-size: var(--brand-font-size-base); font-weight: 600; color: var(--brand-text-on-primary-color);">Start Workout</span>
+        </button>
       </div>
     </ion-content>
   </ion-page>
@@ -120,15 +76,17 @@ import {
   flameOutline,
   playOutline
 } from 'ionicons/icons'
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useAuth } from '../../auth/composables/useAuth'
+import WeeklyCalendar from '../components/WeeklyCalendar.vue'
 
 export default {
   name: 'HomeView',
   components: {
     IonPage,
     IonContent,
-    IonIcon
+    IonIcon,
+    WeeklyCalendar
   },
   setup() {
     const { user } = useAuth()
@@ -144,21 +102,27 @@ export default {
       caloriesBurned: 978
     })
     
-    // Workout lengths in minutes (mock data)
-    const workoutLengths = ref([
-      { day: 'Mon', minutes: 45 },
-      { day: 'Tue', minutes: 60 }, // Longest workout
-      { day: 'Wed', minutes: 50 },
-      { day: 'Thu', minutes: 30 },
-      { day: 'Fri', minutes: 55 },
-      { day: 'Sat', minutes: 40 },
-      { day: 'Sun', minutes: 35 }
-    ])
+    // Generate mock workout data with actual dates for the current week
+    const generateWorkoutsByDate = () => {
+      const today = new Date()
+      const currentDay = today.getDay() // 0 = Sunday, 1 = Monday, etc.
+      const startOfWeek = new Date(today)
+      startOfWeek.setDate(today.getDate() - currentDay) // Start from Sunday
+      
+      const workouts = []
+      // Add workouts for Monday (index 1) and Wednesday (index 3) to match the image
+      const monday = new Date(startOfWeek)
+      monday.setDate(startOfWeek.getDate() + 1)
+      workouts.push({ date: monday.toISOString().split('T')[0], completed: true })
+      
+      const wednesday = new Date(startOfWeek)
+      wednesday.setDate(startOfWeek.getDate() + 3)
+      workouts.push({ date: wednesday.toISOString().split('T')[0], completed: true })
+      
+      return workouts
+    }
     
-    // Calculate max workout length for chart scaling
-    const maxWorkoutLength = computed(() => {
-      return Math.max(...workoutLengths.value.map(w => w.minutes))
-    })
+    const workoutsByDate = ref(generateWorkoutsByDate())
     
     // Start workout handler (placeholder)
     const handleStartWorkout = () => {
@@ -171,8 +135,7 @@ export default {
       userLocation,
       fitnessLevel,
       fitnessMetrics,
-      workoutLengths,
-      maxWorkoutLength,
+      workoutsByDate,
       handleStartWorkout,
       // Icons
       personOutline,
@@ -283,149 +246,11 @@ export default {
 }
 
 
-/* Performed Workouts Card */
-.workouts-card {
-  background: var(--brand-gray-10, var(--brand-card-background-color));
-  border-radius: 30px;
-  padding: 12px;
-  margin-bottom: 16px;
+/* Calendar Wrapper */
+.calendar-wrapper {
   margin-top: 10%; /* Overlap with header */
   position: relative;
   z-index: 2;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.title-section {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.icon-badge {
-  width: 19px;
-  height: 19px;
-  background: var(--brand-primary);
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px;
-}
-
-.badge-icon {
-  width: 15px;
-  height: 15px;
-  object-fit: contain;
-}
-
-.card-title {
-  font-family: var(--brand-font-family);
-  font-weight: 600;
-  font-size: var(--brand-font-size-xl);
-  color: var(--brand-text-primary-color);
-  margin: 0;
-  letter-spacing: -0.7px;
-}
-
-/* Chart Container */
-.chart-container {
-  position: relative;
-  padding: 0 24px 8px 0;
-}
-
-.chart-wrapper {
-  display: flex;
-  position: relative;
-  height: 18vh;
-  margin-bottom: 8px;
-}
-
-.y-axis {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding-right: 8px;
-  height: 100%;
-  min-width: 25px;
-}
-
-.y-label {
-  font-family: var(--brand-font-family);
-  font-weight: 600;
-  font-size: var(--brand-font-size-xs);
-  color: var(--brand-gray-30, var(--brand-text-tertiary-color));
-  letter-spacing: -0.42px;
-}
-
-.bars-container {
-  flex: 1;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-around;
-  gap: 8px;
-  height: 100%;
-  position: relative;
-}
-
-.bar-wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100%;
-  position: relative;
-}
-
-.bar {
-  width: 10px;
-  background: var(--brand-gray-20, var(--brand-border-color));
-  border-radius: 2px;
-  position: relative;
-  transition: all 0.3s ease;
-  min-height: 4px;
-}
-
-.bar.highest {
-  background: var(--brand-text-primary-color);
-}
-
-.workout-badge {
-  position: absolute;
-  top: -35px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--brand-primary);
-  color: var(--brand-text-on-primary-color);
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-family: var(--brand-font-family);
-  font-weight: 600;
-  font-size: var(--brand-font-size-base);
-  white-space: nowrap;
-  letter-spacing: -0.88px;
-}
-
-.day-labels {
-  display: flex;
-  justify-content: space-around;
-  padding-left: 25px;
-  gap: 8px;
-}
-
-.day-label {
-  flex: 1;
-  text-align: center;
-  font-family: var(--brand-font-family);
-  font-weight: 600;
-  font-size: var(--brand-font-size-xs);
-  color: var(--brand-gray-40);
-  letter-spacing: 0.06px;
 }
 
 /* Metric Cards */
