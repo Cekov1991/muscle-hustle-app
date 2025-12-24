@@ -57,12 +57,6 @@
       <ion-icon :icon="alertCircleOutline" class="error-icon"></ion-icon>
       <span>{{ error }}</span>
     </div>
-
-    <!-- Upload Instructions -->
-    <div class="upload-instructions">
-      <p>Upload a profile photo (JPEG, PNG, or GIF)</p>
-      <p class="size-limit">Maximum file size: 2MB</p>
-    </div>
   </div>
 </template>
 

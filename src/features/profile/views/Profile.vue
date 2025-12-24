@@ -33,10 +33,6 @@
             :loading="saving"
             @photo-updated="handlePhotoUpdate"
           />
-          <div class="profile-info">
-            <h2>{{ profile?.name || 'User' }}</h2>
-            <p>{{ profile?.email }}</p>
-          </div>
         </div>
 
         <!-- Tabbed Interface -->

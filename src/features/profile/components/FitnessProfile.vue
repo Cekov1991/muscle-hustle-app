@@ -2,26 +2,28 @@
   <div class="fitness-profile">
     <form @submit.prevent="handleSubmit" class="fitness-form">
       <!-- Fitness Goal -->
-      <ion-item class="form-item">
-        <ion-label position="stacked">Fitness Goal</ion-label>
-        <ion-select
-          v-model="formData.fitness_goal"
-          placeholder="Select your primary goal"
-          :class="{ 'ion-invalid': validationErrors.fitness_goal }"
-          @selection-change="validateField('fitness_goal')"
-        >
-          <ion-select-option
-            v-for="option in fitnessGoalOptions"
-            :key="option.value"
-            :value="option.value"
+      <div class="field-card">
+        <ion-item lines="none" class="form-item">
+          <ion-label position="stacked">Fitness Goal</ion-label>
+          <ion-select
+            v-model="formData.fitness_goal"
+            placeholder="Select your primary goal"
+            :class="{ 'ion-invalid': validationErrors.fitness_goal }"
+            @selection-change="validateField('fitness_goal')"
           >
-            {{ option.label }}
-          </ion-select-option>
-        </ion-select>
-        <ion-note v-if="validationErrors.fitness_goal" slot="error">
-          {{ validationErrors.fitness_goal }}
-        </ion-note>
-      </ion-item>
+            <ion-select-option
+              v-for="option in fitnessGoalOptions"
+              :key="option.value"
+              :value="option.value"
+            >
+              {{ option.label }}
+            </ion-select-option>
+          </ion-select>
+          <ion-note v-if="validationErrors.fitness_goal" slot="error">
+            {{ validationErrors.fitness_goal }}
+          </ion-note>
+        </ion-item>
+      </div>
 
       <!-- Personal Information Section -->
       <div class="section-header">
@@ -29,78 +31,86 @@
       </div>
 
       <!-- Age -->
-      <ion-item class="form-item">
-        <ion-label position="stacked">Age</ion-label>
-        <ion-input
-          v-model.number="formData.age"
-          type="number"
-          placeholder="Enter your age"
-          min="1"
-          max="150"
-          :class="{ 'ion-invalid': validationErrors.age }"
-          @ion-blur="validateField('age')"
-        ></ion-input>
-        <ion-note v-if="validationErrors.age" slot="error">
-          {{ validationErrors.age }}
-        </ion-note>
-      </ion-item>
+      <div class="field-card">
+        <ion-item lines="none" class="form-item">
+          <ion-label position="stacked">Age</ion-label>
+          <ion-input
+            v-model.number="formData.age"
+            type="number"
+            placeholder="Enter your age"
+            min="1"
+            max="150"
+            :class="{ 'ion-invalid': validationErrors.age }"
+            @ion-blur="validateField('age')"
+          ></ion-input>
+          <ion-note v-if="validationErrors.age" slot="error">
+            {{ validationErrors.age }}
+          </ion-note>
+        </ion-item>
+      </div>
 
       <!-- Gender -->
-      <ion-item class="form-item">
-        <ion-label position="stacked">Gender</ion-label>
-        <ion-select
-          v-model="formData.gender"
-          placeholder="Select gender"
-          :class="{ 'ion-invalid': validationErrors.gender }"
-          @selection-change="validateField('gender')"
-        >
-          <ion-select-option
-            v-for="option in genderOptions"
-            :key="option.value"
-            :value="option.value"
+      <div class="field-card">
+        <ion-item lines="none" class="form-item">
+          <ion-label position="stacked">Gender</ion-label>
+          <ion-select
+            v-model="formData.gender"
+            placeholder="Select gender"
+            :class="{ 'ion-invalid': validationErrors.gender }"
+            @selection-change="validateField('gender')"
           >
-            {{ option.label }}
-          </ion-select-option>
-        </ion-select>
-        <ion-note v-if="validationErrors.gender" slot="error">
-          {{ validationErrors.gender }}
-        </ion-note>
-      </ion-item>
+            <ion-select-option
+              v-for="option in genderOptions"
+              :key="option.value"
+              :value="option.value"
+            >
+              {{ option.label }}
+            </ion-select-option>
+          </ion-select>
+          <ion-note v-if="validationErrors.gender" slot="error">
+            {{ validationErrors.gender }}
+          </ion-note>
+        </ion-item>
+      </div>
 
       <!-- Height -->
-      <ion-item class="form-item">
-        <ion-label position="stacked">Height (cm)</ion-label>
-        <ion-input
-          v-model.number="formData.height"
-          type="number"
-          placeholder="Enter height in centimeters"
-          min="50"
-          max="300"
-          :class="{ 'ion-invalid': validationErrors.height }"
-          @ion-blur="validateField('height')"
-        ></ion-input>
-        <ion-note v-if="validationErrors.height" slot="error">
-          {{ validationErrors.height }}
-        </ion-note>
-      </ion-item>
+      <div class="field-card">
+        <ion-item lines="none" class="form-item">
+          <ion-label position="stacked">Height (cm)</ion-label>
+          <ion-input
+            v-model.number="formData.height"
+            type="number"
+            placeholder="Enter height in centimeters"
+            min="50"
+            max="300"
+            :class="{ 'ion-invalid': validationErrors.height }"
+            @ion-blur="validateField('height')"
+          ></ion-input>
+          <ion-note v-if="validationErrors.height" slot="error">
+            {{ validationErrors.height }}
+          </ion-note>
+        </ion-item>
+      </div>
 
       <!-- Weight -->
-      <ion-item class="form-item">
-        <ion-label position="stacked">Weight (kg)</ion-label>
-        <ion-input
-          v-model.number="formData.weight"
-          type="number"
-          placeholder="Enter weight in kilograms"
-          min="1"
-          max="500"
-          step="0.1"
-          :class="{ 'ion-invalid': validationErrors.weight }"
-          @ion-blur="validateField('weight')"
-        ></ion-input>
-        <ion-note v-if="validationErrors.weight" slot="error">
-          {{ validationErrors.weight }}
-        </ion-note>
-      </ion-item>
+      <div class="field-card">
+        <ion-item lines="none" class="form-item">
+          <ion-label position="stacked">Weight (kg)</ion-label>
+          <ion-input
+            v-model.number="formData.weight"
+            type="number"
+            placeholder="Enter weight in kilograms"
+            min="1"
+            max="500"
+            step="0.1"
+            :class="{ 'ion-invalid': validationErrors.weight }"
+            @ion-blur="validateField('weight')"
+          ></ion-input>
+          <ion-note v-if="validationErrors.weight" slot="error">
+            {{ validationErrors.weight }}
+          </ion-note>
+        </ion-item>
+      </div>
 
       <!-- Training Information Section -->
       <div class="section-header">
@@ -108,60 +118,66 @@
       </div>
 
       <!-- Training Experience -->
-      <ion-item class="form-item">
-        <ion-label position="stacked">Training Experience</ion-label>
-        <ion-select
-          v-model="formData.training_experience"
-          placeholder="Select your experience level"
-          :class="{ 'ion-invalid': validationErrors.training_experience }"
-          @selection-change="validateField('training_experience')"
-        >
-          <ion-select-option
-            v-for="option in experienceOptions"
-            :key="option.value"
-            :value="option.value"
+      <div class="field-card">
+        <ion-item lines="none" class="form-item">
+          <ion-label position="stacked">Training Experience</ion-label>
+          <ion-select
+            v-model="formData.training_experience"
+            placeholder="Select your experience level"
+            :class="{ 'ion-invalid': validationErrors.training_experience }"
+            @selection-change="validateField('training_experience')"
           >
-            {{ option.label }}
-          </ion-select-option>
-        </ion-select>
-        <ion-note v-if="validationErrors.training_experience" slot="error">
-          {{ validationErrors.training_experience }}
-        </ion-note>
-      </ion-item>
+            <ion-select-option
+              v-for="option in experienceOptions"
+              :key="option.value"
+              :value="option.value"
+            >
+              {{ option.label }}
+            </ion-select-option>
+          </ion-select>
+          <ion-note v-if="validationErrors.training_experience" slot="error">
+            {{ validationErrors.training_experience }}
+          </ion-note>
+        </ion-item>
+      </div>
 
       <!-- Training Days Per Week -->
-      <ion-item class="form-item">
-        <ion-label position="stacked">Training Days Per Week</ion-label>
-        <ion-input
-          v-model.number="formData.training_days_per_week"
-          type="number"
-          placeholder="How many days per week do you train?"
-          min="1"
-          max="7"
-          :class="{ 'ion-invalid': validationErrors.training_days_per_week }"
-          @ion-blur="validateField('training_days_per_week')"
-        ></ion-input>
-        <ion-note v-if="validationErrors.training_days_per_week" slot="error">
-          {{ validationErrors.training_days_per_week }}
-        </ion-note>
-      </ion-item>
+      <div class="field-card">
+        <ion-item lines="none" class="form-item">
+          <ion-label position="stacked">Training Days Per Week</ion-label>
+          <ion-input
+            v-model.number="formData.training_days_per_week"
+            type="number"
+            placeholder="How many days per week do you train?"
+            min="1"
+            max="7"
+            :class="{ 'ion-invalid': validationErrors.training_days_per_week }"
+            @ion-blur="validateField('training_days_per_week')"
+          ></ion-input>
+          <ion-note v-if="validationErrors.training_days_per_week" slot="error">
+            {{ validationErrors.training_days_per_week }}
+          </ion-note>
+        </ion-item>
+      </div>
 
       <!-- Workout Duration -->
-      <ion-item class="form-item">
-        <ion-label position="stacked">Workout Duration (minutes)</ion-label>
-        <ion-input
-          v-model.number="formData.workout_duration_minutes"
-          type="number"
-          placeholder="Average workout duration"
-          min="1"
-          max="600"
-          :class="{ 'ion-invalid': validationErrors.workout_duration_minutes }"
-          @ion-blur="validateField('workout_duration_minutes')"
-        ></ion-input>
-        <ion-note v-if="validationErrors.workout_duration_minutes" slot="error">
-          {{ validationErrors.workout_duration_minutes }}
-        </ion-note>
-      </ion-item>
+      <div class="field-card">
+        <ion-item lines="none" class="form-item">
+          <ion-label position="stacked">Workout Duration (minutes)</ion-label>
+          <ion-input
+            v-model.number="formData.workout_duration_minutes"
+            type="number"
+            placeholder="Average workout duration"
+            min="1"
+            max="600"
+            :class="{ 'ion-invalid': validationErrors.workout_duration_minutes }"
+            @ion-blur="validateField('workout_duration_minutes')"
+          ></ion-input>
+          <ion-note v-if="validationErrors.workout_duration_minutes" slot="error">
+            {{ validationErrors.workout_duration_minutes }}
+          </ion-note>
+        </ion-item>
+      </div>
 
       <!-- Form Actions -->
       <div class="form-actions">
@@ -407,7 +423,8 @@ export default {
 
 <style scoped>
 .fitness-profile {
-  padding: 20px;
+  padding: 16px;
+  background: var(--brand-background-color, #fafafa);
 }
 
 .fitness-form {
@@ -416,34 +433,64 @@ export default {
 }
 
 .section-header {
-  margin: 32px 0 16px 0;
-  padding: 0 16px;
+  margin: 24px 0 16px 0;
+  padding: 0 4px;
 }
 
 .section-header h3 {
-  color: var(--brand-text-primary);
   font-family: var(--brand-font-family);
-  font-size: 18px;
+  color: var(--brand-text-primary-color);
+  font-size: var(--brand-font-size-xl);
   font-weight: 600;
   margin: 0;
+  letter-spacing: -0.7px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .fitness-profile {
+    background: var(--brand-background-color, #1a1a1a);
+  }
+}
+
+.field-card {
+  background: var(--brand-gray-10, var(--brand-card-background-color));
+  border-radius: 20px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+  .field-card {
+    background: var(--brand-gray-10, var(--brand-card-background-color));
+  }
 }
 
 .form-item {
-  margin-bottom: 16px;
-  --background: var(--brand-background-color);
-  --border-color: var(--ion-color-light-shade);
+  --background: transparent;
+  --border-color: transparent;
+  --inner-padding-start: 6px;
+  --inner-padding-end: 16px;
+  --inner-padding-top: 6px;
+  --inner-padding-bottom: 6px;
+  --min-height: auto;
 }
 
 .form-item ion-label {
-  color: var(--brand-text-primary);
-  font-weight: 500;
-  margin-bottom: 8px;
+  font-family: var(--brand-font-family);
+  color: var(--brand-gray-50, var(--brand-text-secondary-color));
+  font-weight: 600;
+  font-size: var(--brand-font-size-sm);
+  margin-bottom: 4px;
+  letter-spacing: -0.3px;
 }
 
 .form-item ion-input,
 .form-item ion-select {
-  --color: var(--brand-text-primary);
-  --placeholder-color: var(--brand-text-secondary);
+  font-family: var(--brand-font-family);
+  --color: var(--brand-text-primary-color);
+  --placeholder-color: var(--brand-gray-50, var(--brand-text-secondary-color));
+  font-size: var(--brand-font-size-base);
+  font-weight: 600;
 }
 
 .form-actions {
@@ -451,21 +498,34 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  padding: 0 4px;
 }
 
 .save-button {
   --background: var(--brand-primary);
-  --background-hover: var(--brand-primary-hover);
-  --color: white;
+  --background-hover: var(--brand-primary-shade);
+  --color: var(--brand-text-on-primary-color);
+  font-family: var(--brand-font-family);
   font-weight: 600;
+  font-size: var(--brand-font-size-base);
+  border-radius: var(--brand-button-border-radius, 12px);
+  height: 48px;
+  letter-spacing: -0.3px;
 }
 
 .cancel-button {
-  --color: var(--brand-text-secondary);
+  font-family: var(--brand-font-family);
+  --color: var(--brand-gray-50, var(--brand-text-secondary-color));
+  font-weight: 600;
+  font-size: var(--brand-font-size-base);
+  border-radius: var(--brand-button-border-radius, 12px);
+  height: 48px;
+  letter-spacing: -0.3px;
 }
 
 .save-button:disabled {
-  --background: var(--ion-color-light);
-  --color: var(--ion-color-medium);
+  --background: var(--brand-gray-10, var(--brand-card-background-color));
+  --color: var(--brand-gray-50, var(--brand-text-secondary-color));
 }
 </style>
+

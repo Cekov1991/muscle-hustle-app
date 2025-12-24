@@ -2,43 +2,49 @@
   <div class="account-info">
     <form @submit.prevent="handleSubmit" class="account-form">
       <!-- Name Field -->
-      <ion-item class="form-item">
-        <ion-label position="stacked">Full Name *</ion-label>
-        <ion-input
-          v-model="formData.name"
-          type="text"
-          placeholder="Enter your full name"
-          :class="{ 'ion-invalid': validationErrors.name }"
-          @ion-blur="validateField('name')"
-        ></ion-input>
-        <ion-note v-if="validationErrors.name" slot="error">
-          {{ validationErrors.name }}
-        </ion-note>
-      </ion-item>
+      <div class="field-card">
+        <ion-item lines="none" class="form-item">
+          <ion-label position="stacked">Full Name *</ion-label>
+          <ion-input
+            v-model="formData.name"
+            type="text"
+            placeholder="Enter your full name"
+            :class="{ 'ion-invalid': validationErrors.name }"
+            @ion-blur="validateField('name')"
+          ></ion-input>
+          <ion-note v-if="validationErrors.name" slot="error">
+            {{ validationErrors.name }}
+          </ion-note>
+        </ion-item>
+      </div>
 
       <!-- Email Field -->
-      <ion-item class="form-item">
-        <ion-label position="stacked">Email Address *</ion-label>
-        <ion-input
-          v-model="formData.email"
-          type="email"
-          placeholder="Enter your email address"
-          :class="{ 'ion-invalid': validationErrors.email }"
-          @ion-blur="validateField('email')"
-        ></ion-input>
-        <ion-note v-if="validationErrors.email" slot="error">
-          {{ validationErrors.email }}
-        </ion-note>
-      </ion-item>
+      <div class="field-card">
+        <ion-item lines="none" class="form-item">
+          <ion-label position="stacked">Email Address *</ion-label>
+          <ion-input
+            v-model="formData.email"
+            type="email"
+            placeholder="Enter your email address"
+            :class="{ 'ion-invalid': validationErrors.email }"
+            @ion-blur="validateField('email')"
+          ></ion-input>
+          <ion-note v-if="validationErrors.email" slot="error">
+            {{ validationErrors.email }}
+          </ion-note>
+        </ion-item>
+      </div>
 
       <!-- Email Verification Notice -->
-      <ion-item v-if="profile?.email_verified_at === null" class="verification-notice">
-        <ion-icon :icon="warningOutline" slot="start" color="warning"></ion-icon>
-        <ion-label>
-          <h3>Email Verification Required</h3>
-          <p>Please verify your email address to secure your account.</p>
-        </ion-label>
-      </ion-item>
+      <div v-if="profile?.email_verified_at === null" class="field-card verification-card">
+        <ion-item lines="none" class="verification-notice">
+          <ion-icon :icon="warningOutline" slot="start" color="warning"></ion-icon>
+          <ion-label>
+            <h3>Email Verification Required</h3>
+            <p>Please verify your email address to secure your account.</p>
+          </ion-label>
+        </ion-item>
+      </div>
 
       <!-- Form Actions -->
       <div class="form-actions">
@@ -228,7 +234,8 @@ export default {
 
 <style scoped>
 .account-info {
-  padding: 20px;
+  padding: 16px;
+  background: var(--brand-background-color, #fafafa);
 }
 
 .account-form {
@@ -236,41 +243,82 @@ export default {
   margin: 0 auto;
 }
 
+.field-card {
+  background: var(--brand-gray-10, var(--brand-card-background-color));
+  border-radius: 20px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+  .field-card {
+    background: var(--brand-gray-10, var(--brand-card-background-color));
+  }
+  
+  .account-info {
+    background: var(--brand-background-color, #1a1a1a);
+  }
+}
+
 .form-item {
-  margin-bottom: 16px;
-  --background: var(--brand-background-color);
-  --border-color: var(--ion-color-light-shade);
+  --background: transparent;
+  --border-color: transparent;
+  --inner-padding-start: 6px;
+  --inner-padding-end: 16px;
+  --inner-padding-top: 6px;
+  --inner-padding-bottom: 6px;
+  --min-height: auto;
 }
 
 .form-item ion-label {
-  color: var(--brand-text-primary);
-  font-weight: 500;
-  margin-bottom: 8px;
+  font-family: var(--brand-font-family);
+  color: var(--brand-gray-50, var(--brand-text-secondary-color));
+  font-weight: 600;
+  font-size: var(--brand-font-size-sm);
+  margin-bottom: 4px;
+  letter-spacing: -0.3px;
 }
 
 .form-item ion-input {
-  --color: var(--brand-text-primary);
-  --placeholder-color: var(--brand-text-secondary);
-}
-
-.verification-notice {
-  --background: var(--ion-color-warning-tint);
-  --border-color: var(--ion-color-warning);
-  border-radius: 8px;
-  margin: 16px 0;
-}
-
-.verification-notice ion-label h3 {
-  color: var(--ion-color-warning-shade);
-  margin: 0 0 4px 0;
-  font-size: 14px;
+  font-family: var(--brand-font-family);
+  --color: var(--brand-text-primary-color);
+  --placeholder-color: var(--brand-gray-50, var(--brand-text-secondary-color));
+  font-size: var(--brand-font-size-base);
   font-weight: 600;
 }
 
+.verification-card {
+  background: var(--brand-gray-10, var(--brand-card-background-color));
+  border: 2px solid var(--brand-warning-color);
+}
+
+@media (prefers-color-scheme: dark) {
+  .verification-card {
+    background: var(--brand-gray-10, var(--brand-card-background-color));
+    border-color: var(--brand-warning-color);
+  }
+}
+
+.verification-notice {
+  --background: transparent;
+  --border-color: transparent;
+}
+
+.verification-notice ion-label h3 {
+  font-family: var(--brand-font-family);
+  color: var(--brand-warning-color);
+  margin: 0 0 4px 0;
+  font-size: var(--brand-font-size-sm);
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
 .verification-notice ion-label p {
-  color: var(--ion-color-warning-shade);
+  font-family: var(--brand-font-family);
+  color: var(--brand-warning-color);
   margin: 0;
-  font-size: 12px;
+  font-size: var(--brand-font-size-xs);
+  letter-spacing: -0.2px;
 }
 
 .form-actions {
@@ -278,21 +326,35 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  padding: 0 4px;
 }
 
 .save-button {
   --background: var(--brand-primary);
-  --background-hover: var(--brand-primary-hover);
-  --color: white;
+  --background-hover: var(--brand-primary-shade);
+  --color: var(--brand-text-on-primary-color);
+  font-family: var(--brand-font-family);
   font-weight: 600;
+  font-size: var(--brand-font-size-base);
+  border-radius: var(--brand-button-border-radius, 12px);
+  height: 48px;
+  letter-spacing: -0.3px;
 }
 
 .cancel-button {
-  --color: var(--brand-text-secondary);
+  font-family: var(--brand-font-family);
+  --color: var(--brand-gray-50, var(--brand-text-secondary-color));
+  font-weight: 600;
+  font-size: var(--brand-font-size-base);
+  border-radius: var(--brand-button-border-radius, 12px);
+  height: 48px;
+  letter-spacing: -0.3px;
 }
 
 .save-button:disabled {
-  --background: var(--ion-color-light);
-  --color: var(--ion-color-medium);
+  --background: var(--brand-gray-10, var(--brand-card-background-color));
+  --color: var(--brand-gray-50, var(--brand-text-secondary-color));
 }
 </style>
+
+
