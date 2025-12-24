@@ -174,6 +174,14 @@ export const workoutsAPI = {
 }
 
 /**
+ * Fitness metrics API endpoints
+ */
+export const fitnessAPI = {
+  // Get current fitness metrics (all-time values)
+  getMetrics: () => api.get('/user/fitness-metrics')
+}
+
+/**
  * Generic API helpers
  */
 export const apiHelpers = {

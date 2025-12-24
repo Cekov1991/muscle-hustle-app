@@ -35,29 +35,71 @@
 
       
         <div class="metrics-container">
-          <div class="metric-card">
-            <div class="metric-icon">
-              <ion-icon :icon="personOutline" />
+          <!-- Loading State -->
+          <template v-if="metricsLoading">
+            <div class="metric-card loading-state">
+              <div class="loading-content">
+                <ion-spinner name="crescent" class="metrics-spinner"></ion-spinner>
+                <div class="loading-text">Loading...</div>
+              </div>
             </div>
-            <div class="metric-value">{{ fitnessMetrics.age }}yr</div>
-            <div class="metric-label">Current Age</div>
-          </div>
+            <div class="metric-card loading-state">
+              <div class="loading-content">
+                <ion-spinner name="crescent" class="metrics-spinner"></ion-spinner>
+                <div class="loading-text">Loading...</div>
+              </div>
+            </div>
+            <div class="metric-card loading-state">
+              <div class="loading-content">
+                <ion-spinner name="crescent" class="metrics-spinner"></ion-spinner>
+                <div class="loading-text">Loading...</div>
+              </div>
+            </div>
+          </template>
+          
+          <!-- Error State -->
+          <template v-else-if="metricsError">
+            <div class="metric-card error-state">
+              <div class="error-content">
+                <p class="error-text">Failed to load metrics</p>
+                <ion-button 
+                  fill="outline" 
+                  size="small" 
+                  class="retry-button"
+                  @click="handleMetricsRetry"
+                >
+                  Retry
+                </ion-button>
+              </div>
+            </div>
+          </template>
+          
+          <!-- Metrics Content -->
+          <template v-else>
+            <div class="metric-card">
+              <div class="metric-icon">
+                <ion-icon :icon="barbellOutline" />
+              </div>
+              <div class="metric-value">{{ metrics.strengthScore.current }}</div>
+              <div class="metric-label">Strength Score</div>
+            </div>
 
-          <div class="metric-card">
-            <div class="metric-icon">
-              <ion-icon :icon="scaleOutline" />
+            <div class="metric-card">
+              <div class="metric-icon">
+                <ion-icon :icon="analyticsOutline" />
+              </div>
+              <div class="metric-value">{{ metrics.strengthBalance.percentage }}%</div>
+              <div class="metric-label">Strength Balance</div>
             </div>
-            <div class="metric-value">{{ fitnessMetrics.weight }}kg</div>
-            <div class="metric-label">Weight</div>
-          </div>
 
-          <div class="metric-card">
-            <div class="metric-icon">
-              <ion-icon :icon="flameOutline" />
+            <div class="metric-card">
+              <div class="metric-icon">
+                <ion-icon :icon="trendingUpOutline" />
+              </div>
+              <div class="metric-value">+{{ metrics.weeklyProgress.percentage }}%</div>
+              <div class="metric-label">Weekly Progress</div>
             </div>
-            <div class="metric-value">{{ fitnessMetrics.caloriesBurned }} kcal</div>
-            <div class="metric-label">Calories Burned</div>
-          </div>
+          </template>
         </div>
 
         <button class="start-workout-button" @click="handleStartWorkout">
@@ -73,17 +115,20 @@
 import { 
   IonPage, 
   IonContent,
-  IonIcon
+  IonIcon,
+  IonSpinner,
+  IonButton
 } from '@ionic/vue'
 import { 
-  personOutline,
-  scaleOutline,
-  flameOutline,
+  barbellOutline,
+  analyticsOutline,
+  trendingUpOutline,
   playOutline
 } from 'ionicons/icons'
 import { ref, onMounted } from 'vue'
 import { useAuth } from '../../auth/composables/useAuth'
 import { useCalendar } from '../composables/useCalendar'
+import { useMetrics } from '../composables/useMetrics'
 import WeeklyCalendar from '../components/WeeklyCalendar.vue'
 
 export default {
@@ -92,22 +137,19 @@ export default {
     IonPage,
     IonContent,
     IonIcon,
+    IonSpinner,
+    IonButton,
     WeeklyCalendar
   },
   setup() {
     const { user } = useAuth()
     const { sessions, loading: calendarLoading, error: calendarError, fetchCurrentWeek, retryFetch } = useCalendar()
+    const { metrics, loading: metricsLoading, error: metricsError, fetchMetrics, retryFetch: retryMetrics } = useMetrics()
     
     // User data
     const userLocation = ref('Tokyo, Japan')
     const fitnessLevel = ref('Beginner') // Options: Beginner, Intermediate, Advanced, Expert
     
-    // Fitness metrics (mock data)
-    const fitnessMetrics = ref({
-      age: 17,
-      weight: 68,
-      caloriesBurned: 978
-    })
     
     // Handle calendar retry
     const handleCalendarRetry = async () => {
@@ -118,12 +160,24 @@ export default {
       }
     }
     
-    // Fetch calendar data on mount
+    // Handle metrics retry
+    const handleMetricsRetry = async () => {
+      try {
+        await retryMetrics()
+      } catch (error) {
+        console.error('Metrics retry failed:', error)
+      }
+    }
+    
+    // Fetch data on mount
     onMounted(async () => {
       try {
-        await fetchCurrentWeek()
+        await Promise.all([
+          fetchCurrentWeek(),
+          fetchMetrics()
+        ])
       } catch (error) {
-        console.error('Failed to load calendar on mount:', error)
+        console.error('Failed to load data on mount:', error)
       }
     })
     
@@ -137,16 +191,19 @@ export default {
       user,
       userLocation,
       fitnessLevel,
-      fitnessMetrics,
+      metrics,
+      metricsLoading,
+      metricsError,
+      handleMetricsRetry,
       sessions,
       calendarLoading,
       calendarError,
       handleCalendarRetry,
       handleStartWorkout,
       // Icons
-      personOutline,
-      scaleOutline,
-      flameOutline,
+      barbellOutline,
+      analyticsOutline,
+      trendingUpOutline,
       playOutline
     }
   }
@@ -344,5 +401,69 @@ export default {
   font-size: var(--brand-font-size-4xl);
   color: var(--brand-text-on-primary-color);
   margin-left: 2px; /* Slight offset for play icon */
+}
+
+/* Metrics Loading & Error States */
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.metrics-spinner {
+  --color: var(--brand-primary);
+  width: 20px;
+  height: 20px;
+}
+
+.loading-text {
+  font-family: var(--brand-font-family);
+  font-weight: 500;
+  font-size: var(--brand-font-size-xs);
+  color: var(--brand-gray-40, var(--brand-text-tertiary-color));
+  letter-spacing: -0.3px;
+}
+
+.error-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+  grid-column: 1 / -1;
+}
+
+.error-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.error-text {
+  font-family: var(--brand-font-family);
+  font-weight: 500;
+  font-size: var(--brand-font-size-sm);
+  color: var(--brand-gray-50, var(--brand-text-secondary-color));
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.retry-button {
+  --color: var(--brand-primary);
+  --border-color: var(--brand-primary);
+  font-family: var(--brand-font-family);
+  font-weight: 600;
+  font-size: var(--brand-font-size-xs);
+  letter-spacing: -0.2px;
+  min-height: 32px;
 }
 </style>
