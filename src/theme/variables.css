@@ -171,6 +171,12 @@ ion-toolbar {
     --fitness-shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.4);
   }
   
+  /* Toolbar dark mode styling */
+  ion-toolbar {
+    --background: var(--ion-color-primary);
+    --color: var(--ion-color-primary-contrast);
+  }
+  
   ion-card {
     --background: var(--ion-color-step-50);
     border: 1px solid var(--ion-color-step-100);

@@ -289,7 +289,7 @@ export default {
   border-radius: 30px;
   padding: 12px;
   margin-bottom: 16px;
-  margin-top: 5%; /* Overlap with header */
+  margin-top: 10%; /* Overlap with header */
   position: relative;
   z-index: 2;
 }
