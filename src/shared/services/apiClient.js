@@ -161,7 +161,16 @@ export const workoutsAPI = {
   getWorkoutSessions: () => api.get('/workout-sessions'),
   getWorkoutSession: (id) => api.get(`/workout-sessions/${id}`),
   updateWorkoutSession: (id, data) => api.put(`/workout-sessions/${id}`, data),
-  deleteWorkoutSession: (id) => api.delete(`/workout-sessions/${id}`)
+  deleteWorkoutSession: (id) => api.delete(`/workout-sessions/${id}`),
+  
+  // Calendar endpoint
+  getCalendarSessions: (startDate, endDate) => 
+    api.get('/workout-sessions/calendar', { 
+      params: { 
+        start_date: startDate, 
+        end_date: endDate 
+      } 
+    })
 }
 
 /**

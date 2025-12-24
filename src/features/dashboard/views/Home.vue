@@ -25,7 +25,12 @@
       <div style="padding: 10px !important;">
         <!-- Weekly Calendar Component -->
         <div class="calendar-wrapper">
-          <WeeklyCalendar :workouts="workoutsByDate" />
+          <WeeklyCalendar 
+            :workouts="sessions" 
+            :loading="calendarLoading" 
+            :error="calendarError"
+            @retry="handleCalendarRetry"
+          />
         </div>
 
       
@@ -76,8 +81,9 @@ import {
   flameOutline,
   playOutline
 } from 'ionicons/icons'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useAuth } from '../../auth/composables/useAuth'
+import { useCalendar } from '../composables/useCalendar'
 import WeeklyCalendar from '../components/WeeklyCalendar.vue'
 
 export default {
@@ -90,6 +96,7 @@ export default {
   },
   setup() {
     const { user } = useAuth()
+    const { sessions, loading: calendarLoading, error: calendarError, fetchCurrentWeek, retryFetch } = useCalendar()
     
     // User data
     const userLocation = ref('Tokyo, Japan')
@@ -102,27 +109,23 @@ export default {
       caloriesBurned: 978
     })
     
-    // Generate mock workout data with actual dates for the current week
-    const generateWorkoutsByDate = () => {
-      const today = new Date()
-      const currentDay = today.getDay() // 0 = Sunday, 1 = Monday, etc.
-      const startOfWeek = new Date(today)
-      startOfWeek.setDate(today.getDate() - currentDay) // Start from Sunday
-      
-      const workouts = []
-      // Add workouts for Monday (index 1) and Wednesday (index 3) to match the image
-      const monday = new Date(startOfWeek)
-      monday.setDate(startOfWeek.getDate() + 1)
-      workouts.push({ date: monday.toISOString().split('T')[0], completed: true })
-      
-      const wednesday = new Date(startOfWeek)
-      wednesday.setDate(startOfWeek.getDate() + 3)
-      workouts.push({ date: wednesday.toISOString().split('T')[0], completed: true })
-      
-      return workouts
+    // Handle calendar retry
+    const handleCalendarRetry = async () => {
+      try {
+        await retryFetch()
+      } catch (error) {
+        console.error('Retry failed:', error)
+      }
     }
     
-    const workoutsByDate = ref(generateWorkoutsByDate())
+    // Fetch calendar data on mount
+    onMounted(async () => {
+      try {
+        await fetchCurrentWeek()
+      } catch (error) {
+        console.error('Failed to load calendar on mount:', error)
+      }
+    })
     
     // Start workout handler (placeholder)
     const handleStartWorkout = () => {
@@ -135,7 +138,10 @@ export default {
       userLocation,
       fitnessLevel,
       fitnessMetrics,
-      workoutsByDate,
+      sessions,
+      calendarLoading,
+      calendarError,
+      handleCalendarRetry,
       handleStartWorkout,
       // Icons
       personOutline,
