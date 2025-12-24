@@ -35,36 +35,12 @@
           />
         </div>
 
-        <!-- Tabbed Interface -->
-        <ion-segment v-model="activeTab" class="profile-tabs">
-          <ion-segment-button value="account">
-            <ion-icon :icon="personOutline"></ion-icon>
-            <ion-label>Account</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="fitness">
-            <ion-icon :icon="fitnessOutline"></ion-icon>
-            <ion-label>Fitness</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-
-        <!-- Tab Content -->
-        <div class="tab-content">
-          <!-- Account Info Tab -->
-          <AccountInfo 
-            v-show="activeTab === 'account'"
-            :profile="profile"
-            :loading="saving"
-            @update="handleAccountUpdate"
-          />
-
-          <!-- Fitness Profile Tab -->
-          <FitnessProfile 
-            v-show="activeTab === 'fitness'"
-            :profile="profile"
-            :loading="saving"
-            @update="handleFitnessUpdate"
-          />
-        </div>
+        <!-- Profile Form -->
+        <AccountInfo 
+          :profile="profile"
+          :loading="saving"
+          @update="handleProfileUpdate"
+        />
       </div>
     </ion-content>
   </ion-page>
@@ -79,22 +55,16 @@ import {
   IonContent,
   IonSpinner,
   IonIcon,
-  IonButton,
-  IonSegment,
-  IonSegmentButton,
-  IonLabel
+  IonButton
 } from '@ionic/vue'
 import {
   alertCircleOutline,
-  refreshOutline,
-  personOutline,
-  fitnessOutline
+  refreshOutline
 } from 'ionicons/icons'
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useProfile } from '../composables/useProfile'
 import { useToast } from '../../../shared/composables/useToast'
 import AccountInfo from '../components/AccountInfo.vue'
-import FitnessProfile from '../components/FitnessProfile.vue'
 import ProfilePhotoUpload from '../components/ProfilePhotoUpload.vue'
 
 export default {
@@ -108,11 +78,7 @@ export default {
     IonSpinner,
     IonIcon,
     IonButton,
-    IonSegment,
-    IonSegmentButton,
-    IonLabel,
     AccountInfo,
-    FitnessProfile,
     ProfilePhotoUpload
   },
   setup() {
@@ -126,9 +92,6 @@ export default {
       updateProfile,
       clearError
     } = useProfile()
-
-    // Local state
-    const activeTab = ref('account')
 
     // Fetch profile on mount
     onMounted(async () => {
@@ -149,37 +112,20 @@ export default {
       }
     }
 
-    // Handle account info update
-    const handleAccountUpdate = async (accountData) => {
+    // Handle profile update (combined account and fitness)
+    const handleProfileUpdate = async (profileData) => {
       try {
-        await updateProfile(accountData)
-        await showSuccess('Account information updated successfully')
+        await updateProfile(profileData)
+        await showSuccess('Profile updated successfully')
       } catch (error) {
-        console.error('Failed to update account:', error)
+        console.error('Failed to update profile:', error)
         
         if (error.response?.status === 422) {
           // Validation errors - let the component handle them
           throw error
         }
         
-        await showError(error.message || 'Failed to update account information')
-      }
-    }
-
-    // Handle fitness profile update
-    const handleFitnessUpdate = async (fitnessData) => {
-      try {
-        await updateProfile(fitnessData)
-        await showSuccess('Fitness profile updated successfully')
-      } catch (error) {
-        console.error('Failed to update fitness profile:', error)
-        
-        if (error.response?.status === 422) {
-          // Validation errors - let the component handle them
-          throw error
-        }
-        
-        await showError(error.message || 'Failed to update fitness profile')
+        await showError(error.message || 'Failed to update profile')
       }
     }
 
@@ -194,19 +140,15 @@ export default {
       loading,
       error,
       saving,
-      activeTab,
       
       // Methods
       handleRetry,
-      handleAccountUpdate,
-      handleFitnessUpdate,
+      handleProfileUpdate,
       handlePhotoUpdate,
       
       // Icons
       alertCircleOutline,
-      refreshOutline,
-      personOutline,
-      fitnessOutline
+      refreshOutline
     }
   }
 }
@@ -265,21 +207,5 @@ export default {
   margin: 0;
   color: var(--brand-text-secondary);
   font-size: 14px;
-}
-
-.profile-tabs {
-  margin: 0;
-  --background: var(--brand-background-color);
-}
-
-.tab-content {
-  padding: 0;
-}
-
-/* Ensure consistent styling with existing components */
-ion-segment-button {
-  --color: var(--brand-gray-40);
-  --color-checked: var(--brand-primary);
-  --indicator-color: var(--brand-primary);
 }
 </style>
