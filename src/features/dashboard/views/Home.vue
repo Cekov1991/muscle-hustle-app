@@ -76,31 +76,51 @@
           
           <!-- Metrics Content -->
           <template v-else>
-            <div class="metric-card">
+            <div class="metric-card clickable" @click="showMetricDetail('strengthScore')">
               <div class="metric-icon">
                 <ion-icon :icon="barbellOutline" />
               </div>
               <div class="metric-value">{{ metrics.strengthScore.current }}</div>
               <div class="metric-label">Strength Score</div>
+              <div class="click-indicator">
+                <ion-icon :icon="chevronForwardOutline" />
+              </div>
             </div>
 
-            <div class="metric-card">
+            <div class="metric-card clickable" @click="showMetricDetail('strengthBalance')">
               <div class="metric-icon">
                 <ion-icon :icon="analyticsOutline" />
               </div>
               <div class="metric-value">{{ metrics.strengthBalance.percentage }}%</div>
               <div class="metric-label">Strength Balance</div>
+              <div class="click-indicator">
+                <ion-icon :icon="chevronForwardOutline" />
+              </div>
             </div>
 
-            <div class="metric-card">
+            <div class="metric-card clickable" @click="showMetricDetail('weeklyProgress')">
               <div class="metric-icon">
                 <ion-icon :icon="trendingUpOutline" />
               </div>
               <div class="metric-value">+{{ metrics.weeklyProgress.percentage }}%</div>
               <div class="metric-label">Weekly Progress</div>
+              <div class="click-indicator">
+                <ion-icon :icon="chevronForwardOutline" />
+              </div>
             </div>
           </template>
         </div>
+
+        <!-- Metrics Detail Modal -->
+        <MetricsDetailModal 
+          :is-open="showMetricsModal"
+          :selected-metric="selectedMetricData"
+          :additional-data="{
+            currentWeekWorkouts: metrics?.weeklyProgress?.currentWeekWorkouts || 0,
+            previousWeekWorkouts: metrics?.weeklyProgress?.previousWeekWorkouts || 0
+          }"
+          @close="closeMetricsModal"
+        />
 
         <button class="start-workout-button" @click="handleStartWorkout">
           <!-- <ion-icon :icon="playOutline" /> -->
@@ -123,13 +143,15 @@ import {
   barbellOutline,
   analyticsOutline,
   trendingUpOutline,
-  playOutline
+  playOutline,
+  chevronForwardOutline
 } from 'ionicons/icons'
 import { ref, onMounted } from 'vue'
 import { useAuth } from '../../auth/composables/useAuth'
 import { useCalendar } from '../composables/useCalendar'
 import { useMetrics } from '../composables/useMetrics'
 import WeeklyCalendar from '../components/WeeklyCalendar.vue'
+import MetricsDetailModal from '../components/MetricsDetailModal.vue'
 
 export default {
   name: 'HomeView',
@@ -139,12 +161,17 @@ export default {
     IonIcon,
     IonSpinner,
     IonButton,
-    WeeklyCalendar
+    WeeklyCalendar,
+    MetricsDetailModal
   },
   setup() {
     const { user } = useAuth()
     const { sessions, loading: calendarLoading, error: calendarError, fetchCurrentWeek, retryFetch } = useCalendar()
     const { metrics, loading: metricsLoading, error: metricsError, fetchMetrics, retryFetch: retryMetrics } = useMetrics()
+    
+    // Modal state
+    const showMetricsModal = ref(false)
+    const selectedMetricData = ref(null)
     
     // User data
     const userLocation = ref('Tokyo, Japan')
@@ -167,6 +194,22 @@ export default {
       } catch (error) {
         console.error('Metrics retry failed:', error)
       }
+    }
+    
+    // Handle metric card clicks
+    const showMetricDetail = (type) => {
+      if (!metrics.value) return
+      
+      selectedMetricData.value = {
+        type,
+        data: metrics.value[type]
+      }
+      showMetricsModal.value = true
+    }
+    
+    const closeMetricsModal = () => {
+      showMetricsModal.value = false
+      selectedMetricData.value = null
     }
     
     // Fetch data on mount
@@ -195,6 +238,10 @@ export default {
       metricsLoading,
       metricsError,
       handleMetricsRetry,
+      showMetricsModal,
+      selectedMetricData,
+      showMetricDetail,
+      closeMetricsModal,
       sessions,
       calendarLoading,
       calendarError,
@@ -204,7 +251,8 @@ export default {
       barbellOutline,
       analyticsOutline,
       trendingUpOutline,
-      playOutline
+      playOutline,
+      chevronForwardOutline
     }
   }
 }
@@ -333,6 +381,23 @@ export default {
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card.clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.metric-card.clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.metric-card.clickable:active {
+  transform: translateY(0);
 }
 
 .metric-icon {
@@ -465,5 +530,26 @@ export default {
   font-size: var(--brand-font-size-xs);
   letter-spacing: -0.2px;
   min-height: 32px;
+}
+
+/* Click Indicator */
+.click-indicator {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 16px;
+  height: 16px;
+  color: var(--brand-gray-40, var(--brand-text-tertiary-color));
+  font-size: 16px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.metric-card.clickable:hover .click-indicator {
+  opacity: 1;
+}
+
+.metric-card.clickable .click-indicator {
+  opacity: 0.6;
 }
 </style>
