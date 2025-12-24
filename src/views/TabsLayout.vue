@@ -18,7 +18,7 @@
           <ion-label>Progress</ion-label>
         </ion-tab-button>
         
-        <ion-tab-button @click="comingSoon" tab="profile">
+        <ion-tab-button tab="profile" href="/tabs/profile">
           <ion-icon :icon="personOutline" />
           <ion-label>Profile</ion-label>
         </ion-tab-button>

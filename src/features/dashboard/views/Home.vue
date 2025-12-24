@@ -7,14 +7,18 @@
       </div>
       <div class="profile-content">
         <div class="profile-picture">
-          <img src="/assets/profile-avatar.png" alt="Profile" class="avatar" />
+          <img 
+            :src="profilePhoto || '/assets/profile-avatar.png'" 
+            alt="Profile" 
+            class="avatar" 
+          />
         </div>
         <div class="profile-info">
           <h1 class="user-name">{{ user?.name || 'User' }}</h1>
           <div class="user-details">
             <span class="location">{{ userLocation }}</span>
             <span class="separator">•</span>
-            <span class="fitness-level">{{ fitnessLevel }}</span>
+            <span class="fitness-level">{{ displayFitnessLevel }}</span>
           </div>
         </div>
       </div>
@@ -75,12 +79,12 @@
           </template>
           
           <!-- Metrics Content -->
-          <template v-else>
+          <template v-else-if="metrics">
             <div class="metric-card clickable" @click="showMetricDetail('strengthScore')">
               <div class="metric-icon">
                 <ion-icon :icon="barbellOutline" />
               </div>
-              <div class="metric-value">{{ metrics.strengthScore.current }}</div>
+              <div class="metric-value">{{ metrics.strengthScore?.current || 0 }}</div>
               <div class="metric-label">Strength Score</div>
               <div class="click-indicator">
                 <ion-icon :icon="chevronForwardOutline" />
@@ -91,7 +95,7 @@
               <div class="metric-icon">
                 <ion-icon :icon="analyticsOutline" />
               </div>
-              <div class="metric-value">{{ metrics.strengthBalance.percentage }}%</div>
+              <div class="metric-value">{{ metrics.strengthBalance?.percentage || 0 }}%</div>
               <div class="metric-label">Strength Balance</div>
               <div class="click-indicator">
                 <ion-icon :icon="chevronForwardOutline" />
@@ -102,11 +106,38 @@
               <div class="metric-icon">
                 <ion-icon :icon="trendingUpOutline" />
               </div>
-              <div class="metric-value">+{{ metrics.weeklyProgress.percentage }}%</div>
+              <div class="metric-value">+{{ metrics.weeklyProgress?.percentage || 0 }}%</div>
               <div class="metric-label">Weekly Progress</div>
               <div class="click-indicator">
                 <ion-icon :icon="chevronForwardOutline" />
               </div>
+            </div>
+          </template>
+
+          <!-- No Metrics Available -->
+          <template v-else>
+            <div class="metric-card">
+              <div class="metric-icon">
+                <ion-icon :icon="barbellOutline" />
+              </div>
+              <div class="metric-value">-</div>
+              <div class="metric-label">Strength Score</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon">
+                <ion-icon :icon="analyticsOutline" />
+              </div>
+              <div class="metric-value">-%</div>
+              <div class="metric-label">Strength Balance</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon">
+                <ion-icon :icon="trendingUpOutline" />
+              </div>
+              <div class="metric-value">-% </div>
+              <div class="metric-label">Weekly Progress</div>
             </div>
           </template>
         </div>
@@ -146,10 +177,11 @@ import {
   playOutline,
   chevronForwardOutline
 } from 'ionicons/icons'
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '../../auth/composables/useAuth'
 import { useCalendar } from '../composables/useCalendar'
 import { useMetrics } from '../composables/useMetrics'
+import { useProfile } from '../../profile/composables/useProfile'
 import WeeklyCalendar from '../components/WeeklyCalendar.vue'
 import MetricsDetailModal from '../components/MetricsDetailModal.vue'
 
@@ -168,6 +200,7 @@ export default {
     const { user } = useAuth()
     const { sessions, loading: calendarLoading, error: calendarError, fetchCurrentWeek, retryFetch } = useCalendar()
     const { metrics, loading: metricsLoading, error: metricsError, fetchMetrics, retryFetch: retryMetrics } = useMetrics()
+    const { profile, fetchProfile } = useProfile()
     
     // Modal state
     const showMetricsModal = ref(false)
@@ -212,12 +245,28 @@ export default {
       selectedMetricData.value = null
     }
     
+    // Computed properties for profile data
+    const profilePhoto = computed(() => {
+      return profile.value?.profile_photo || null
+    })
+    
+    const displayFitnessLevel = computed(() => {
+      if (profile.value?.profile?.training_experience) {
+        const experience = profile.value.profile.training_experience
+        return experience.charAt(0).toUpperCase() + experience.slice(1)
+      }
+      return fitnessLevel.value
+    })
+    
     // Fetch data on mount
     onMounted(async () => {
       try {
         await Promise.all([
           fetchCurrentWeek(),
-          fetchMetrics()
+          fetchMetrics(),
+          fetchProfile().catch(error => {
+            console.warn('Failed to load profile, using defaults:', error)
+          })
         ])
       } catch (error) {
         console.error('Failed to load data on mount:', error)
@@ -234,6 +283,8 @@ export default {
       user,
       userLocation,
       fitnessLevel,
+      profilePhoto,
+      displayFitnessLevel,
       metrics,
       metricsLoading,
       metricsError,

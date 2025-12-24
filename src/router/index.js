@@ -57,6 +57,14 @@ const routes = [
         meta: { 
           title: 'Edit Workout'
         }
+      },
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: () => import('../features/profile/views/Profile.vue'),
+        meta: { 
+          title: 'Profile'
+        }
       }
     ]
   },

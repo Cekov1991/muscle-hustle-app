@@ -182,6 +182,29 @@ export const fitnessAPI = {
 }
 
 /**
+ * Profile API endpoints
+ */
+export const profileAPI = {
+  // Get user profile
+  getProfile: () => api.get('/profile'),
+  
+  // Update profile (JSON)
+  updateProfile: (data) => api.patch('/profile', data),
+  
+  // Update profile with photo upload
+  updateProfileWithPhoto: (formData) => {
+    return api.patch('/profile', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  },
+  
+  // Delete profile photo
+  deleteProfilePhoto: () => api.delete('/profile/photo')
+}
+
+/**
  * Generic API helpers
  */
 export const apiHelpers = {
