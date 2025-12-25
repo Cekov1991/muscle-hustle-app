@@ -1,43 +1,35 @@
 <template>
   <ion-page class="fitness-assessment">
-    <!-- Profile Header Section -->
-    <div class="profile-header">
-      <div class="header-background">
-        <div class="bg-image"></div>
-      </div>
-      <div class="profile-content">
-        <div class="profile-picture">
-          <img 
-            :src="profilePhoto || '/assets/profile-avatar.png'" 
-            alt="Profile" 
-            class="avatar" 
-          />
+    <ion-content class="dashboard-content">
+
+      <!-- Profile Header Section -->
+      <div class="profile-header">
+        <div class="header-background">
+          <div class="bg-image"></div>
         </div>
-        <div class="profile-info">
-          <h1 class="user-name">{{ user?.name || 'User' }}</h1>
-          <div class="user-details">
-            <span class="location">{{ userLocation }}</span>
-            <span class="separator">•</span>
-            <span class="fitness-level">{{ displayFitnessLevel }}</span>
+        <div class="profile-content">
+          <div class="profile-picture">
+            <img :src="profilePhoto || '/assets/profile-avatar.png'" alt="Profile" class="avatar" />
+          </div>
+          <div class="profile-info">
+            <h1 class="user-name">{{ user?.name || 'User' }}</h1>
+            <div class="user-details">
+              <span class="location">{{ userLocation }}</span>
+              <span class="separator">•</span>
+              <span class="fitness-level">{{ displayFitnessLevel }}</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <ion-content class="dashboard-content">
-     
-      <div style="padding: 10px !important;">
+      <div class="container">
         <!-- Weekly Calendar Component -->
         <div class="calendar-wrapper">
-          <WeeklyCalendar 
-            :workouts="sessions" 
-            :loading="calendarLoading" 
-            :error="calendarError"
-            @retry="handleCalendarRetry"
-          />
+          <WeeklyCalendar :workouts="sessions" :loading="calendarLoading" :error="calendarError"
+            @retry="handleCalendarRetry" />
         </div>
 
-      
+
         <div class="metrics-container">
           <!-- Loading State -->
           <template v-if="metricsLoading">
@@ -60,24 +52,19 @@
               </div>
             </div>
           </template>
-          
+
           <!-- Error State -->
           <template v-else-if="metricsError">
             <div class="metric-card error-state">
               <div class="error-content">
                 <p class="error-text">Failed to load metrics</p>
-                <ion-button 
-                  fill="outline" 
-                  size="small" 
-                  class="retry-button"
-                  @click="handleMetricsRetry"
-                >
+                <ion-button fill="outline" size="small" class="retry-button" @click="handleMetricsRetry">
                   Retry
                 </ion-button>
               </div>
             </div>
           </template>
-          
+
           <!-- Metrics Content -->
           <template v-else-if="metrics">
             <div class="metric-card clickable" @click="showMetricDetail('strengthScore')">
@@ -143,19 +130,16 @@
         </div>
 
         <!-- Metrics Detail Modal -->
-        <MetricsDetailModal 
-          :is-open="showMetricsModal"
-          :selected-metric="selectedMetricData"
-          :additional-data="{
-            currentWeekWorkouts: metrics?.weeklyProgress?.currentWeekWorkouts || 0,
-            previousWeekWorkouts: metrics?.weeklyProgress?.previousWeekWorkouts || 0
-          }"
-          @close="closeMetricsModal"
-        />
+        <MetricsDetailModal :is-open="showMetricsModal" :selected-metric="selectedMetricData" :additional-data="{
+          currentWeekWorkouts: metrics?.weeklyProgress?.currentWeekWorkouts || 0,
+          previousWeekWorkouts: metrics?.weeklyProgress?.previousWeekWorkouts || 0
+        }" @close="closeMetricsModal" />
 
         <button class="start-workout-button" @click="handleStartWorkout">
           <!-- <ion-icon :icon="playOutline" /> -->
-          <span style="font-size: var(--brand-font-size-base); font-weight: 600; color: var(--brand-text-on-primary-color);">Start Workout</span>
+          <span
+            style="font-size: var(--brand-font-size-base); font-weight: 600; color: var(--brand-text-on-primary-color);">Start
+            Workout</span>
         </button>
       </div>
     </ion-content>
@@ -163,14 +147,14 @@
 </template>
 
 <script>
-import { 
-  IonPage, 
+import {
+  IonPage,
   IonContent,
   IonIcon,
   IonSpinner,
   IonButton
 } from '@ionic/vue'
-import { 
+import {
   barbellOutline,
   analyticsOutline,
   trendingUpOutline,
@@ -201,16 +185,16 @@ export default {
     const { sessions, loading: calendarLoading, error: calendarError, fetchCurrentWeek, retryFetch } = useCalendar()
     const { metrics, loading: metricsLoading, error: metricsError, fetchMetrics, retryFetch: retryMetrics } = useMetrics()
     const { profile, fetchProfile } = useProfile()
-    
+
     // Modal state
     const showMetricsModal = ref(false)
     const selectedMetricData = ref(null)
-    
+
     // User data
     const userLocation = ref('Tokyo, Japan')
     const fitnessLevel = ref('Beginner') // Options: Beginner, Intermediate, Advanced, Expert
-    
-    
+
+
     // Handle calendar retry
     const handleCalendarRetry = async () => {
       try {
@@ -219,7 +203,7 @@ export default {
         console.error('Retry failed:', error)
       }
     }
-    
+
     // Handle metrics retry
     const handleMetricsRetry = async () => {
       try {
@@ -228,28 +212,28 @@ export default {
         console.error('Metrics retry failed:', error)
       }
     }
-    
+
     // Handle metric card clicks
     const showMetricDetail = (type) => {
       if (!metrics.value) return
-      
+
       selectedMetricData.value = {
         type,
         data: metrics.value[type]
       }
       showMetricsModal.value = true
     }
-    
+
     const closeMetricsModal = () => {
       showMetricsModal.value = false
       selectedMetricData.value = null
     }
-    
+
     // Computed properties for profile data
     const profilePhoto = computed(() => {
       return profile.value?.profile_photo || null
     })
-    
+
     const displayFitnessLevel = computed(() => {
       if (profile.value?.profile?.training_experience) {
         const experience = profile.value.profile.training_experience
@@ -257,7 +241,7 @@ export default {
       }
       return fitnessLevel.value
     })
-    
+
     // Fetch data on mount
     onMounted(async () => {
       try {
@@ -272,13 +256,13 @@ export default {
         console.error('Failed to load data on mount:', error)
       }
     })
-    
+
     // Start workout handler (placeholder)
     const handleStartWorkout = () => {
       console.log('Start workout clicked - functionality to be implemented')
       // TODO: Navigate to workout screen or start workout flow
     }
-    
+
     return {
       user,
       userLocation,
@@ -332,7 +316,7 @@ export default {
   right: 0;
   bottom: 0;
   overflow: hidden;
-  border-radius: 0 0 40px 40px ;
+  border-radius: 0 0 40px 40px;
 }
 
 .bg-image {
@@ -357,7 +341,7 @@ export default {
   pointer-events: none;
 }
 
-.profile-content > * {
+.profile-content>* {
   pointer-events: auto;
 }
 
@@ -410,7 +394,8 @@ export default {
 
 /* Calendar Wrapper */
 .calendar-wrapper {
-  margin-top: 10%; /* Overlap with header */
+  margin-top: 10%;
+  /* Overlap with header */
   position: relative;
   z-index: 2;
 }
@@ -476,7 +461,8 @@ export default {
 }
 
 .metric-card:nth-child(3) .metric-value {
-  font-size: 23px; /* Unique size, keeping as is */
+  font-size: 23px;
+  /* Unique size, keeping as is */
   letter-spacing: -0.322px;
 }
 
@@ -505,7 +491,7 @@ export default {
 }
 
 .start-workout-button:hover {
-  transform: scale(1.05);
+  transform: scale(1.01);
   box-shadow: 0 6px 16px rgba(249, 115, 22, 0.4);
 }
 
@@ -516,7 +502,8 @@ export default {
 .start-workout-button ion-icon {
   font-size: var(--brand-font-size-4xl);
   color: var(--brand-text-on-primary-color);
-  margin-left: 2px; /* Slight offset for play icon */
+  margin-left: 2px;
+  /* Slight offset for play icon */
 }
 
 /* Metrics Loading & Error States */

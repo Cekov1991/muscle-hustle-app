@@ -12,82 +12,85 @@
     </ion-header>
     
     <ion-content fullscreen class="ion-padding">
-      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
-        <ion-refresher-content></ion-refresher-content>
-      </ion-refresher>
+      <div class="container">
+  
+        <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+          <ion-refresher-content></ion-refresher-content>
+        </ion-refresher>
 
-      <!-- Loading State -->
-      <div v-if="loading && (!workouts || workouts.length === 0)" class="loading-container">
-        <ion-spinner name="crescent"></ion-spinner>
-        <p>Loading workouts...</p>
-      </div>
+        <!-- Loading State -->
+        <div v-if="loading && (!workouts || workouts.length === 0)" class="loading-container">
+          <ion-spinner name="crescent"></ion-spinner>
+          <p>Loading workouts...</p>
+        </div>
 
-      <!-- Empty State -->
-      <div v-else-if="!loading && (!workouts || workouts.length === 0)" class="empty-state">
-        <ion-icon :icon="barbellOutline" class="empty-icon" />
-        <h2>No Workouts Yet</h2>
-        <p>Create your first workout template to get started!</p>
-        <ion-button @click="handleAddWorkout" color="primary">
-          <ion-icon :icon="addOutline" slot="start" />
-          Create Workout
-        </ion-button>
-      </div>
+        <!-- Empty State -->
+        <div v-else-if="!loading && (!workouts || workouts.length === 0)" class="empty-state">
+          <ion-icon :icon="barbellOutline" class="empty-icon" />
+          <h2>No Workouts Yet</h2>
+          <p>Create your first workout template to get started!</p>
+          <ion-button @click="handleAddWorkout" color="primary">
+            <ion-icon :icon="addOutline" slot="start" />
+            Create Workout
+          </ion-button>
+        </div>
 
-      <!-- Workouts List -->
-      <div v-else-if="workouts && workouts.length > 0" class="workouts-container">
-        <ion-card 
-          v-for="workout in workouts" 
-          :key="workout.id" 
-          class="workout-card"
-          @click="handleEditWorkout(workout.id)"
-        >
-          <ion-card-header>
-            <div class="workout-header">
-              <div>
-                <ion-card-title>{{ workout.name }}</ion-card-title>
-                <ion-card-subtitle v-if="workout.description">
-                  {{ workout.description }}
-                </ion-card-subtitle>
+        <!-- Workouts List -->
+        <div v-else-if="workouts && workouts.length > 0" class="workouts-container">
+          <ion-card 
+            v-for="workout in workouts" 
+            :key="workout.id" 
+            class="workout-card"
+            @click="handleEditWorkout(workout.id)"
+          >
+            <ion-card-header>
+              <div class="workout-header">
+                <div>
+                  <ion-card-title>{{ workout.name }}</ion-card-title>
+                  <ion-card-subtitle v-if="workout.description">
+                    {{ workout.description }}
+                  </ion-card-subtitle>
+                </div>
+                <ion-badge 
+                  v-if="workout.day_of_week !== null" 
+                  color="primary"
+                  class="day-badge"
+                >
+                  {{ getDayName(workout.day_of_week) }}
+                </ion-badge>
               </div>
-              <ion-badge 
-                v-if="workout.day_of_week !== null" 
-                color="primary"
-                class="day-badge"
-              >
-                {{ getDayName(workout.day_of_week) }}
-              </ion-badge>
-            </div>
-          </ion-card-header>
-          
-          <ion-card-content>
-            <div class="workout-info">
-              <div class="exercise-count">
-                <ion-icon :icon="barbellOutline" />
-                <span>{{ workout.exercises?.length || 0 }} {{ workout.exercises?.length === 1 ? 'Exercise' : 'Exercises' }}</span>
-              </div>
-            </div>
+            </ion-card-header>
             
-            <div class="workout-actions" @click.stop>
-              <ion-button 
-                fill="clear" 
-                size="small" 
-                @click="handleEditWorkout(workout.id)"
-              >
-                <ion-icon :icon="createOutline" slot="start" />
-                Edit
-              </ion-button>
-              <ion-button 
-                fill="clear" 
-                size="small" 
-                color="danger"
-                @click="handleDeleteClick(workout)"
-              >
-                <ion-icon :icon="trashOutline" slot="start" />
-                Delete
-              </ion-button>
-            </div>
-          </ion-card-content>
-        </ion-card>
+            <ion-card-content>
+              <div class="workout-info">
+                <div class="exercise-count">
+                  <ion-icon :icon="barbellOutline" />
+                  <span>{{ workout.exercises?.length || 0 }} {{ workout.exercises?.length === 1 ? 'Exercise' : 'Exercises' }}</span>
+                </div>
+              </div>
+              
+              <div class="workout-actions" @click.stop>
+                <ion-button 
+                  fill="clear" 
+                  size="small" 
+                  @click="handleEditWorkout(workout.id)"
+                >
+                  <ion-icon :icon="createOutline" slot="start" />
+                  Edit
+                </ion-button>
+                <ion-button 
+                  fill="clear" 
+                  size="small" 
+                  color="danger"
+                  @click="handleDeleteClick(workout)"
+                >
+                  <ion-icon :icon="trashOutline" slot="start" />
+                  Delete
+                </ion-button>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </div>
       </div>
     </ion-content>
   </ion-page>

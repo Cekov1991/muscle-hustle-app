@@ -5,42 +5,37 @@
         <ion-title>Profile</ion-title>
       </ion-toolbar>
     </ion-header>
-    
+
     <ion-content fullscreen>
       <!-- Loading State -->
-      <div v-if="loading" class="loading-container">
-        <ion-spinner name="crescent"></ion-spinner>
-        <p>Loading profile...</p>
-      </div>
-
-      <!-- Error State -->
-      <div v-else-if="error" class="error-container">
-        <ion-icon :icon="alertCircleOutline" class="error-icon"></ion-icon>
-        <h3>Unable to load profile</h3>
-        <p>{{ error.message || 'Something went wrong' }}</p>
-        <ion-button @click="handleRetry" fill="outline">
-          <ion-icon :icon="refreshOutline" slot="start"></ion-icon>
-          Try Again
-        </ion-button>
-      </div>
-
-      <!-- Profile Content -->
-      <div v-else class="profile-container">
-        <!-- Profile Header -->
-        <div class="profile-header">
-          <ProfilePhotoUpload 
-            :current-photo="profile?.profile_photo"
-            :loading="saving"
-            @photo-updated="handlePhotoUpdate"
-          />
+      <div class="container">
+        <div v-if="loading" class="loading-container">
+          <ion-spinner name="crescent"></ion-spinner>
+          <p>Loading profile...</p>
         </div>
 
-        <!-- Profile Form -->
-        <AccountInfo 
-          :profile="profile"
-          :loading="saving"
-          @update="handleProfileUpdate"
-        />
+        <!-- Error State -->
+        <div v-else-if="error" class="error-container">
+          <ion-icon :icon="alertCircleOutline" class="error-icon"></ion-icon>
+          <h3>Unable to load profile</h3>
+          <p>{{ error.message || 'Something went wrong' }}</p>
+          <ion-button @click="handleRetry" fill="outline">
+            <ion-icon :icon="refreshOutline" slot="start"></ion-icon>
+            Try Again
+          </ion-button>
+        </div>
+
+        <!-- Profile Content -->
+        <div v-else class="profile-container">
+          <!-- Profile Header -->
+          <div class="profile-header">
+            <ProfilePhotoUpload :current-photo="profile?.profile_photo" :loading="saving"
+              @photo-updated="handlePhotoUpdate" />
+          </div>
+
+          <!-- Profile Form -->
+          <AccountInfo :profile="profile" :loading="saving" @update="handleProfileUpdate" />
+        </div>
       </div>
     </ion-content>
   </ion-page>
@@ -119,12 +114,12 @@ export default {
         await showSuccess('Profile updated successfully')
       } catch (error) {
         console.error('Failed to update profile:', error)
-        
+
         if (error.response?.status === 422) {
           // Validation errors - let the component handle them
           throw error
         }
-        
+
         await showError(error.message || 'Failed to update profile')
       }
     }
@@ -140,12 +135,12 @@ export default {
       loading,
       error,
       saving,
-      
+
       // Methods
       handleRetry,
       handleProfileUpdate,
       handlePhotoUpdate,
-      
+
       // Icons
       alertCircleOutline,
       refreshOutline
@@ -189,7 +184,6 @@ export default {
   align-items: center;
   padding: 24px;
   background: var(--brand-background-color, #fafafa);
-  border-bottom: 1px solid var(--ion-color-light-shade);
 }
 
 .profile-info {

@@ -39,6 +39,7 @@ import '@ionic/vue/css/palettes/dark.system.css'
 /* Theme variables */
 import './theme/variables.css'
 import './theme/branding.css'
+import './theme/common.css'
 
 // Create Vue app
 const app = createApp(App)

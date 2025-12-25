@@ -32,15 +32,6 @@ export const appConfig = {
     biometricLogin: false,
     offlineMode: false,
     analytics: false,
-  },
-  
-  // White-labeling configuration (for future expansion)
-  branding: {
-    primaryColor: '#3880ff',
-    secondaryColor: '#0cd1e8',
-    logo: null,
-    gymName: 'Fitness App',
-    customCss: null,
   }
 }
 
