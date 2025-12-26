@@ -379,44 +379,4 @@ body.gym-branded {
   }
 }
 
-/* Dark mode brand adjustments */
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Primary colors - keep brand colors but can adjust if needed */
-    --brand-primary: var(--brand-primary-dark, #fa812d);  /* Lighter tint for dark mode */
-    --brand-secondary: var(--brand-secondary-dark, #292a2c); /* Lighter tint for dark mode */
-    
-    /* Background Colors - Dark mode adjustments */
-    --brand-background-color: #121212;      /* Dark background */
-    --brand-card-background-color: #1e1e1e;  /* Dark card background */
-    --brand-input-background-color: #2a2a2a; /* Dark input background */
-    
-    /* Text Colors - Dark mode adjustments */
-    --brand-text-primary-color: #ffffff;    /* White for primary text */
-    --brand-text-secondary-color: #b0b0b0;   /* Light gray for secondary text */
-    --brand-text-tertiary-color: #808080;    /* Medium gray for tertiary text */
-    --brand-text-on-primary-color: #ffffff;   /* White text on primary (unchanged) */
-    
-    /* Border Colors - Dark mode adjustments */
-    --brand-border-color: #3a3a3a;           /* Dark border color */
-    
-    /* Gray Scale Colors - Dark mode adjustments */
-    --brand-gray-10: #2a2a2a;    /* Dark card backgrounds */
-    --brand-gray-20: #3a3a3a;    /* Dark borders/icons */
-    --brand-gray-30: #808080;    /* Medium gray for secondary text */
-    --brand-gray-40: #707070;    /* Slightly darker for labels */
-    --brand-gray-50: #989898;    /* Light gray for tertiary text */
-  }
-  
-  /* Toolbar dark mode styling */
-  .gym-branded ion-toolbar {
-    --background: var(--brand-primary);
-    --color: var(--brand-text-on-primary-color);
-  }
-  
-  /* Card dark mode styling */
-  .gym-branded ion-card {
-    --background: var(--brand-card-background-color);
-    border-color: var(--brand-border-color);
-  }
-}
+/* Dark mode brand adjustments are now handled via JavaScript for partner branding compatibility */

@@ -5,6 +5,7 @@
 
 // Default color palette (hex format) - Ulpift design
 export const DEFAULT_PALETTE = {
+  // Light mode colors
   primary: '#f97316',              // pulse-orange
   secondary: '#111214',            // sandow-gray-100
   textPrimary: '#111214',          // sandow-gray-100
@@ -16,7 +17,36 @@ export const DEFAULT_PALETTE = {
   background: '#ffffff',           // white
   cardBackground: '#f3f3f4',       // sandow-gray-10
   border: '#babbbe',               // sandow-gray-30
-  success: '#10dc60'               // standard green
+  success: '#10dc60',              // standard green
+
+  // Dark mode variants
+  primaryDark: '#fa812d',          // lighter tint for dark mode
+  secondaryDark: '#292a2c',        // lighter tint for dark mode
+  textPrimaryDark: '#ffffff',      // white for primary text
+  textSecondaryDark: '#b0b0b0',    // light gray for secondary text
+  textOnPrimaryDark: '#ffffff',    // white text on primary (unchanged)
+  warningDark: '#fff94f',          // canary-yellow (unchanged)
+  dangerDark: '#ff6b6b',           // lighter red for dark mode
+  accentDark: '#fff94f',           // canary-yellow (unchanged)
+  backgroundDark: '#121212',       // dark background
+  cardBackgroundDark: '#1e1e1e',   // dark card background
+  inputBackgroundDark: '#2a2a2a',  // dark input background
+  borderDark: '#3a3a3a',           // dark border color
+  successDark: '#4ade80',          // lighter green for dark mode
+  
+  // Gray scale colors - light mode
+  gray10: '#ededed',                // for card backgrounds
+  gray20: '#babbbe',                // for borders/icons
+  gray30: '#7a7a7a',                // for secondary text
+  gray40: '#707070',                // for labels
+  gray50: '#989898',                // for tertiary text
+  
+  // Gray scale colors - dark mode
+  gray10Dark: '#2a2a2a',            // dark card backgrounds
+  gray20Dark: '#3a3a3a',            // dark borders/icons
+  gray30Dark: '#808080',            // medium gray for secondary text
+  gray40Dark: '#707070',            // slightly darker for labels
+  gray50Dark: '#989898'              // light gray for tertiary text
 }
 
 // Default branding configuration
@@ -48,6 +78,7 @@ export const BRANDING_CSS_VARS = {
   // Background colors
   BACKGROUND: '--brand-background-color',
   CARD_BACKGROUND: '--brand-card-background-color',
+  INPUT_BACKGROUND: '--brand-input-background-color',
   
   // Text colors
   TEXT_PRIMARY: '--brand-text-primary-color',
@@ -64,7 +95,28 @@ export const BRANDING_CSS_VARS = {
   BORDER: '--brand-border-color',
   BACKGROUND_PATTERN: '--brand-background-pattern',
   LOGO_URL: '--brand-logo-url',
-  FONT_FAMILY: '--brand-font-family'
+  FONT_FAMILY: '--brand-font-family',
+  
+  // Gray scale colors
+  GRAY_10: '--brand-gray-10',
+  GRAY_20: '--brand-gray-20',
+  GRAY_30: '--brand-gray-30',
+  GRAY_40: '--brand-gray-40',
+  GRAY_50: '--brand-gray-50',
+
+  // Dark mode variants
+  PRIMARY_DARK: '--brand-primary-dark',
+  SECONDARY_DARK: '--brand-secondary-dark',
+  TEXT_PRIMARY_DARK: '--brand-text-primary-dark',
+  TEXT_SECONDARY_DARK: '--brand-text-secondary-dark',
+  TEXT_ON_PRIMARY_DARK: '--brand-text-on-primary-dark',
+  BACKGROUND_DARK: '--brand-background-dark',
+  CARD_BACKGROUND_DARK: '--brand-card-background-dark',
+  BORDER_DARK: '--brand-border-dark',
+  SUCCESS_DARK: '--brand-success-dark',
+  WARNING_DARK: '--brand-warning-dark',
+  DANGER_DARK: '--brand-danger-dark',
+  ACCENT_DARK: '--brand-accent-dark'
 }
 
 // CSS class names

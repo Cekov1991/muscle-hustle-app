@@ -16,6 +16,20 @@ export const simulateBackendResponse = () => {
         "visual_identity": {
           "primary_color": "255,107,53",      // RGB format from backend
           "secondary_color": "78,205,196",    // RGB format from backend
+          "primary_color_dark": "255,140,90", // Lighter version for dark mode
+          "secondary_color_dark": "110,229,219", // Lighter version for dark mode
+          "background_color": "#ffffff",
+          "background_color_dark": "#121212",
+          "card_background_color": "#f3f3f4",
+          "card_background_color_dark": "#1e1e1e",
+          "text_primary_color": "#111214",
+          "text_primary_color_dark": "#ffffff",
+          "text_secondary_color": "#393c43",
+          "text_secondary_color_dark": "#b0b0b0",
+          "text_on_primary_color": "#ffffff",
+          "text_on_primary_color_dark": "#ffffff",
+          "border_color": "#babbbe",
+          "border_color_dark": "#3a3a3a",
           "logo": "/images/muscle-hustle-logo.png",
           "font_family": "Inter"
         }
@@ -38,7 +52,11 @@ export const testBrandingApplication = async (useAuth, useBranding) => {
   console.log('📥 Simulated Backend Response:', {
     partnerName: userData.partner.name,
     primaryColor: userData.partner.visual_identity.primary_color,
+    primaryColorDark: userData.partner.visual_identity.primary_color_dark,
     secondaryColor: userData.partner.visual_identity.secondary_color,
+    secondaryColorDark: userData.partner.visual_identity.secondary_color_dark,
+    backgroundColor: userData.partner.visual_identity.background_color,
+    backgroundColorDark: userData.partner.visual_identity.background_color_dark,
     logo: userData.partner.visual_identity.logo,
     fontFamily: userData.partner.visual_identity.font_family
   })
@@ -49,7 +67,10 @@ export const testBrandingApplication = async (useAuth, useBranding) => {
   
   console.log('🎨 Expected Branding Changes:')
   console.log('  - Primary Color (RGB):', userData.partner.visual_identity.primary_color, '→ Hex conversion')
+  console.log('  - Primary Color Dark (RGB):', userData.partner.visual_identity.primary_color_dark, '→ Hex conversion')
   console.log('  - Secondary Color (RGB):', userData.partner.visual_identity.secondary_color, '→ Hex conversion')
+  console.log('  - Secondary Color Dark (RGB):', userData.partner.visual_identity.secondary_color_dark, '→ Hex conversion')
+  console.log('  - Background Color:', userData.partner.visual_identity.background_color, '/ Dark:', userData.partner.visual_identity.background_color_dark)
   console.log('  - Partner Name:', userData.partner.name)
   console.log('  - Logo:', userData.partner.visual_identity.logo)
   console.log('  - Font:', userData.partner.visual_identity.font_family)
@@ -61,9 +82,15 @@ export const testBrandingApplication = async (useAuth, useBranding) => {
     expectedResults: {
       partnerName: userData.partner.name,
       primaryColorHex: '#FF6B35',  // Converted from "255,107,53"
+      primaryColorHexDark: '#FF8C5A', // Converted from "255,140,90"
       secondaryColorHex: '#4ECDC4', // Converted from "78,205,196"  
+      secondaryColorHexDark: '#6EE5DB', // Converted from "110,229,219"
       primaryColorRgb: userData.partner.visual_identity.primary_color,
+      primaryColorRgbDark: userData.partner.visual_identity.primary_color_dark,
       secondaryColorRgb: userData.partner.visual_identity.secondary_color,
+      secondaryColorRgbDark: userData.partner.visual_identity.secondary_color_dark,
+      backgroundColor: userData.partner.visual_identity.background_color,
+      backgroundColorDark: userData.partner.visual_identity.background_color_dark,
       logo: userData.partner.visual_identity.logo,
       fontFamily: userData.partner.visual_identity.font_family
     }
@@ -84,4 +111,6 @@ export const rgbToHex = (rgb) => {
 // Example usage and verification
 console.log('🎯 Color Conversion Examples:')
 console.log('RGB "255,107,53" → Hex:', rgbToHex('255,107,53'))  // Should be #FF6B35
+console.log('RGB "255,140,90" → Hex:', rgbToHex('255,140,90'))  // Should be #FF8C5A (dark variant)
 console.log('RGB "78,205,196" → Hex:', rgbToHex('78,205,196'))  // Should be #4ECDC4
+console.log('RGB "110,229,219" → Hex:', rgbToHex('110,229,219'))  // Should be #6EE5DB (dark variant)

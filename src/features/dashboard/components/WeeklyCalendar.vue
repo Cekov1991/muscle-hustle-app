@@ -263,7 +263,7 @@ export default {
   height: 32px;
   border-radius: 50%;
   border: 2px solid var(--brand-gray-20, var(--brand-border-color));
-  background: white;
+  background: var(--brand-gray-10, var(--brand-card-background-color));
   display: flex;
   align-items: center;
   justify-content: center;

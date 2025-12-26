@@ -1,50 +1,70 @@
 import { generateShade } from '../utils/colorHelpers'
 import { BRANDING_CSS_VARS, BRANDING_CLASSES } from '../constants/brandingDefaults'
+import { resolveColorsForCurrentMode } from '../services/colorResolver'
+import { isDarkMode, createDarkModeListener } from '../utils/darkModeHelpers'
 
 export const useBrandingDOM = () => {
-  // Apply CSS custom properties to document root
+  // Apply CSS custom properties to document root with dark mode awareness
   const applyBrandingToDOM = (brandingData) => {
     const root = document.documentElement
+    const currentIsDark = isDarkMode()
     
-    // Primary and secondary colors (hex)
-    root.style.setProperty(BRANDING_CSS_VARS.PRIMARY, brandingData.primaryColor)
-    root.style.setProperty(BRANDING_CSS_VARS.SECONDARY, brandingData.secondaryColor)
+    console.log('🎨 [useBrandingDOM] applyBrandingToDOM called:', {
+      isDark: currentIsDark,
+      hasLightColors: !!brandingData.primaryColor,
+      hasDarkColors: !!brandingData.primaryColorDark
+    })
     
-    // Ionic colors (hex)
-    root.style.setProperty(BRANDING_CSS_VARS.ION_PRIMARY, brandingData.primaryColor)
-    root.style.setProperty(BRANDING_CSS_VARS.ION_SECONDARY, brandingData.secondaryColor)
+    // Resolve colors for current mode
+    const resolvedColors = resolveColorsForCurrentMode(brandingData, currentIsDark)
     
-    // RGB values for Ionic components that need them (only for primary/secondary)
-    root.style.setProperty(BRANDING_CSS_VARS.PRIMARY_RGB, brandingData.primaryColorRgb)
-    root.style.setProperty(BRANDING_CSS_VARS.SECONDARY_RGB, brandingData.secondaryColorRgb)
-    root.style.setProperty(BRANDING_CSS_VARS.ION_PRIMARY_RGB, brandingData.primaryColorRgb)
-    root.style.setProperty(BRANDING_CSS_VARS.ION_SECONDARY_RGB, brandingData.secondaryColorRgb)
+    // Primary and secondary colors (resolved for current mode)
+    root.style.setProperty(BRANDING_CSS_VARS.PRIMARY, resolvedColors.primaryColor)
+    root.style.setProperty(BRANDING_CSS_VARS.SECONDARY, resolvedColors.secondaryColor)
+    
+    // Ionic colors (resolved for current mode)
+    root.style.setProperty(BRANDING_CSS_VARS.ION_PRIMARY, resolvedColors.primaryColor)
+    root.style.setProperty(BRANDING_CSS_VARS.ION_SECONDARY, resolvedColors.secondaryColor)
+    
+    // RGB values for Ionic components (resolved for current mode)
+    root.style.setProperty(BRANDING_CSS_VARS.PRIMARY_RGB, resolvedColors.primaryColorRgb)
+    root.style.setProperty(BRANDING_CSS_VARS.SECONDARY_RGB, resolvedColors.secondaryColorRgb)
+    root.style.setProperty(BRANDING_CSS_VARS.ION_PRIMARY_RGB, resolvedColors.primaryColorRgb)
+    root.style.setProperty(BRANDING_CSS_VARS.ION_SECONDARY_RGB, resolvedColors.secondaryColorRgb)
     
     // Generate and set shade colors for hover/active states
-    const primaryShade = generateShade(brandingData.primaryColor)
-    const secondaryShade = generateShade(brandingData.secondaryColor)
+    const primaryShade = generateShade(resolvedColors.primaryColor)
+    const secondaryShade = generateShade(resolvedColors.secondaryColor)
     root.style.setProperty(BRANDING_CSS_VARS.PRIMARY_SHADE, primaryShade)
     root.style.setProperty(BRANDING_CSS_VARS.SECONDARY_SHADE, secondaryShade)
     root.style.setProperty(BRANDING_CSS_VARS.ION_PRIMARY_SHADE, primaryShade)
     root.style.setProperty(BRANDING_CSS_VARS.ION_SECONDARY_SHADE, secondaryShade)
     
-    // Background colors (hex only)
-    root.style.setProperty(BRANDING_CSS_VARS.BACKGROUND, brandingData.backgroundColor)
-    root.style.setProperty(BRANDING_CSS_VARS.CARD_BACKGROUND, brandingData.cardBackgroundColor)
+    // Background colors (resolved for current mode)
+    root.style.setProperty(BRANDING_CSS_VARS.BACKGROUND, resolvedColors.backgroundColor)
+    root.style.setProperty(BRANDING_CSS_VARS.CARD_BACKGROUND, resolvedColors.cardBackgroundColor)
+    root.style.setProperty(BRANDING_CSS_VARS.INPUT_BACKGROUND, resolvedColors.inputBackgroundColor)
     
-    // Text colors (hex only)
-    root.style.setProperty(BRANDING_CSS_VARS.TEXT_PRIMARY, brandingData.textPrimaryColor)
-    root.style.setProperty(BRANDING_CSS_VARS.TEXT_SECONDARY, brandingData.textSecondaryColor)
-    root.style.setProperty(BRANDING_CSS_VARS.TEXT_ON_PRIMARY, brandingData.textOnPrimaryColor)
+    // Text colors (resolved for current mode)
+    root.style.setProperty(BRANDING_CSS_VARS.TEXT_PRIMARY, resolvedColors.textPrimaryColor)
+    root.style.setProperty(BRANDING_CSS_VARS.TEXT_SECONDARY, resolvedColors.textSecondaryColor)
+    root.style.setProperty(BRANDING_CSS_VARS.TEXT_ON_PRIMARY, resolvedColors.textOnPrimaryColor)
     
-    // Semantic colors (hex only)
-    root.style.setProperty(BRANDING_CSS_VARS.SUCCESS, brandingData.successColor)
-    root.style.setProperty(BRANDING_CSS_VARS.WARNING, brandingData.warningColor)
-    root.style.setProperty(BRANDING_CSS_VARS.DANGER, brandingData.dangerColor)
-    root.style.setProperty(BRANDING_CSS_VARS.ACCENT, brandingData.accentColor)
+    // Semantic colors (resolved for current mode)
+    root.style.setProperty(BRANDING_CSS_VARS.SUCCESS, resolvedColors.successColor)
+    root.style.setProperty(BRANDING_CSS_VARS.WARNING, resolvedColors.warningColor)
+    root.style.setProperty(BRANDING_CSS_VARS.DANGER, resolvedColors.dangerColor)
+    root.style.setProperty(BRANDING_CSS_VARS.ACCENT, resolvedColors.accentColor)
     
-    // Other colors (hex only)
-    root.style.setProperty(BRANDING_CSS_VARS.BORDER, brandingData.borderColor)
+    // Other colors (resolved for current mode)
+    root.style.setProperty(BRANDING_CSS_VARS.BORDER, resolvedColors.borderColor)
+    
+    // Gray scale colors (resolved for current mode)
+    root.style.setProperty(BRANDING_CSS_VARS.GRAY_10, resolvedColors.gray10)
+    root.style.setProperty(BRANDING_CSS_VARS.GRAY_20, resolvedColors.gray20)
+    root.style.setProperty(BRANDING_CSS_VARS.GRAY_30, resolvedColors.gray30)
+    root.style.setProperty(BRANDING_CSS_VARS.GRAY_40, resolvedColors.gray40)
+    root.style.setProperty(BRANDING_CSS_VARS.GRAY_50, resolvedColors.gray50)
     
     // Background pattern
     if (brandingData.backgroundPattern) {
@@ -62,6 +82,12 @@ export const useBrandingDOM = () => {
     
     // Add gym-branded class to body for CSS targeting
     document.body.classList.add(BRANDING_CLASSES.GYM_BRANDED)
+    
+    console.log('✅ [useBrandingDOM] Branding applied to DOM:', {
+      primaryColor: resolvedColors.primaryColor,
+      backgroundColor: resolvedColors.backgroundColor,
+      textPrimaryColor: resolvedColors.textPrimaryColor
+    })
   }
 
   // Remove all branding CSS custom properties
@@ -98,11 +124,24 @@ export const useBrandingDOM = () => {
     return document.body.classList.contains(BRANDING_CLASSES.GYM_BRANDED)
   }
 
+  // Setup dark mode listener for automatic re-application
+  const setupDarkModeListener = (brandingData) => {
+    console.log('🌙 [useBrandingDOM] Setting up dark mode listener')
+    
+    return createDarkModeListener((isDark) => {
+      console.log('🌙 [useBrandingDOM] Dark mode changed:', { isDark })
+      
+      // Re-apply branding when dark mode changes
+      applyBrandingToDOM(brandingData)
+    })
+  }
+
   return {
     applyBrandingToDOM,
     removeBrandingFromDOM,
     updateCSSProperty,
     getCSSPropertyValue,
-    isBrandingAppliedToDOM
+    isBrandingAppliedToDOM,
+    setupDarkModeListener
   }
 }
