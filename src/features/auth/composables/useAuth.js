@@ -12,24 +12,45 @@ const authState = reactive({
 
 // Initialize auth state from localStorage
 const initializeAuth = () => {
+  console.log('🔧 [useAuth] initializeAuth called')
   const storedToken = localStorage.getItem('auth_token')
   const storedUser = localStorage.getItem('user_data')
+  
+  console.log('🔧 [useAuth] localStorage check:', {
+    hasToken: !!storedToken,
+    hasUserData: !!storedUser
+  })
   
   if (storedToken) {
     authState.token = storedToken
     apiHelpers.setAuthToken(storedToken)
+    console.log('✅ [useAuth] Token loaded from localStorage')
   }
   
   if (storedUser) {
     try {
-      authState.user = JSON.parse(storedUser)
+      const parsedUser = JSON.parse(storedUser)
+      authState.user = parsedUser
+      console.log('✅ [useAuth] User loaded from localStorage:', {
+        hasUser: !!authState.user,
+        hasPartner: !!authState.user?.partner,
+        hasVisualIdentity: !!authState.user?.partner?.visual_identity,
+        partnerName: authState.user?.partner?.name,
+        visualIdentityKeys: authState.user?.partner?.visual_identity ? Object.keys(authState.user.partner.visual_identity) : []
+      })
     } catch (e) {
-      console.error('Error parsing stored user data:', e)
+      console.error('❌ [useAuth] Error parsing stored user data:', e)
       localStorage.removeItem('user_data')
     }
+  } else {
+    console.log('⚠️ [useAuth] No user data in localStorage')
   }
   
   authState.isInitialized = true
+  console.log('✅ [useAuth] Auth initialization complete:', {
+    isInitialized: authState.isInitialized,
+    isAuthenticated: !!authState.token && !!authState.user
+  })
 }
 
 // Initialize on module load
@@ -46,6 +67,7 @@ export const useAuth = () => {
 
   // Login function
   const login = async (credentials) => {
+    console.log('🔐 [useAuth] login called')
     try {
       const response = await authAPI.login({
         email: credentials.email,
@@ -58,6 +80,15 @@ export const useAuth = () => {
         throw new Error('Invalid response from server')
       }
       
+      console.log('✅ [useAuth] Login successful:', {
+        hasToken: !!authToken,
+        hasUser: !!userData,
+        hasPartner: !!userData?.partner,
+        hasVisualIdentity: !!userData?.partner?.visual_identity,
+        partnerName: userData?.partner?.name,
+        visualIdentityKeys: userData?.partner?.visual_identity ? Object.keys(userData.partner.visual_identity) : []
+      })
+      
       // Update reactive state
       authState.token = authToken
       authState.user = userData
@@ -65,6 +96,8 @@ export const useAuth = () => {
       // Store in localStorage and set auth header
       localStorage.setItem('user_data', JSON.stringify(userData))
       apiHelpers.setAuthToken(authToken)
+      
+      console.log('✅ [useAuth] User data stored in localStorage and state updated')
       
       return { token: authToken, user: userData }
     } catch (error) {
@@ -105,9 +138,11 @@ export const useAuth = () => {
     
     try {
       const response = await authAPI.getUser()
+      // Backend returns { user: {...} }, extract user object
+      const userData = response.data?.user || response.data
       // Update user data if successful
-      authState.user = response.data
-      localStorage.setItem('user_data', JSON.stringify(response.data))
+      authState.user = userData
+      localStorage.setItem('user_data', JSON.stringify(userData))
       return true
     } catch (error) {
       // Token is invalid, logout user
@@ -119,14 +154,58 @@ export const useAuth = () => {
 
   // Refresh user data
   const refreshUser = async () => {
-    if (!isAuthenticated.value) return null
+    console.log('🔄 [useAuth] refreshUser called')
+    console.log('🔄 [useAuth] Current state:', {
+      isAuthenticated: isAuthenticated.value,
+      hasToken: !!authState.token,
+      hasUser: !!authState.user,
+      userHasPartner: !!authState.user?.partner,
+      userHasVisualIdentity: !!authState.user?.partner?.visual_identity
+    })
+    
+    if (!isAuthenticated.value) {
+      console.log('⚠️ [useAuth] Not authenticated, skipping refresh')
+      return null
+    }
     
     try {
+      console.log('📡 [useAuth] Fetching fresh user data from /user endpoint...')
       const response = await authAPI.getUser()
-      authState.user = response.data
-      localStorage.setItem('user_data', JSON.stringify(response.data))
-      return response.data
+      // Backend returns { user: {...} }, extract user object
+      const freshUserData = response.data?.user || response.data
+      
+      console.log('✅ [useAuth] Fresh user data received:', {
+        responseStructure: response.data?.user ? 'wrapped in user key' : 'direct user object',
+        hasUser: !!freshUserData,
+        hasPartner: !!freshUserData?.partner,
+        hasVisualIdentity: !!freshUserData?.partner?.visual_identity,
+        partnerName: freshUserData?.partner?.name,
+        visualIdentityKeys: freshUserData?.partner?.visual_identity ? Object.keys(freshUserData.partner.visual_identity) : []
+      })
+      
+      const oldUser = { ...authState.user }
+      
+      // Use fresh data directly (backend returns complete data with partner/visual_identity)
+      authState.user = freshUserData
+      localStorage.setItem('user_data', JSON.stringify(freshUserData))
+      
+      console.log('✅ [useAuth] User state updated:', {
+        oldUserHadPartner: !!oldUser?.partner,
+        oldUserHadVisualIdentity: !!oldUser?.partner?.visual_identity,
+        freshDataHadPartner: !!freshUserData?.partner,
+        freshDataHadVisualIdentity: !!freshUserData?.partner?.visual_identity,
+        newUserHasPartner: !!authState.user?.partner,
+        newUserHasVisualIdentity: !!authState.user?.partner?.visual_identity
+      })
+      
+      return freshUserData
     } catch (error) {
+      console.error('❌ [useAuth] Failed to refresh user data:', error)
+      console.error('❌ [useAuth] Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      })
       const message = getApiErrorMessage(error, 'refresh user', 'Failed to refresh user data')
       throw new Error(message)
     }

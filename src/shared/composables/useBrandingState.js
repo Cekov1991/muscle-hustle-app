@@ -66,10 +66,19 @@ export const useBrandingState = () => {
 
   // Update branding state from partner visual identity
   const updateBrandingState = (partner) => {
+    console.log('🎨 [useBrandingState] updateBrandingState called:', {
+      hasPartner: !!partner,
+      hasVisualIdentity: !!partner?.visual_identity,
+      partnerName: partner?.name,
+      visualIdentityKeys: partner?.visual_identity ? Object.keys(partner.visual_identity) : []
+    })
+    
     if (!partner?.visual_identity) {
-      console.warn('No visual identity found for partner:', partner)
+      console.warn('⚠️ [useBrandingState] No visual identity found for partner:', partner)
       return
     }
+    
+    console.log('✅ [useBrandingState] Visual identity found, updating branding state...')
     
     const { visual_identity } = partner
     
@@ -112,6 +121,15 @@ export const useBrandingState = () => {
     brandingState.partnerName = partner.name || brandingState.partnerName
     brandingState.fontFamily = visual_identity.font_family || brandingState.fontFamily
     brandingState.isInitialized = true
+    
+    console.log('✅ [useBrandingState] Branding state updated:', {
+      primaryColor: brandingState.primaryColor,
+      secondaryColor: brandingState.secondaryColor,
+      partnerName: brandingState.partnerName,
+      logo: brandingState.logo,
+      fontFamily: brandingState.fontFamily,
+      isInitialized: brandingState.isInitialized
+    })
   }
 
   // Reset state to defaults

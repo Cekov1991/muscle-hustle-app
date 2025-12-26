@@ -25,13 +25,32 @@ export default {
     IonLoading
   },
   setup() {
-    const { isInitialized } = useAuth()
+    const { isInitialized, isAuthenticated, refreshUser } = useAuth()
     const { isInitialized: isBrandingInitialized } = useBranding()
     const isInitializing = ref(true)
     
-    // Watch for auth initialization instead of polling
-    watch(isInitialized, (initialized) => {
+    console.log('📱 [App] App component setup')
+    
+    // Watch for auth initialization and refresh user data
+    watch(isInitialized, async (initialized) => {
+      console.log('📱 [App] Auth initialization watcher triggered:', {
+        initialized,
+        isAuthenticated: isAuthenticated.value
+      })
+      
       if (initialized) {
+        // If user is authenticated, fetch fresh data from backend
+        if (isAuthenticated.value) {
+          console.log('📱 [App] User authenticated, fetching fresh data...')
+          try {
+            await refreshUser()
+            console.log('📱 [App] Fresh data fetch completed')
+          } catch (error) {
+            console.error('📱 [App] Failed to fetch fresh data:', error)
+          }
+        } else {
+          console.log('📱 [App] User not authenticated, skipping refresh')
+        }
         isInitializing.value = false
       }
     }, { immediate: true })
