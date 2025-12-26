@@ -96,11 +96,42 @@ export default {
 </script>
 ```
 
-### Accessing Branding Data
+### Accessing Branding Data (New Grouped API)
 
 ```javascript
 import { useBranding } from '../shared/composables/useBranding'
 
+const { colors, assets, metadata } = useBranding()
+
+// Colors
+colors.primary           // Hex color (e.g., "#FF6B35")
+colors.secondary         // Hex color (e.g., "#4ECDC4")
+colors.rgb.primary       // RGB string (e.g., "255,107,53")
+colors.shades.primary    // Shade color (mode-aware)
+colors.text.primary      // Text color
+colors.success           // Semantic colors
+
+// Assets
+assets.logo              // Logo URL
+assets.backgroundPattern // Background pattern URL
+
+// Metadata
+metadata.partnerName     // Partner name (e.g., "Muscle Hustle")
+metadata.fontFamily      // Font family (e.g., "Inter")
+metadata.isInitialized   // Boolean: is branding applied?
+metadata.isDarkMode      // Boolean: is dark mode active?
+
+// Methods
+branding.apply(partner)  // Apply partner branding
+branding.applyDefault()  // Apply default branding
+branding.reset()         // Reset branding
+```
+
+### Legacy Flat API (Deprecated)
+
+The old flat API still works but is deprecated:
+
+```javascript
 const {
   primaryColor,        // Hex color (e.g., "#FF6B35")
   secondaryColor,      // Hex color (e.g., "#4ECDC4")
@@ -112,6 +143,8 @@ const {
   isInitialized        // Boolean: is branding applied?
 } = useBranding()
 ```
+
+See [BRANDING_API_MIGRATION.md](./BRANDING_API_MIGRATION.md) for migration guide.
 
 ## 🎨 CSS Custom Properties Applied
 

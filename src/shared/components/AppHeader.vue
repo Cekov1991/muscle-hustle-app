@@ -23,6 +23,7 @@
 
 <script>
 import { IonHeader, IonToolbar, IonTitle } from '@ionic/vue'
+import { computed } from 'vue'
 import { useBranding } from '../composables/useBranding'
 
 export default {
@@ -33,11 +34,11 @@ export default {
     IonTitle
   },
   setup() {
-    const { logo, partnerName } = useBranding()
+    const { assets, metadata } = useBranding()
     
     return {
-      logo,
-      partnerName
+      logo: computed(() => assets.value.logo),
+      partnerName: computed(() => metadata.value.partnerName)
     }
   }
 }

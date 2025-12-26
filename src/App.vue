@@ -13,7 +13,7 @@
 
 <script>
 import { IonApp, IonRouterOutlet, IonLoading } from '@ionic/vue'
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useAuth } from './features/auth/composables/useAuth'
 import { useBranding } from './shared/composables/useBranding'
 
@@ -26,7 +26,7 @@ export default {
   },
   setup() {
     const { isInitialized, isAuthenticated, refreshUser } = useAuth()
-    const { isInitialized: isBrandingInitialized } = useBranding()
+    const { metadata } = useBranding()
     const isInitializing = ref(true)
     
     console.log('📱 [App] App component setup')
@@ -76,7 +76,7 @@ export default {
     
     return {
       isInitializing,
-      isBrandingInitialized
+      isBrandingInitialized: computed(() => metadata.value.isInitialized)
     }
   }
 }

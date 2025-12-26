@@ -13,7 +13,7 @@
         </div>
         <div class="header-text">
           <h1 class="main-title">Sign In To Ulpift</h1>
-          <p class="subtitle">Let's personalize your fitness with AI</p>
+          <p class="subtitle">Let's personalize your fitness journey</p>
         </div>
       </div>
     </div>

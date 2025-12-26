@@ -75,6 +75,7 @@ import {
   IonCheckbox,
   IonLabel
 } from '@ionic/vue'
+import { computed } from 'vue'
 import { useBranding } from '../composables/useBranding'
 
 export default {
@@ -91,24 +92,16 @@ export default {
     IonLabel
   },
   setup() {
-    const { 
-      primaryColor, 
-      secondaryColor, 
-      primaryColorRgb,
-      secondaryColorRgb,
-      logo, 
-      partnerName, 
-      fontFamily 
-    } = useBranding()
+    const { colors, assets, metadata } = useBranding()
     
     return {
-      primaryColor,
-      secondaryColor,
-      primaryColorRgb,
-      secondaryColorRgb,
-      logo,
-      partnerName,
-      fontFamily
+      primaryColor: computed(() => colors.value.primary),
+      secondaryColor: computed(() => colors.value.secondary),
+      primaryColorRgb: computed(() => colors.value.rgb.primary),
+      secondaryColorRgb: computed(() => colors.value.rgb.secondary),
+      logo: computed(() => assets.value.logo),
+      partnerName: computed(() => metadata.value.partnerName),
+      fontFamily: computed(() => metadata.value.fontFamily)
     }
   }
 }
