@@ -698,7 +698,6 @@ export default {
 
 .cancel-button {
   font-family: var(--brand-font-family);
-  --color: var(--brand-gray-50, var(--brand-text-secondary-color));
   font-weight: 600;
   font-size: var(--brand-font-size-base);
   border-radius: var(--brand-button-border-radius, 12px);

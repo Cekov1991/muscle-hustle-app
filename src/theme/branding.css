@@ -198,9 +198,9 @@ body.gym-branded {
 }
 
 .gym-branded ion-button.button-clear {
-  --color: var(--brand-primary);
-  --color-activated: var(--brand-primary-shade);
-  --color-focused: var(--brand-primary-shade);
+  --color: var(--brand-text-secondary-color);
+  --color-activated: var(--brand-text-secondary-color);
+  --color-focused: var(--brand-text-secondary-color);
 }
 
 /* Card branding */

@@ -591,7 +591,7 @@ export default {
 
 /* Sign In Button */
 .signin-button {
-  background: var(--brand-secondary);
+  background: var(--brand-primary);
   border: none;
   border-radius: var(--brand-button-border-radius);
   height: 56px;
@@ -610,7 +610,7 @@ export default {
 }
 
 .signin-button:hover:not(:disabled) {
-  background: var(--brand-black);
+  background: var(--brand-primary-shade);
   transform: translateY(-1px);
 }
 
