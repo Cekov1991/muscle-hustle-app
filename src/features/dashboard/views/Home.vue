@@ -12,12 +12,7 @@
             <img :src="profilePhoto || '/assets/profile-avatar.png'" alt="Profile" class="avatar" />
           </div>
           <div class="profile-info">
-            <h1 class="user-name">{{ user?.name || 'User' }}</h1>
-            <div class="user-details">
-              <span class="location">{{ userLocation }}</span>
-              <span class="separator">•</span>
-              <span class="fitness-level">{{ displayFitnessLevel }}</span>
-            </div>
+            <h1 class="user-name">{{ partnerName || 'UpLift' }}</h1>
           </div>
         </div>
       </div>
@@ -168,6 +163,8 @@ import { useMetrics } from '../composables/useMetrics'
 import { useProfile } from '../../profile/composables/useProfile'
 import WeeklyCalendar from '../components/WeeklyCalendar.vue'
 import MetricsDetailModal from '../components/MetricsDetailModal.vue'
+import { useBranding } from '../../../shared/composables/useBranding'
+
 
 export default {
   name: 'HomeView',
@@ -182,6 +179,7 @@ export default {
   },
   setup() {
     const { user } = useAuth()
+
     const { sessions, loading: calendarLoading, error: calendarError, fetchCurrentWeek, retryFetch } = useCalendar()
     const { metrics, loading: metricsLoading, error: metricsError, fetchMetrics, retryFetch: retryMetrics } = useMetrics()
     const { profile, fetchProfile } = useProfile()
@@ -190,10 +188,13 @@ export default {
     const showMetricsModal = ref(false)
     const selectedMetricData = ref(null)
 
-    // User data
-    const userLocation = ref('Tokyo, Japan')
-    const fitnessLevel = ref('Beginner') // Options: Beginner, Intermediate, Advanced, Expert
+    const partnerName = computed(() => {
+      return user.value?.partner?.name || null
+    })
 
+    const partnerLogo = computed(() => {
+      return user.value?.partner?.visual_identity?.logo || null
+    })    
 
     // Handle calendar retry
     const handleCalendarRetry = async () => {
@@ -234,14 +235,6 @@ export default {
       return profile.value?.profile_photo || null
     })
 
-    const displayFitnessLevel = computed(() => {
-      if (profile.value?.profile?.training_experience) {
-        const experience = profile.value.profile.training_experience
-        return experience.charAt(0).toUpperCase() + experience.slice(1)
-      }
-      return fitnessLevel.value
-    })
-
     // Fetch data on mount
     onMounted(async () => {
       try {
@@ -265,10 +258,9 @@ export default {
 
     return {
       user,
-      userLocation,
-      fitnessLevel,
+      partnerName,
+      partnerLogo,
       profilePhoto,
-      displayFitnessLevel,
       metrics,
       metricsLoading,
       metricsError,
