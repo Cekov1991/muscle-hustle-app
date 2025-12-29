@@ -177,7 +177,7 @@ export default {
 <style scoped>
 /* Calendar Card */
 .calendar-card {
-  background: var(--brand-gray-10, var(--brand-card-background-color));
+  background: var(--brand-card-background-color, var(--brand-gray-10));
   border-radius: 30px;
   padding: 16px;
   margin-bottom: 16px;
@@ -263,7 +263,7 @@ export default {
   height: 32px;
   border-radius: 50%;
   border: 2px solid var(--brand-gray-20, var(--brand-border-color));
-  background: var(--brand-gray-10, var(--brand-card-background-color));
+  background: var(--brand-card-background-color, var(--brand-gray-10));
   display: flex;
   align-items: center;
   justify-content: center;

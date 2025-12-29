@@ -5,14 +5,15 @@
       <!-- Profile Header Section -->
       <div class="profile-header">
         <div class="header-background">
-          <div class="bg-image"></div>
+          <div class="bg-image" :style="backgroundImage"></div>
+          <div class="bg-overlay"></div>
         </div>
         <div class="profile-content">
           <div class="profile-picture">
-            <img :src="profilePhoto || '/assets/profile-avatar.png'" alt="Profile" class="avatar" />
+            <div class="partner-logo" :style="partnerLogoStyle"></div>
           </div>
           <div class="profile-info">
-            <h1 class="user-name">{{ partnerName || 'UpLift' }}</h1>
+            <h1 class="partner-name">{{ partnerName || 'UpLift' }}</h1>
           </div>
         </div>
       </div>
@@ -130,12 +131,19 @@
           previousWeekWorkouts: metrics?.weeklyProgress?.previousWeekWorkouts || 0
         }" @close="closeMetricsModal" />
 
-        <button class="start-workout-button" @click="handleStartWorkout">
-          <!-- <ion-icon :icon="playOutline" /> -->
-          <span
+        <button class="start-workout-button" :disabled="startingWorkout" @click="handleStartWorkout">
+          <ion-spinner v-if="startingWorkout" name="crescent" class="button-spinner" />
+          <span v-else
             style="font-size: var(--brand-font-size-base); font-weight: 600; color: var(--brand-text-on-primary-color);">Start
             Workout</span>
         </button>
+        
+        <!-- Template Picker Modal -->
+        <TemplatePickerModal 
+          :is-open="showTemplatePicker" 
+          @close="showTemplatePicker = false"
+          @select="handleTemplateSelect"
+        />
       </div>
     </ion-content>
   </ion-page>
@@ -157,13 +165,14 @@ import {
   chevronForwardOutline
 } from 'ionicons/icons'
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuth } from '../../auth/composables/useAuth'
 import { useCalendar } from '../composables/useCalendar'
 import { useMetrics } from '../composables/useMetrics'
-import { useProfile } from '../../profile/composables/useProfile'
+import { useWorkoutSession } from '../../workouts/composables/useWorkoutSession'
 import WeeklyCalendar from '../components/WeeklyCalendar.vue'
 import MetricsDetailModal from '../components/MetricsDetailModal.vue'
-import { useBranding } from '../../../shared/composables/useBranding'
+import TemplatePickerModal from '../../workouts/components/TemplatePickerModal.vue'
 
 
 export default {
@@ -175,25 +184,51 @@ export default {
     IonSpinner,
     IonButton,
     WeeklyCalendar,
-    MetricsDetailModal
+    MetricsDetailModal,
+    TemplatePickerModal
   },
   setup() {
+    const router = useRouter()
     const { user } = useAuth()
 
     const { sessions, loading: calendarLoading, error: calendarError, fetchCurrentWeek, retryFetch } = useCalendar()
     const { metrics, loading: metricsLoading, error: metricsError, fetchMetrics, retryFetch: retryMetrics } = useMetrics()
-    const { profile, fetchProfile } = useProfile()
+    const { fetchToday, startSession } = useWorkoutSession()
 
     // Modal state
     const showMetricsModal = ref(false)
     const selectedMetricData = ref(null)
+    
+    // Workout state
+    const showTemplatePicker = ref(false)
+    const startingWorkout = ref(false)
 
     const partnerName = computed(() => {
       return user.value?.partner?.name || null
     })
 
-    const partnerLogo = computed(() => {
-      return user.value?.partner?.visual_identity?.logo || null
+    const partnerLogoStyle = computed(() => {
+      const logo = user.value?.partner?.visual_identity?.logo
+      if (logo) {
+        return {
+          backgroundImage: `url(${logo})`
+        }
+      }
+      // Fallback to default logo
+      return {
+        backgroundImage: `url(/assets/ulpift-logo.png)`
+      }
+    })
+
+    const backgroundImage = computed(() => {
+      const bgImage = user.value?.partner?.visual_identity?.background_image
+      if (bgImage) {
+        return {
+          backgroundImage: `url(${bgImage})`
+        }
+      }
+      // Fallback to CSS variable (default background)
+      return {}
     })    
 
     // Handle calendar retry
@@ -230,37 +265,63 @@ export default {
       selectedMetricData.value = null
     }
 
-    // Computed properties for profile data
-    const profilePhoto = computed(() => {
-      return profile.value?.profile_photo || null
-    })
-
     // Fetch data on mount
     onMounted(async () => {
       try {
         await Promise.all([
           fetchCurrentWeek(),
-          fetchMetrics(),
-          fetchProfile().catch(error => {
-            console.warn('Failed to load profile, using defaults:', error)
-          })
+          fetchMetrics()
         ])
       } catch (error) {
         console.error('Failed to load data on mount:', error)
       }
     })
 
-    // Start workout handler (placeholder)
-    const handleStartWorkout = () => {
-      console.log('Start workout clicked - functionality to be implemented')
-      // TODO: Navigate to workout screen or start workout flow
+    // Start workout handler
+    const handleStartWorkout = async () => {
+      startingWorkout.value = true
+      
+      try {
+        const todayData = await fetchToday()
+        
+        if (todayData?.session) {
+          // Resume existing session
+          router.push(`/tabs/workout-session/${todayData.session.id}`)
+        } else if (todayData?.template) {
+          // Start from today's template
+          const newSession = await startSession(todayData.template.id)
+          router.push(`/tabs/workout-session/${newSession.id}`)
+        } else {
+          // No template scheduled - show picker
+          showTemplatePicker.value = true
+        }
+      } catch (error) {
+        console.error('Failed to start workout:', error)
+      } finally {
+        startingWorkout.value = false
+      }
+    }
+    
+    // Handle template selection from picker
+    const handleTemplateSelect = async (templateId) => {
+      showTemplatePicker.value = false
+      startingWorkout.value = true
+      
+      try {
+        const newSession = await startSession(templateId)
+        router.push(`/tabs/workout-session/${newSession.id}`)
+      } catch (error) {
+        console.error('Failed to start workout from template:', error)
+      } finally {
+        startingWorkout.value = false
+      }
     }
 
     return {
       user,
       partnerName,
-      partnerLogo,
-      profilePhoto,
+      partnerLogoStyle,
+      backgroundImage,
       metrics,
       metricsLoading,
       metricsError,
@@ -274,6 +335,9 @@ export default {
       calendarError,
       handleCalendarRetry,
       handleStartWorkout,
+      handleTemplateSelect,
+      showTemplatePicker,
+      startingWorkout,
       // Icons
       barbellOutline,
       analyticsOutline,
@@ -320,6 +384,16 @@ export default {
   background-repeat: no-repeat;
 }
 
+.bg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.5) 100%);
+  z-index: 1;
+}
+
 .profile-content {
   position: absolute;
   bottom: -1%;
@@ -346,10 +420,12 @@ export default {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.avatar {
+.partner-logo {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .profile-info {
@@ -359,7 +435,7 @@ export default {
   padding: 8px 16px;
 }
 
-.user-name {
+.partner-name {
   font-family: var(--brand-font-family);
   color: var(--brand-text-on-primary-color);
   font-weight: 700;
@@ -402,7 +478,7 @@ export default {
 
 .metric-card {
   flex: 1;
-  background: var(--brand-gray-10, var(--brand-card-background-color));
+  background: var(--brand-card-background-color, var(--brand-gray-10));
   border-radius: 20px;
   padding: 10px;
   display: flex;
@@ -496,6 +572,17 @@ export default {
   color: var(--brand-text-on-primary-color);
   margin-left: 2px;
   /* Slight offset for play icon */
+}
+
+.start-workout-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.button-spinner {
+  --color: var(--brand-text-on-primary-color);
+  width: 24px;
+  height: 24px;
 }
 
 /* Metrics Loading & Error States */
