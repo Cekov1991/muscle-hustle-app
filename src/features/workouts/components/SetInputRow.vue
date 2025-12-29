@@ -119,21 +119,13 @@
 
 <script>
 import { ref, computed, watch } from 'vue'
-import { IonInput, IonButton, IonIcon, IonSpinner } from '@ionic/vue'
-import { 
-  checkmarkCircle, 
-  checkmark, 
-  close, 
-  pencil, 
-  trashOutline,
-  timeOutline 
-} from 'ionicons/icons'
+import { IonInput, IonIcon, IonSpinner } from '@ionic/vue'
+import { checkmarkCircle, timeOutline } from 'ionicons/icons'
 
 export default {
   name: 'SetInputRow',
   components: {
     IonInput,
-    IonButton,
     IonIcon,
     IonSpinner
   },
@@ -313,10 +305,6 @@ export default {
       handleDelete,
       // Icons
       checkmarkCircle,
-      checkmark,
-      close,
-      pencil,
-      trashOutline,
       timeOutline
     }
   }
@@ -413,28 +401,8 @@ export default {
   min-width: 0;
 }
 
-/* Hide number input spinners for all browsers */
-.value-input input[type="number"] {
-  -moz-appearance: textfield;
-}
-
-.value-input input[type="number"]::-webkit-outer-spin-button,
-.value-input input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-  display: none;
-}
-
 .value-input::part(native) {
   text-align: center;
-  -moz-appearance: textfield;
-}
-
-/* Hide number input spinners */
-.value-input::part(native)::-webkit-outer-spin-button,
-.value-input::part(native)::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
 }
 
 .input-unit {

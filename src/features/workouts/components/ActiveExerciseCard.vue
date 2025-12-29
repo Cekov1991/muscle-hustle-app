@@ -63,7 +63,7 @@
 
 <script>
 import { ref, computed } from 'vue'
-import { IonIcon, IonButton } from '@ionic/vue'
+import { IonIcon } from '@ionic/vue'
 import { 
   checkmarkCircle, 
   chevronDownOutline, 
@@ -76,7 +76,6 @@ export default {
   name: 'ActiveExerciseCard',
   components: {
     IonIcon,
-    IonButton,
     SetInputRow
   },
   props: {
