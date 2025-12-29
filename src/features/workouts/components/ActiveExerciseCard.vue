@@ -14,7 +14,7 @@
       </div>
       
       <div class="exercise-status">
-        <div class="sets-progress">
+        <div class="sets-progress" :class="{ 'completed': isExerciseCompleted }">
           {{ loggedSetsCount }}/{{ targetSets }}
         </div>
         <ion-icon 
@@ -46,15 +46,10 @@
       
       <!-- Add Extra Set Button -->
       <div v-if="canAddExtraSet" class="add-set-section">
-        <ion-button 
-          fill="outline" 
-          size="small" 
-          class="add-set-button"
-          @click="addExtraSet"
-        >
-          <ion-icon :icon="addOutline" slot="start" />
-          Add Set
-        </ion-button>
+        <button class="add-set-button" @click="addExtraSet">
+          <ion-icon :icon="addOutline" />
+          <span>Add Set</span>
+        </button>
       </div>
       
       <!-- Rest Time Info -->
@@ -231,7 +226,7 @@ export default {
   border-radius: 20px;
   margin-bottom: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   transition: all 0.2s ease;
 }
 
@@ -243,7 +238,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px;
+  padding: 20px;
   cursor: pointer;
   user-select: none;
 }
@@ -256,49 +251,51 @@ export default {
 .exercise-category {
   font-family: var(--brand-font-family);
   font-size: var(--brand-font-size-xs);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--brand-primary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .exercise-name {
   font-family: var(--brand-font-family);
   font-weight: 700;
-  font-size: var(--brand-font-size-lg);
+  font-size: var(--brand-font-size-xl);
   color: var(--brand-text-primary-color);
-  margin: 0 0 4px 0;
+  margin: 0 0 6px 0;
   line-height: 1.2;
+  letter-spacing: -0.5px;
 }
 
 .exercise-target {
   font-family: var(--brand-font-family);
   font-size: var(--brand-font-size-sm);
   color: var(--brand-text-secondary-color);
+  letter-spacing: -0.2px;
 }
 
 .exercise-status {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding-left: 12px;
+  gap: 6px;
+  padding-left: 16px;
 }
 
 .sets-progress {
   font-family: var(--brand-font-family);
   font-weight: 700;
-  font-size: var(--brand-font-size-lg);
+  font-size: var(--brand-font-size-xl);
   color: var(--brand-text-primary-color);
 }
 
-.exercise-card.is-completed .sets-progress {
+.sets-progress.completed {
   color: var(--ion-color-success, #2dd36f);
 }
 
 .exercise-status ion-icon {
-  font-size: 20px;
+  font-size: 22px;
   color: var(--brand-gray-40);
   transition: transform 0.2s ease;
 }
@@ -313,46 +310,82 @@ export default {
 }
 
 .exercise-content {
-  padding: 0 16px 16px 16px;
+  padding: 0 10px 20px 10px;
   border-top: 1px solid var(--brand-gray-10, rgba(0, 0, 0, 0.05));
 }
 
 .sets-list {
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
 .add-set-section {
   display: flex;
   justify-content: center;
-  margin-top: 8px;
+  margin-top: 12px;
 }
 
 .add-set-button {
-  --border-radius: 8px;
-  --border-color: var(--brand-primary);
-  --color: var(--brand-primary);
-  --background: transparent;
-  --background-hover: var(--brand-primary-light, rgba(249, 115, 22, 0.1));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 20px;
+  background: transparent;
+  border: 2px dashed var(--brand-gray-30, #d1d5db);
+  border-radius: 16px;
+  cursor: pointer;
   font-family: var(--brand-font-family);
-  font-weight: 500;
-  font-size: var(--brand-font-size-sm);
+  font-weight: 600;
+  font-size: var(--brand-font-size-base);
+  color: var(--brand-primary);
+  transition: all 0.2s ease;
+}
+
+.add-set-button:hover {
+  background: var(--brand-primary-light, rgba(59, 130, 246, 0.08));
+  border-color: var(--brand-primary);
+}
+
+.add-set-button:active {
+  transform: scale(0.98);
+}
+
+.add-set-button ion-icon {
+  font-size: 20px;
 }
 
 .rest-info {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  margin-top: 16px;
-  padding-top: 12px;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 16px;
   border-top: 1px solid var(--brand-gray-10, rgba(0, 0, 0, 0.05));
   font-family: var(--brand-font-family);
-  font-size: var(--brand-font-size-xs);
+  font-size: var(--brand-font-size-sm);
   color: var(--brand-text-tertiary-color);
+  letter-spacing: -0.2px;
 }
 
 .rest-info ion-icon {
-  font-size: 14px;
+  font-size: 16px;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .exercise-card {
+    background: var(--brand-card-background-color, #1f1f1f);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .add-set-button {
+    border-color: var(--brand-gray-40, #4b5563);
+  }
+  
+  .add-set-button:hover {
+    background: var(--brand-primary-light, rgba(59, 130, 246, 0.15));
+  }
 }
 </style>
-

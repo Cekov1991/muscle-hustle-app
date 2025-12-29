@@ -1,110 +1,118 @@
 <template>
-  <div class="set-row" :class="{ 'is-logged': isLogged, 'is-editing': isEditing }">
-    <div class="set-header">
-      <span class="set-number">Set {{ setNumber }}</span>
-      <span v-if="isLogged" class="logged-badge">
-        <ion-icon :icon="checkmarkCircle" />
-        Logged
-      </span>
+  <div class="set-card" :class="{ 'is-logged': isLogged, 'is-editing': isEditing }">
+    <div class="set-content">
+      <!-- Set Label -->
+      <div class="set-label">
+        <span class="set-number">Set {{ setNumber }}</span>
+        <span v-if="isLogged" class="logged-indicator">
+          <ion-icon :icon="checkmarkCircle" />
+        </span>
+      </div>
+
+      <!-- Inputs Container -->
+      <div class="inputs-container">
+        <!-- Reps Input -->
+        <div class="input-box">
+          <div class="input-wrapper" :class="{ 'has-value': localReps }">
+            <ion-input
+              :value="localReps"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              :placeholder="repsPlaceholder"
+              :disabled="isLogged && !isEditing"
+              class="value-input"
+              @ionInput="handleRepsInput"
+              @ionFocus="handleFocus"
+              @ionBlur="handleBlur"
+            />
+            <span class="input-unit">reps</span>
+          </div>
+          <div v-if="previousSet" class="last-value">
+            <ion-icon :icon="timeOutline" />
+            <span>Last: {{ previousSet.reps }} reps</span>
+          </div>
+        </div>
+
+        <!-- Weight Input -->
+        <div class="input-box">
+          <div class="input-wrapper" :class="{ 'has-value': localWeight }">
+            <ion-input
+              :value="localWeight"
+              type="text"
+              inputmode="decimal"
+              pattern="[0-9]*\.?[0-9]*"
+              :placeholder="weightPlaceholder"
+              :disabled="isLogged && !isEditing"
+              class="value-input"
+              @ionInput="handleWeightInput"
+              @ionFocus="handleFocus"
+              @ionBlur="handleBlur"
+            />
+            <span class="input-unit">kg</span>
+          </div>
+          <div v-if="previousSet" class="last-value">
+            <ion-icon :icon="timeOutline" />
+            <span>Last: {{ previousSet.weight }} kg</span>
+          </div>
+        </div>
+      </div>
     </div>
-    
-    <div class="set-inputs">
-      <div class="input-group">
-        <ion-input
-          v-model.number="localWeight"
-          type="number"
-          inputmode="decimal"
-          :placeholder="weightPlaceholder"
-          :disabled="isLogged && !isEditing"
-          class="weight-input"
-          @ionFocus="handleFocus"
-          @ionBlur="handleBlur"
-        />
-        <span class="input-unit">kg</span>
-      </div>
+
+    <!-- Action Buttons -->
+    <div class="action-row" v-if="showActions">
+      <!-- Log Set Button (not logged yet) -->
+      <template v-if="!isLogged">
+        <button 
+          class="log-button"
+          :disabled="!canLog || loading"
+          @click="handleLogSet"
+        >
+          <ion-spinner v-if="loading" name="crescent" />
+          <span v-else>Log Set</span>
+        </button>
+      </template>
       
-      <span class="input-separator">x</span>
-      
-      <div class="input-group">
-        <ion-input
-          v-model.number="localReps"
-          type="number"
-          inputmode="numeric"
-          :placeholder="repsPlaceholder"
-          :disabled="isLogged && !isEditing"
-          class="reps-input"
-          @ionFocus="handleFocus"
-          @ionBlur="handleBlur"
-        />
-        <span class="input-unit">reps</span>
-      </div>
-      
-      <div class="action-buttons">
-        <template v-if="!isLogged">
-          <ion-button 
-            fill="solid" 
-            size="small" 
-            class="log-button"
-            :disabled="!canLog || loading"
-            @click="handleLogSet"
-          >
-            <ion-spinner v-if="loading" name="crescent" />
-            <span v-else>Log</span>
-          </ion-button>
-        </template>
-        
-        <template v-else-if="isEditing">
-          <ion-button 
-            fill="solid" 
-            size="small" 
-            color="success"
-            class="save-button"
+      <!-- Editing Mode: Save & Cancel -->
+      <template v-else-if="isEditing">
+        <div class="edit-actions">
+          <button 
+            class="text-btn save-btn"
             :disabled="loading"
             @click="handleSaveEdit"
           >
             <ion-spinner v-if="loading" name="crescent" />
-            <ion-icon v-else :icon="checkmark" />
-          </ion-button>
-          <ion-button 
-            fill="clear" 
-            size="small" 
-            color="medium"
-            class="cancel-button"
+            <span v-else>Save</span>
+          </button>
+          <button 
+            class="text-btn cancel-btn"
             @click="handleCancelEdit"
           >
-            <ion-icon :icon="close" />
-          </ion-button>
-        </template>
-        
-        <template v-else-if="canEdit">
-          <ion-button 
-            fill="clear" 
-            size="small" 
-            color="medium"
-            class="edit-button"
+            Cancel
+          </button>
+        </div>
+      </template>
+      
+      <!-- Logged: Edit & Delete -->
+      <template v-else-if="canEdit">
+        <div class="logged-actions">
+          <button 
+            class="text-btn edit-btn"
             @click="handleStartEdit"
           >
-            <ion-icon :icon="pencil" />
-          </ion-button>
-          <ion-button 
+            Edit
+          </button>
+          <button 
             v-if="canDelete"
-            fill="clear" 
-            size="small" 
-            color="danger"
-            class="delete-button"
+            class="text-btn delete-btn"
             :disabled="loading"
             @click="handleDelete"
           >
             <ion-spinner v-if="loading" name="crescent" />
-            <ion-icon v-else :icon="trashOutline" />
-          </ion-button>
-        </template>
-      </div>
-    </div>
-    
-    <!-- Previous performance hint -->
-    <div v-if="previousSet && !isLogged" class="previous-hint">
-      Previous: {{ previousSet.weight }}kg x {{ previousSet.reps }}
+            <span v-else>Delete</span>
+          </button>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -117,7 +125,8 @@ import {
   checkmark, 
   close, 
   pencil, 
-  trashOutline 
+  trashOutline,
+  timeOutline 
 } from 'ionicons/icons'
 
 export default {
@@ -172,6 +181,10 @@ export default {
     // Computed
     const isLogged = computed(() => !!props.loggedSet)
     
+    const showActions = computed(() => {
+      return isFocused.value || isEditing.value || !isLogged.value || props.canEdit
+    })
+    
     const weightPlaceholder = computed(() => {
       if (props.previousSet) {
         return String(props.previousSet.weight)
@@ -215,6 +228,26 @@ export default {
     }, { immediate: true })
     
     // Methods
+    const handleRepsInput = (event) => {
+      const value = event.detail.value
+      if (value === '' || value === null) {
+        localReps.value = null
+      } else {
+        const parsed = parseInt(value, 10)
+        localReps.value = isNaN(parsed) ? null : parsed
+      }
+    }
+    
+    const handleWeightInput = (event) => {
+      const value = event.detail.value
+      if (value === '' || value === null) {
+        localWeight.value = null
+      } else {
+        const parsed = parseFloat(value)
+        localWeight.value = isNaN(parsed) ? null : parsed
+      }
+    }
+    
     const handleFocus = () => {
       isFocused.value = true
     }
@@ -265,9 +298,12 @@ export default {
       localReps,
       isEditing,
       isLogged,
+      showActions,
       weightPlaceholder,
       repsPlaceholder,
       canLog,
+      handleRepsInput,
+      handleWeightInput,
       handleFocus,
       handleBlur,
       handleLogSet,
@@ -280,146 +316,288 @@ export default {
       checkmark,
       close,
       pencil,
-      trashOutline
+      trashOutline,
+      timeOutline
     }
   }
 }
 </script>
 
 <style scoped>
-.set-row {
-  background: var(--brand-card-background-color, var(--brand-gray-10));
-  border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 8px;
+.set-card {
+  background: var(--brand-card-background-color, #f8f9fa);
+  border-radius: 20px;
+  padding: 16px;
+  margin-bottom: 12px;
   transition: all 0.2s ease;
 }
 
-.set-row.is-logged {
-  background: var(--brand-gray-5, rgba(0, 0, 0, 0.02));
-  border: 1px solid var(--brand-gray-20, rgba(0, 0, 0, 0.08));
+.set-card.is-logged {
+  background: var(--brand-gray-5, #f0f0f0);
 }
 
-.set-row.is-editing {
-  background: var(--brand-primary-light, rgba(249, 115, 22, 0.08));
-  border: 1px solid var(--brand-primary);
+.set-card.is-editing {
+  background: var(--brand-primary-light, rgba(59, 130, 246, 0.08));
+  box-shadow: 0 0 0 2px var(--brand-primary);
 }
 
-.set-header {
+.set-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.set-label {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
+  gap: 6px;
+  min-width: 60px;
+  padding-top: 12px;
 }
 
 .set-number {
   font-family: var(--brand-font-family);
-  font-weight: 600;
-  font-size: var(--brand-font-size-sm);
-  color: var(--brand-text-secondary-color);
+  font-weight: 700;
+  font-size: var(--brand-font-size-lg);
+  color: var(--brand-text-primary-color);
 }
 
-.logged-badge {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--brand-font-family);
-  font-weight: 500;
-  font-size: var(--brand-font-size-xs);
+.logged-indicator {
   color: var(--ion-color-success, #2dd36f);
-}
-
-.logged-badge ion-icon {
-  font-size: 14px;
-}
-
-.set-inputs {
+  font-size: 16px;
   display: flex;
   align-items: center;
-  gap: 8px;
 }
 
-.input-group {
+.inputs-container {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+}
+
+.input-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-wrapper {
   display: flex;
   align-items: center;
   background: var(--brand-background-color, #fff);
-  border-radius: 8px;
-  padding: 4px 8px;
-  border: 1px solid var(--brand-gray-20, rgba(0, 0, 0, 0.1));
+  border: 2px solid var(--brand-gray-20, #e5e7eb);
+  border-radius: 12px;
+  padding: 8px 12px;
+  transition: border-color 0.2s ease;
 }
 
-.weight-input,
-.reps-input {
+.input-wrapper:focus-within {
+  border-color: var(--brand-primary, #3b82f6);
+}
+
+.input-wrapper.has-value {
+  border-color: var(--brand-gray-30, #d1d5db);
+}
+
+.value-input {
   --padding-start: 0;
   --padding-end: 0;
-  --padding-top: 4px;
-  --padding-bottom: 4px;
-  width: 50px;
+  --padding-top: 0;
+  --padding-bottom: 0;
   font-family: var(--brand-font-family);
-  font-weight: 600;
-  font-size: var(--brand-font-size-base);
+  font-weight: 700;
+  font-size: 24px;
   text-align: center;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Hide number input spinners for all browsers */
+.value-input input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.value-input input[type="number"]::-webkit-outer-spin-button,
+.value-input input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+  display: none;
+}
+
+.value-input::part(native) {
+  text-align: center;
+  -moz-appearance: textfield;
+}
+
+/* Hide number input spinners */
+.value-input::part(native)::-webkit-outer-spin-button,
+.value-input::part(native)::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .input-unit {
   font-family: var(--brand-font-family);
-  font-size: var(--brand-font-size-xs);
-  color: var(--brand-text-tertiary-color, var(--brand-gray-50));
+  font-weight: 500;
+  font-size: var(--brand-font-size-sm);
+  color: var(--brand-gray-50, #6b7280);
   margin-left: 4px;
+  white-space: nowrap;
 }
 
-.input-separator {
-  font-family: var(--brand-font-family);
-  font-weight: 600;
-  font-size: var(--brand-font-size-base);
-  color: var(--brand-text-tertiary-color);
-}
-
-.action-buttons {
+.last-value {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-left: auto;
+  font-family: var(--brand-font-family);
+  font-size: var(--brand-font-size-xs);
+  color: var(--brand-gray-40, #9ca3af);
+  padding-left: 4px;
 }
 
+.last-value ion-icon {
+  font-size: 12px;
+}
+
+.action-row {
+  display: flex;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--brand-gray-10, rgba(0, 0, 0, 0.05));
+}
+
+/* Full-width Log Set button */
 .log-button {
-  --padding-start: 16px;
-  --padding-end: 16px;
-  --background: var(--brand-primary);
-  --border-radius: 8px;
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--brand-primary);
+  border: none;
+  border-radius: 12px;
   font-family: var(--brand-font-family);
   font-weight: 600;
-  font-size: var(--brand-font-size-sm);
-  min-height: 36px;
+  font-size: var(--brand-font-size-base);
+  color: var(--brand-text-on-primary-color, #fff);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.log-button:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: scale(1.01);
+}
+
+.log-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.log-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .log-button ion-spinner {
-  width: 16px;
-  height: 16px;
+  --color: var(--brand-text-on-primary-color, #fff);
+  width: 18px;
+  height: 18px;
 }
 
-.save-button,
-.cancel-button,
-.edit-button,
-.delete-button {
-  --padding-start: 8px;
-  --padding-end: 8px;
-  min-height: 32px;
+/* Logged actions container (Edit & Delete) */
+.logged-actions,
+.edit-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  justify-content: flex-end;
 }
 
-.save-button ion-icon,
-.cancel-button ion-icon,
-.edit-button ion-icon,
-.delete-button ion-icon {
-  font-size: 18px;
-}
-
-.previous-hint {
-  margin-top: 8px;
+/* Text buttons */
+.text-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
   font-family: var(--brand-font-family);
-  font-size: var(--brand-font-size-xs);
-  color: var(--brand-gray-40, var(--brand-text-tertiary-color));
-  letter-spacing: -0.2px;
+  font-weight: 600;
+  font-size: var(--brand-font-size-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.text-btn ion-spinner {
+  width: 14px;
+  height: 14px;
+}
+
+.text-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.text-btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+/* Edit button */
+.edit-btn {
+  color: var(--brand-primary);
+  background: var(--brand-primary-light, rgba(59, 130, 246, 0.1));
+}
+
+.edit-btn:hover {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+/* Delete button */
+.delete-btn {
+  color: var(--ion-color-danger, #eb445a);
+  background: rgba(235, 68, 90, 0.1);
+}
+
+.delete-btn:hover {
+  background: rgba(235, 68, 90, 0.15);
+}
+
+/* Save button */
+.save-btn {
+  color: var(--ion-color-success, #2dd36f);
+  background: rgba(45, 211, 111, 0.1);
+}
+
+.save-btn:hover {
+  background: rgba(45, 211, 111, 0.15);
+}
+
+/* Cancel button */
+.cancel-btn {
+  color: var(--brand-gray-50, #6b7280);
+  background: var(--brand-gray-10, rgba(0, 0, 0, 0.05));
+}
+
+.cancel-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .set-card {
+    background: var(--brand-card-background-color, #1f1f1f);
+  }
+  
+  .set-card.is-logged {
+    background: var(--brand-gray-5, #2a2a2a);
+  }
+  
+  .input-wrapper {
+    background: var(--brand-background-color, #121212);
+    border-color: var(--brand-gray-30, #3f3f3f);
+  }
 }
 </style>
-
