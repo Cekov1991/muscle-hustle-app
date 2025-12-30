@@ -256,6 +256,12 @@ ion-title {
   --background: var(--brand-background-color);
 }
 
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
 .loading-state {
   display: flex;
   flex-direction: column;
@@ -285,7 +291,6 @@ ion-title {
   .workout-form-page {
     --background: var(--brand-background-color, #121212);
   }
-
 }
 </style>
 

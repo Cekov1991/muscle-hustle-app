@@ -142,16 +142,66 @@ export default {
 </script>
 
 <style scoped>
+ion-list {
+  background: var(--brand-card-background-color, #fff);
+  border-radius: 20px;
+  padding: 8px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
 ion-item {
-  --padding-start: 1rem;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --background: transparent;
+  --border-color: var(--brand-gray-20, #e5e7eb);
+  font-family: var(--brand-font-family);
+}
+
+ion-label {
+  font-family: var(--brand-font-family);
+  font-size: var(--brand-font-size-sm);
+  font-weight: 600;
+  color: var(--brand-text-primary-color);
+}
+
+ion-input,
+ion-textarea,
+ion-select {
+  font-family: var(--brand-font-family);
+  font-size: var(--brand-font-size-base);
+  color: var(--brand-text-primary-color);
+}
+
+ion-input::placeholder,
+ion-textarea::placeholder {
+  color: var(--brand-text-tertiary-color);
 }
 
 .action-buttons {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+  margin-top: 24px;
+  margin-bottom: 24px;
 }
 
 .action-buttons ion-button {
-  margin-bottom: 0.5rem;
+  margin-bottom: 12px;
+  --border-radius: var(--brand-button-border-radius, 16px);
+  font-family: var(--brand-font-family);
+  font-weight: 600;
+}
+
+.action-buttons ion-button[type="submit"] {
+  --background: var(--brand-primary);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  ion-list {
+    background: var(--brand-card-background-color, #1f1f1f);
+  }
+  
+  ion-item {
+    --border-color: var(--brand-gray-30, #3f3f3f);
+  }
 }
 </style>
