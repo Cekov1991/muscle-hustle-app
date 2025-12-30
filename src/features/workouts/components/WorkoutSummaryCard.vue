@@ -1,15 +1,12 @@
 <template>
   <div class="workout-summary-card">
     <div class="summary-header">
-      <div class="summary-icons-left">
-        <ion-button fill="clear" size="medium">
-          <ion-icon :icon="informationCircleOutline" />
-        </ion-button>
-        <ion-button fill="clear" size="medium">
-          <ion-icon :icon="shareOutline" />
-        </ion-button>
-      </div>
-      <ion-button fill="clear" size="medium" @click="$emit('showMenu')">
+      <div></div>
+      <ion-button 
+        size="small"
+        color="primary"
+        fill="clear" 
+        @click="$emit('showMenu')">
         <ion-icon :icon="ellipsisVertical" />
       </ion-button>
     </div>

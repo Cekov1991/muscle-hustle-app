@@ -47,8 +47,9 @@
             
             <!-- Three-dot Menu -->
             <ion-button 
-              fill="clear" 
               size="small"
+              color="primary"
+              fill="clear"
               @click="$emit('show-exercise-menu', exercise)"
             >
               <ion-icon :icon="ellipsisVertical" slot="icon-only" />

@@ -45,11 +45,22 @@
           >
             <ion-card-header>
               <div class="workout-header">
-                <div>
-                  <ion-card-title>{{ workout.name }}</ion-card-title>
-                  <ion-card-subtitle v-if="workout.description">
-                    {{ workout.description }}
-                  </ion-card-subtitle>
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                  <div>
+                    <ion-card-title>{{ workout.name }}</ion-card-title>
+                    <ion-card-subtitle v-if="workout.description">
+                      {{ workout.description }}
+                    </ion-card-subtitle>
+                  </div>
+                  <!-- Three-dot Menu -->
+                  <ion-button 
+                      size="small"
+                      color="primary"
+                      fill="clear"
+                      @click.stop="handleShowWorkoutMenu(workout)"
+                    >
+                  <ion-icon :icon="ellipsisVertical" slot="icon-only" />
+                </ion-button>
                 </div>
                 <ion-badge 
                   v-if="workout.day_of_week !== null" 
@@ -68,29 +79,18 @@
                   <span>{{ workout.exercises?.length || 0 }} {{ workout.exercises?.length === 1 ? 'Exercise' : 'Exercises' }}</span>
                 </div>
               </div>
-              
-              <div class="workout-actions" @click.stop>
-                <ion-button 
-                  fill="clear" 
-                  size="small" 
-                  @click="handleEditWorkout(workout.id)"
-                >
-                  <span class="button-text">Edit</span>
-                </ion-button>
-                <ion-button 
-                  fill="clear" 
-                  size="small" 
-                  color="danger"
-                  @click="handleDeleteClick(workout)"
-                >
-                  Delete
-                </ion-button>
-              </div>
             </ion-card-content>
           </ion-card>
         </div>
       </div>
     </ion-content>
+     <!-- Workout Menu Action Sheet -->
+     <ion-action-sheet
+      :is-open="showActionSheet"
+      header="Workout Actions"
+      :buttons="actionSheetButtons"
+      @didDismiss="showActionSheet = false"
+    ></ion-action-sheet>
   </ion-page>
 </template>
 
@@ -113,15 +113,17 @@ import {
   IonSpinner,
   IonRefresher,
   IonRefresherContent,
-  alertController
+  alertController,
+  IonActionSheet
 } from '@ionic/vue'
 import { 
   addOutline,
   barbellOutline,
   createOutline,
-  trashOutline
+  trashOutline,
+  ellipsisVertical
 } from 'ionicons/icons'
-import { onMounted, watch } from 'vue'
+import { onMounted, watch, ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useWorkouts } from '../composables/useWorkouts'
 import { getDayOfWeekName } from '../utils/workoutHelpers'
@@ -145,12 +147,48 @@ export default {
     IonBadge,
     IonSpinner,
     IonRefresher,
-    IonRefresherContent
+    IonRefresherContent,
+    IonActionSheet
   },
   setup() {
     const router = useRouter()
     const route = useRoute()
     const { workouts, loading, fetchWorkouts, deleteWorkout } = useWorkouts()
+    // Action sheet state
+    const showActionSheet = ref(false);
+    const menuWorkout = ref(null)
+    // Handle show workout menu
+    const handleShowWorkoutMenu = (workout) => {
+      menuWorkout.value = workout
+      showActionSheet.value = true
+    }
+
+    // Action sheet buttons
+    const actionSheetButtons = computed(() => [
+      {
+        text: 'Edit',
+        icon: createOutline,
+        handler: () => {
+          if (menuWorkout.value) {
+            handleEditWorkout(menuWorkout.value.id)
+          }
+        }
+      },
+      {
+        text: 'Delete',
+        icon: trashOutline,
+        role: 'destructive',
+        handler: async () => {
+          if (menuWorkout.value) {
+            await handleDeleteClick(menuWorkout.value)
+          }
+        }
+      },
+      {
+        text: 'Cancel',
+        role: 'cancel'
+      }
+    ])
 
     // Fetch workouts function
     const loadWorkouts = async () => {
@@ -239,11 +277,15 @@ export default {
       handleEditWorkout,
       handleDeleteClick,
       getDayName,
+      handleShowWorkoutMenu,
+      showActionSheet,
+      actionSheetButtons,
       // Icons
       addOutline,
       barbellOutline,
       createOutline,
-      trashOutline
+      trashOutline,
+      ellipsisVertical
     }
   }
 }
