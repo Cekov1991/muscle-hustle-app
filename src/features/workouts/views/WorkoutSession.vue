@@ -147,7 +147,7 @@
               @click="showCompleteConfirm = true"
             >
               <ion-spinner v-if="loading" name="crescent" />
-              <span v-else>Complete Workout</span>
+              <span v-else class="button-text">Complete Workout</span>
             </button>
           </div>
         </template>
@@ -518,11 +518,6 @@ export default {
 
 ion-header {
   --background: var(--brand-background-color);
-}
-
-ion-toolbar {
-  --background: var(--brand-card-background-color, #fff);
-  --border-width: 0;
 }
 
 ion-title {

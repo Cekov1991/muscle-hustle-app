@@ -188,10 +188,6 @@ export default {
   --border-radius: 20px 20px 0 0;
 }
 
-ion-toolbar {
-  --background: var(--brand-background-color);
-}
-
 ion-title {
   font-family: var(--brand-font-family);
   font-weight: 700;

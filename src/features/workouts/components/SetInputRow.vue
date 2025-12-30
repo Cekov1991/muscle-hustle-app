@@ -69,7 +69,7 @@
           @click="handleLogSet"
         >
           <ion-spinner v-if="loading" name="crescent" />
-          <span v-else>Log Set</span>
+          <span v-else class="button-text">Log Set</span>
         </button>
       </template>
       
@@ -395,7 +395,7 @@ export default {
   --padding-bottom: 0;
   font-family: var(--brand-font-family);
   font-weight: 700;
-  font-size: 24px;
+  font-size: 20px;
   text-align: center;
   flex: 1;
   min-width: 0;

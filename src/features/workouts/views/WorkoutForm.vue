@@ -1,5 +1,5 @@
 <template>
-  <ion-page>
+  <ion-page class="workout-form-page">
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
@@ -14,39 +14,41 @@
       </ion-toolbar>
     </ion-header>
     
-    <ion-content fullscreen class="ion-padding">
-      <!-- Loading State -->
-      <div v-if="initialLoading" class="loading-container">
-        <ion-spinner name="crescent"></ion-spinner>
-        <p>Loading workout...</p>
+    <ion-content fullscreen class="workout-form-content">
+      <div class="container">
+        <!-- Loading State -->
+        <div v-if="initialLoading" class="loading-state">
+          <ion-spinner name="crescent"></ion-spinner>
+          <p>Loading workout...</p>
+        </div>
+
+        <!-- Workout Summary Card -->
+        <WorkoutSummaryCard 
+          v-if="!initialLoading && !editMode"
+          :workout="{ ...currentWorkout, ...formData }"
+          @show-menu="handleShowWorkoutMenu"
+        />
+
+        <!-- Workout Details Form -->
+        <WorkoutDetailsForm
+          v-if="!initialLoading && editMode"
+          v-model="formData"
+          :loading="loading"
+          :is-edit-mode="isEditMode"
+          :is-valid="isFormValid"
+          @submit="handleSave"
+          @cancel="handleCancel"
+        />
+
+        <!-- Exercises Section -->
+        <WorkoutExercisesList
+          v-if="!initialLoading"
+          :exercises="workoutExercises"
+          :loading="loading"
+          @add-exercise="exerciseModalsRef?.openSelection"
+          @show-exercise-menu="exerciseModalsRef?.showExerciseMenu"
+        />
       </div>
-
-      <!-- Workout Summary Card -->
-      <WorkoutSummaryCard 
-        v-if="!initialLoading && !editMode"
-        :workout="{ ...currentWorkout, ...formData }"
-        @show-menu="handleShowWorkoutMenu"
-      />
-
-      <!-- Workout Details Form -->
-      <WorkoutDetailsForm
-        v-if="!initialLoading && editMode"
-        v-model="formData"
-        :loading="loading"
-        :is-edit-mode="isEditMode"
-        :is-valid="isFormValid"
-        @submit="handleSave"
-        @cancel="handleCancel"
-      />
-
-      <!-- Exercises Section -->
-      <WorkoutExercisesList
-        v-if="!initialLoading"
-        :exercises="workoutExercises"
-        :loading="loading"
-        @add-exercise="exerciseModalsRef?.openSelection"
-        @show-exercise-menu="exerciseModalsRef?.showExerciseMenu"
-      />
     </ion-content>
 
     <!-- Exercise Modals -->
@@ -235,18 +237,55 @@ export default {
 </script>
 
 <style scoped>
-.loading-container {
+.workout-form-page {
+  --background: var(--brand-background-color, #fafafa);
+}
+
+ion-header {
+  --background: var(--brand-background-color);
+}
+
+ion-title {
+  font-family: var(--brand-font-family);
+  font-weight: 700;
+  font-size: var(--brand-font-size-lg);
+  letter-spacing: -0.5px;
+}
+
+.workout-form-content {
+  --background: var(--brand-background-color);
+}
+
+.loading-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3rem 1rem;
+  min-height: 300px;
   text-align: center;
+  padding: 24px;
 }
 
-.loading-container p {
-  margin-top: 1rem;
-  color: var(--ion-color-medium);
+.loading-state ion-spinner {
+  --color: var(--brand-primary);
+  width: 40px;
+  height: 40px;
+  margin-bottom: 16px;
+}
+
+.loading-state p {
+  font-family: var(--brand-font-family);
+  font-size: var(--brand-font-size-base);
+  color: var(--brand-text-secondary-color);
+  margin: 0;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .workout-form-page {
+    --background: var(--brand-background-color, #121212);
+  }
+
 }
 </style>
 

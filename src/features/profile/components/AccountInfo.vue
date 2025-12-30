@@ -242,7 +242,7 @@
           class="save-button"
         >
           <ion-spinner v-if="loading" name="crescent" slot="start"></ion-spinner>
-          <span v-else>Save Changes</span>
+          <span v-else class="button-text">Save Changes</span>
         </ion-button>
 
         <ion-button
