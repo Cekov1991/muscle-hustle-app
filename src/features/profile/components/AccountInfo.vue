@@ -242,7 +242,7 @@
           class="save-button"
         >
           <ion-spinner v-if="loading" name="crescent" slot="start"></ion-spinner>
-          <span v-else>Save Changes</span>
+          <span v-else class="button-text">Save Changes</span>
         </ion-button>
 
         <ion-button
@@ -598,7 +598,7 @@ export default {
 }
 
 .field-card {
-  background: var(--brand-gray-10, var(--brand-card-background-color));
+  background: var(--brand-card-background-color, var(--brand-gray-10));
   border-radius: 20px;
   margin-bottom: 12px;
   overflow: hidden;
@@ -606,7 +606,7 @@ export default {
 
 @media (prefers-color-scheme: dark) {
   .field-card {
-    background: var(--brand-gray-10, var(--brand-card-background-color));
+    background: var(--brand-card-background-color, var(--brand-gray-10));
   }
   
   .profile-form {
@@ -643,13 +643,13 @@ export default {
 }
 
 .verification-card {
-  background: var(--brand-gray-10, var(--brand-card-background-color));
+  background: var(--brand-card-background-color, var(--brand-gray-10));
   border: 2px solid var(--brand-warning-color);
 }
 
 @media (prefers-color-scheme: dark) {
   .verification-card {
-    background: var(--brand-gray-10, var(--brand-card-background-color));
+    background: var(--brand-card-background-color, var(--brand-gray-10));
     border-color: var(--brand-warning-color);
   }
 }
@@ -706,7 +706,7 @@ export default {
 }
 
 .save-button:disabled {
-  --background: var(--brand-gray-10, var(--brand-card-background-color));
+  --background: var(--brand-card-background-color, var(--brand-gray-10));
   --color: var(--brand-gray-50, var(--brand-text-secondary-color));
 }
 </style>

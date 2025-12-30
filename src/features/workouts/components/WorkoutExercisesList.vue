@@ -47,8 +47,9 @@
             
             <!-- Three-dot Menu -->
             <ion-button 
-              fill="clear" 
               size="small"
+              color="primary"
+              fill="clear"
               @click="$emit('show-exercise-menu', exercise)"
             >
               <ion-icon :icon="ellipsisVertical" slot="icon-only" />
@@ -120,21 +121,23 @@ export default {
 
 <style scoped>
 .exercises-section {
-  margin-top: 2rem;
+  margin-top: 24px;
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 }
 
 .section-header h2 {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--ion-color-dark);
+  font-family: var(--brand-font-family);
+  font-size: var(--brand-font-size-lg);
+  font-weight: 700;
+  color: var(--brand-text-primary-color);
+  letter-spacing: -0.3px;
 }
 
 .empty-exercises {
@@ -142,40 +145,62 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3rem 1rem;
+  padding: 60px 24px;
   text-align: center;
-  background: var(--ion-color-light);
-  border-radius: 12px;
-  margin-bottom: 1rem;
+  background: var(--brand-card-background-color, #fff);
+  border-radius: 20px;
+  margin-bottom: 16px;
 }
 
 .empty-exercises ion-icon {
-  font-size: 3rem;
-  color: var(--ion-color-medium);
-  margin-bottom: 1rem;
+  font-size: 64px;
+  color: var(--brand-gray-40, #9ca3af);
+  margin-bottom: 16px;
 }
 
 .empty-exercises p {
-  color: var(--ion-color-medium);
-  margin-bottom: 1rem;
+  font-family: var(--brand-font-family);
+  font-size: var(--brand-font-size-sm);
+  color: var(--brand-text-secondary-color);
+  margin: 0 0 24px 0;
+}
+
+.empty-exercises ion-button {
+  --border-radius: var(--brand-button-border-radius, 16px);
+  font-family: var(--brand-font-family);
+  font-weight: 600;
 }
 
 /* Exercises List Container */
 .exercises-list {
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 }
 
 /* Compact Exercise Cards */
 .exercise-card-compact {
-  margin-bottom: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: var(--brand-card-background-color, #fff);
+  border-radius: 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --background: var(--brand-card-background-color, #fff);
+  border: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.exercise-card-compact:hover {
+  transform: scale(1.01);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.exercise-card-compact:active {
+  transform: scale(0.98);
 }
 
 .exercise-row {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.5rem 0;
+  gap: 16px;
+  padding: 8px 0;
 }
 
 .exercise-info {
@@ -184,17 +209,29 @@ export default {
 }
 
 .exercise-info h3 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--ion-color-dark);
+  margin: 0 0 4px 0;
+  font-family: var(--brand-font-family);
+  font-size: var(--brand-font-size-base);
+  font-weight: 700;
+  color: var(--brand-text-primary-color);
   line-height: 1.2;
+  letter-spacing: -0.2px;
 }
 
 .exercise-sets-reps {
   margin: 0;
-  color: var(--ion-color-medium);
-  font-size: 0.875rem;
+  font-family: var(--brand-font-family);
+  font-size: var(--brand-font-size-sm);
+  color: var(--brand-text-tertiary-color);
   line-height: 1.2;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .empty-exercises,
+  .exercise-card-compact {
+    background: var(--brand-card-background-color, #1f1f1f);
+    --background: var(--brand-card-background-color, #1f1f1f);
+  }
 }
 </style>

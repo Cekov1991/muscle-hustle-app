@@ -27,12 +27,6 @@
 
         <!-- Profile Content -->
         <div v-else class="profile-container">
-          <!-- Profile Header -->
-          <div class="profile-header">
-            <ProfilePhotoUpload :current-photo="profile?.profile_photo" :loading="saving"
-              @photo-updated="handlePhotoUpdate" />
-          </div>
-
           <!-- Profile Form -->
           <AccountInfo :profile="profile" :loading="saving" @update="handleProfileUpdate" />
         </div>
@@ -60,7 +54,6 @@ import { onMounted } from 'vue'
 import { useProfile } from '../composables/useProfile'
 import { useToast } from '../../../shared/composables/useToast'
 import AccountInfo from '../components/AccountInfo.vue'
-import ProfilePhotoUpload from '../components/ProfilePhotoUpload.vue'
 
 export default {
   name: 'ProfileView',
@@ -73,8 +66,7 @@ export default {
     IonSpinner,
     IonIcon,
     IonButton,
-    AccountInfo,
-    ProfilePhotoUpload
+    AccountInfo
   },
   setup() {
     const { showSuccess, showError } = useToast()
@@ -124,11 +116,6 @@ export default {
       }
     }
 
-    // Handle photo update
-    const handlePhotoUpdate = async () => {
-      await showSuccess('Profile photo updated successfully')
-    }
-
     return {
       // State
       profile,
@@ -139,7 +126,6 @@ export default {
       // Methods
       handleRetry,
       handleProfileUpdate,
-      handlePhotoUpdate,
 
       // Icons
       alertCircleOutline,
@@ -176,14 +162,6 @@ export default {
 
 .profile-container {
   padding: 0;
-}
-
-.profile-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 24px;
-  background: var(--brand-background-color, #fafafa);
 }
 
 .profile-info {

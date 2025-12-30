@@ -174,6 +174,49 @@ export const workoutsAPI = {
 }
 
 /**
+ * Workout Sessions API endpoints
+ * For active workout tracking and set logging
+ */
+export const workoutSessionsAPI = {
+  // Get today's scheduled workout and active session
+  getToday: () => api.get('/workout-sessions/today'),
+  
+  // Start a new workout session (optionally from template)
+  start: (templateId = null) => api.post('/workout-sessions/start', 
+    templateId ? { template_id: templateId } : {}),
+  
+  // Get session details with progress and previous sets
+  getSession: (id) => api.get(`/workout-sessions/${id}`),
+  
+  // Log a completed set
+  logSet: (sessionId, data) => api.post(`/workout-sessions/${sessionId}/sets`, data),
+  
+  // Update a logged set
+  updateSet: (sessionId, setId, data) => api.put(`/workout-sessions/${sessionId}/sets/${setId}`, data),
+  
+  // Delete the last logged set for an exercise
+  deleteSet: (sessionId, setId) => api.delete(`/workout-sessions/${sessionId}/sets/${setId}`),
+  
+  // Add exercise to session mid-workout
+  addExercise: (sessionId, data) => api.post(`/workout-sessions/${sessionId}/exercises`, data),
+  
+  // Update exercise targets mid-workout
+  updateExercise: (sessionId, exerciseId, data) => api.put(`/workout-sessions/${sessionId}/exercises/${exerciseId}`, data),
+  
+  // Remove exercise from session
+  removeExercise: (sessionId, exerciseId) => api.delete(`/workout-sessions/${sessionId}/exercises/${exerciseId}`),
+  
+  // Reorder exercises in session
+  reorderExercises: (sessionId, exerciseIds) => api.post(`/workout-sessions/${sessionId}/exercises/reorder`, { exercise_ids: exerciseIds }),
+  
+  // Complete the workout session
+  complete: (sessionId, notes = null) => api.post(`/workout-sessions/${sessionId}/complete`, notes ? { notes } : {}),
+  
+  // Cancel/discard the workout session
+  cancel: (sessionId) => api.delete(`/workout-sessions/${sessionId}/cancel`)
+}
+
+/**
  * Fitness metrics API endpoints
  */
 export const fitnessAPI = {
@@ -189,19 +232,7 @@ export const profileAPI = {
   getProfile: () => api.get('/profile'),
   
   // Update profile (JSON)
-  updateProfile: (data) => api.patch('/profile', data),
-  
-  // Update profile with photo upload
-  updateProfileWithPhoto: (formData) => {
-    return api.patch('/profile', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
-  },
-  
-  // Delete profile photo
-  deleteProfilePhoto: () => api.delete('/profile/photo')
+  updateProfile: (data) => api.patch('/profile', data)
 }
 
 /**

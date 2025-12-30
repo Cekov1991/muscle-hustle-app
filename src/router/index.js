@@ -65,6 +65,14 @@ const routes = [
         meta: { 
           title: 'Profile'
         }
+      },
+      {
+        path: 'workout-session/:id',
+        name: 'WorkoutSession',
+        component: () => import('../features/workouts/views/WorkoutSession.vue'),
+        meta: { 
+          title: 'Workout'
+        }
       }
     ]
   },

@@ -12,10 +12,10 @@
     </ion-header>
     
     <ion-content>
-      <form @submit.prevent="handleSubmit">
-        <ion-list>
-          <!-- Exercise Selection (only when adding) -->
-          <ion-item v-if="!isEditMode">
+      <form @submit.prevent="handleSubmit" class="form-container">
+        <!-- Exercise Selection (only when adding) -->
+        <div v-if="!isEditMode" class="field-card">
+          <ion-item lines="none" class="form-item">
             <ion-label position="stacked">Exercise</ion-label>
             <ion-select
               v-model="formData.exercise_id"
@@ -31,18 +31,22 @@
               </ion-select-option>
             </ion-select>
           </ion-item>
+        </div>
 
-          <!-- Exercise Name (read-only when editing) -->
-          <ion-item v-if="isEditMode">
+        <!-- Exercise Name (read-only when editing) -->
+        <div v-if="isEditMode" class="field-card">
+          <ion-item lines="none" class="form-item">
             <ion-label position="stacked">Exercise</ion-label>
             <ion-input
               :value="selectedExercise?.name || 'Unknown'"
               readonly
             ></ion-input>
           </ion-item>
+        </div>
 
-          <!-- Target Sets -->
-          <ion-item>
+        <!-- Target Sets -->
+        <div class="field-card">
+          <ion-item lines="none" class="form-item">
             <ion-label position="stacked">Target Sets</ion-label>
             <ion-input
               v-model.number="formData.target_sets"
@@ -52,9 +56,11 @@
               :disabled="loading"
             ></ion-input>
           </ion-item>
+        </div>
 
-          <!-- Target Reps -->
-          <ion-item>
+        <!-- Target Reps -->
+        <div class="field-card">
+          <ion-item lines="none" class="form-item">
             <ion-label position="stacked">Target Reps</ion-label>
             <ion-input
               v-model.number="formData.target_reps"
@@ -64,9 +70,11 @@
               :disabled="loading"
             ></ion-input>
           </ion-item>
+        </div>
 
-          <!-- Target Weight -->
-          <ion-item>
+        <!-- Target Weight -->
+        <div class="field-card">
+          <ion-item lines="none" class="form-item">
             <ion-label position="stacked">Target Weight</ion-label>
             <ion-input
               v-model.number="formData.target_weight"
@@ -77,9 +85,11 @@
               :disabled="loading"
             ></ion-input>
           </ion-item>
+        </div>
 
-          <!-- Rest Seconds -->
-          <ion-item>
+        <!-- Rest Seconds -->
+        <div class="field-card">
+          <ion-item lines="none" class="form-item">
             <ion-label position="stacked">Rest Time (seconds)</ion-label>
             <ion-input
               v-model.number="formData.rest_seconds"
@@ -89,14 +99,15 @@
               :disabled="loading"
             ></ion-input>
           </ion-item>
-        </ion-list>
+        </div>
 
         <!-- Action Buttons -->
-        <div class="ion-padding">
+        <div class="form-actions">
           <ion-button
             expand="block"
             type="submit"
             :disabled="loading || !isFormValid"
+            class="save-button"
           >
             <ion-spinner v-if="loading" name="crescent" slot="start" />
             <ion-icon v-else :icon="checkmarkOutline" slot="start" />
@@ -108,8 +119,9 @@
             fill="outline"
             @click="handleClose"
             :disabled="loading"
+            class="cancel-button"
           >
-            Cancel
+          <span class="button-text"> Cancel </span>
           </ion-button>
         </div>
       </form>
@@ -127,7 +139,6 @@ import {
   IonButton,
   IonButtons,
   IonIcon,
-  IonList,
   IonItem,
   IonLabel,
   IonInput,
@@ -153,7 +164,6 @@ export default {
     IonButton,
     IonButtons,
     IonIcon,
-    IonList,
     IonItem,
     IonLabel,
     IonInput,
@@ -285,8 +295,111 @@ export default {
 </script>
 
 <style scoped>
-ion-item {
-  --padding-start: 1rem;
+ion-header {
+  --background: var(--brand-primary);
+}
+
+ion-toolbar {
+  --background: var(--brand-primary);
+  --color: var(--brand-text-on-primary-color);
+}
+
+ion-title {
+  font-family: var(--brand-font-family);
+  font-weight: 700;
+  font-size: var(--brand-font-size-lg);
+  letter-spacing: -0.5px;
+  color: var(--brand-text-on-primary-color);
+}
+
+ion-content {
+  --background: var(--brand-background-color, #fafafa);
+}
+
+.form-container {
+  padding: 16px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.field-card {
+  background: var(--brand-card-background-color, #fff);
+  border-radius: 20px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.form-item {
+  --background: transparent;
+  --border-color: transparent;
+  --inner-padding-start: 6px;
+  --inner-padding-end: 16px;
+  --inner-padding-top: 6px;
+  --inner-padding-bottom: 6px;
+  --min-height: auto;
+}
+
+.form-item ion-label {
+  font-family: var(--brand-font-family);
+  color: var(--brand-gray-50, var(--brand-text-secondary-color));
+  font-weight: 600;
+  font-size: var(--brand-font-size-sm);
+  margin-bottom: 4px;
+  letter-spacing: -0.3px;
+}
+
+.form-item ion-input,
+.form-item ion-select {
+  font-family: var(--brand-font-family);
+  --color: var(--brand-text-primary-color);
+  --placeholder-color: var(--brand-gray-50, var(--brand-text-secondary-color));
+  font-size: var(--brand-font-size-base);
+  font-weight: 600;
+}
+
+.form-actions {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.save-button {
+  --background: var(--brand-primary);
+  --background-hover: var(--brand-primary-shade);
+  --color: var(--brand-text-on-primary-color);
+  font-family: var(--brand-font-family);
+  font-weight: 600;
+  font-size: var(--brand-font-size-base);
+  border-radius: var(--brand-button-border-radius, 16px);
+  height: 48px;
+  letter-spacing: -0.3px;
+}
+
+.cancel-button {
+  font-family: var(--brand-font-family);
+  font-weight: 600;
+  font-size: var(--brand-font-size-base);
+  border-radius: var(--brand-button-border-radius, 16px);
+  height: 48px;
+  letter-spacing: -0.3px;
+}
+
+.save-button:disabled {
+  --background: var(--brand-card-background-color, var(--brand-gray-10));
+  --color: var(--brand-gray-50, var(--brand-text-secondary-color));
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  ion-content {
+    --background: var(--brand-background-color, #121212);
+  }
+  
+  .field-card {
+    background: var(--brand-card-background-color, #1f1f1f);
+  }
 }
 </style>
 

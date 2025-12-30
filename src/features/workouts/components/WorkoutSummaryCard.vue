@@ -1,15 +1,12 @@
 <template>
   <div class="workout-summary-card">
     <div class="summary-header">
-      <div class="summary-icons-left">
-        <ion-button fill="clear" size="medium">
-          <ion-icon :icon="informationCircleOutline" />
-        </ion-button>
-        <ion-button fill="clear" size="medium">
-          <ion-icon :icon="shareOutline" />
-        </ion-button>
-      </div>
-      <ion-button fill="clear" size="medium" @click="$emit('showMenu')">
+      <div></div>
+      <ion-button 
+        size="small"
+        color="primary"
+        fill="clear" 
+        @click="$emit('showMenu')">
         <ion-icon :icon="ellipsisVertical" />
       </ion-button>
     </div>
@@ -65,33 +62,49 @@ export default {
 <style scoped>
 /* Workout Summary Card */
 .workout-summary-card {
-  background: white;
-  border-radius: 12px;
-  padding: 1.2rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--brand-card-background-color, #fff);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.workout-summary-card:hover {
+  transform: scale(1.01);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .summary-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 24px;
 }
 
 .workout-title {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.75rem;
+  margin: 0 0 8px 0;
+  font-family: var(--brand-font-family);
+  font-size: var(--brand-font-size-xl);
   font-weight: 700;
-  color: var(--ion-color-dark);
+  color: var(--brand-text-primary-color);
   line-height: 1.2;
+  letter-spacing: -0.3px;
 }
 
 .workout-meta {
   margin: 0;
-  color: var(--ion-color-medium);
-  font-size: 1rem;
+  font-family: var(--brand-font-family);
+  font-size: var(--brand-font-size-sm);
+  color: var(--brand-text-tertiary-color);
   line-height: 1.3;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .workout-summary-card {
+    background: var(--brand-card-background-color, #1f1f1f);
+  }
 }
 </style>

@@ -278,7 +278,7 @@ export default {
   align-items: center;
   gap: 16px;
   padding: 20px;
-  background: var(--brand-gray-10, var(--brand-card-background-color));
+  background: var(--brand-card-background-color, var(--brand-gray-10));
   border-radius: 20px;
 }
 
@@ -353,7 +353,7 @@ export default {
   align-items: center;
   gap: 12px;
   padding: 16px 20px;
-  background: var(--brand-gray-10, var(--brand-card-background-color));
+  background: var(--brand-card-background-color, var(--brand-gray-10));
   border-radius: 16px;
 }
 
@@ -392,7 +392,7 @@ export default {
 
 .detail-description {
   padding: 20px;
-  background: var(--brand-gray-10, var(--brand-card-background-color));
+  background: var(--brand-card-background-color, var(--brand-gray-10));
   border-radius: 16px;
 }
 

@@ -153,56 +153,6 @@ export const useProfile = () => {
     }
   }
   
-  // Update profile with photo upload
-  const updateProfileWithPhoto = async (formData) => {
-    profileState.saving = true
-    profileState.error = null
-    
-    try {
-      const response = await profileAPI.updateProfileWithPhoto(formData)
-      profileState.profile = response.data.user
-      
-      // Refresh auth user data to keep it in sync
-      await refreshUser()
-      
-      return profileState.profile
-    } catch (error) {
-      profileState.error = error
-      
-      // For validation errors (422), preserve the original error object
-      if (error.response?.status === 422) {
-        throw error
-      }
-      
-      const message = getApiErrorMessage(error, 'profile', 'Failed to update profile')
-      throw new Error(message)
-    } finally {
-      profileState.saving = false
-    }
-  }
-  
-  // Delete profile photo
-  const deleteProfilePhoto = async () => {
-    profileState.saving = true
-    profileState.error = null
-    
-    try {
-      const response = await profileAPI.deleteProfilePhoto()
-      profileState.profile = response.data.user
-      
-      // Refresh auth user data to keep it in sync
-      await refreshUser()
-      
-      return profileState.profile
-    } catch (error) {
-      profileState.error = error
-      const message = getApiErrorMessage(error, 'profile', 'Failed to delete profile photo')
-      throw new Error(message)
-    } finally {
-      profileState.saving = false
-    }
-  }
-  
   // Validate form data
   const validateProfileData = (data) => {
     const errors = {}
@@ -286,8 +236,6 @@ export const useProfile = () => {
     // Methods
     fetchProfile,
     updateProfile,
-    updateProfileWithPhoto,
-    deleteProfilePhoto,
     validateProfileData,
     clearError,
     resetProfile,
