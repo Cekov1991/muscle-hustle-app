@@ -134,8 +134,9 @@
         <button class="start-workout-button" :disabled="startingWorkout" @click="handleStartWorkout">
           <ion-spinner v-if="startingWorkout" name="crescent" class="button-spinner" />
           <span v-else
-            style="font-size: var(--brand-font-size-base); font-weight: 600; color: var(--brand-text-on-primary-color);">Start
-            Workout</span>
+            style="font-size: var(--brand-font-size-base); font-weight: 600; color: var(--brand-text-on-primary-color);">
+            {{ workoutButtonText }}
+          </span>
         </button>
         
         <!-- Template Picker Modal -->
@@ -193,7 +194,7 @@ export default {
 
     const { sessions, loading: calendarLoading, error: calendarError, fetchCurrentWeek, retryFetch } = useCalendar()
     const { metrics, loading: metricsLoading, error: metricsError, fetchMetrics, retryFetch: retryMetrics } = useMetrics()
-    const { fetchToday, startSession } = useWorkoutSession()
+    const { fetchToday, startSession, hasActiveSession } = useWorkoutSession()
 
     // Modal state
     const showMetricsModal = ref(false)
@@ -229,6 +230,11 @@ export default {
       }
       // Fallback to CSS variable (default background)
       return {}
+    })
+
+    // Computed property for workout button text
+    const workoutButtonText = computed(() => {
+      return hasActiveSession.value ? 'Continue Workout' : 'Start Workout'
     })    
 
     // Handle calendar retry
@@ -270,7 +276,8 @@ export default {
       try {
         await Promise.all([
           fetchCurrentWeek(),
-          fetchMetrics()
+          fetchMetrics(),
+          fetchToday() // Check for active session on mount
         ])
       } catch (error) {
         console.error('Failed to load data on mount:', error)
@@ -338,6 +345,7 @@ export default {
       handleTemplateSelect,
       showTemplatePicker,
       startingWorkout,
+      workoutButtonText,
       // Icons
       barbellOutline,
       analyticsOutline,
