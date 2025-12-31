@@ -1,10 +1,12 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useWorkouts } from './useWorkouts'
+import { usePlans } from './usePlans'
 
 export const useWorkoutForm = (workoutId) => {
   const router = useRouter()
   const { createWorkout, updateWorkout, fetchWorkout } = useWorkouts()
+  const { plans, fetchPlans, getActivePlan, ensurePlansExist } = usePlans()
 
   // Form state
   const editMode = ref(false)
@@ -13,6 +15,7 @@ export const useWorkoutForm = (workoutId) => {
 
   // Form data
   const formData = ref({
+    plan_id: null,
     name: '',
     description: '',
     day_of_week: null
@@ -20,22 +23,40 @@ export const useWorkoutForm = (workoutId) => {
 
   // Computed properties
   const isEditMode = computed(() => !!workoutId?.value || !!workoutId)
-  const isFormValid = computed(() => formData.value.name.trim().length > 0)
+  const isFormValid = computed(() => {
+    const hasName = formData.value.name.trim().length > 0
+    // plan_id is required for new workouts, optional for updates
+    const hasPlan = isEditMode.value ? true : !!formData.value.plan_id
+    return hasName && hasPlan
+  })
 
   // Initialize form data
   const initializeForm = async () => {
     initialLoading.value = true
 
     try {
+      // Ensure plans exist and fetch them
+      await ensurePlansExist()
+      await fetchPlans()
+      
       if (isEditMode.value) {
         const id = workoutId?.value || workoutId
         const workout = await fetchWorkout(id)
         currentWorkout.value = workout
         
         formData.value = {
+          plan_id: workout.plan_id || null,
           name: workout.name || '',
           description: workout.description || '',
           day_of_week: workout.day_of_week
+        }
+      } else {
+        // For new workouts, auto-select active plan or first plan
+        const activePlan = getActivePlan()
+        if (activePlan) {
+          formData.value.plan_id = activePlan.id
+        } else if (plans.value && plans.value.length > 0) {
+          formData.value.plan_id = plans.value[0].id
         }
       }
     } catch (error) {
@@ -59,6 +80,15 @@ export const useWorkoutForm = (workoutId) => {
       name: formData.value.name.trim(),
       description: formData.value.description?.trim() || null,
       day_of_week: formData.value.day_of_week
+    }
+
+    // Include plan_id for create, optionally for update
+    if (!isEditMode.value) {
+      // Required for new workouts
+      data.plan_id = formData.value.plan_id
+    } else if (formData.value.plan_id) {
+      // Optional for updates - only include if changed
+      data.plan_id = formData.value.plan_id
     }
 
     try {
@@ -85,8 +115,14 @@ export const useWorkoutForm = (workoutId) => {
   }
 
   // Reset form
-  const resetForm = () => {
+  const resetForm = async () => {
+    // Ensure plans exist before resetting
+    await ensurePlansExist()
+    await fetchPlans()
+    
+    const activePlan = getActivePlan()
     formData.value = {
+      plan_id: activePlan ? activePlan.id : (plans.value && plans.value.length > 0 ? plans.value[0].id : null),
       name: '',
       description: '',
       day_of_week: null

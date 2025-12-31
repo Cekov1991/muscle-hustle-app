@@ -36,11 +36,7 @@ const routes = [
       },
       {
         path: 'workouts',
-        name: 'Workouts',
-        component: () => import('../features/workouts/views/WorkoutsList.vue'),
-        meta: { 
-          title: 'Workouts'
-        }
+        redirect: '/tabs/plans'
       },
       {
         path: 'workouts/new',
@@ -56,6 +52,30 @@ const routes = [
         component: () => import('../features/workouts/views/WorkoutForm.vue'),
         meta: { 
           title: 'Edit Workout'
+        }
+      },
+      {
+        path: 'plans',
+        name: 'Plans',
+        component: () => import('../features/workouts/views/PlansList.vue'),
+        meta: { 
+          title: 'Plans'
+        }
+      },
+      {
+        path: 'plans/new',
+        name: 'PlanNew',
+        component: () => import('../features/workouts/views/PlanForm.vue'),
+        meta: { 
+          title: 'New Plan'
+        }
+      },
+      {
+        path: 'plans/:id/edit',
+        name: 'PlanEdit',
+        component: () => import('../features/workouts/views/PlanForm.vue'),
+        meta: { 
+          title: 'Edit Plan'
         }
       },
       {

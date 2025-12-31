@@ -65,8 +65,13 @@
           <div class="template-info">
             <h4>{{ template.name }}</h4>
             <p>{{ getExerciseCount(template) }} exercises</p>
-            <div v-if="template.day_of_week !== null" class="template-day">
-              {{ getDayName(template.day_of_week) }}
+            <div class="template-meta">
+              <span v-if="template.plan" class="template-plan">
+                {{ template.plan.name }}
+              </span>
+              <span v-if="template.day_of_week !== null" class="template-day">
+                {{ getDayName(template.day_of_week) }}
+              </span>
             </div>
           </div>
           <ion-icon :icon="chevronForwardOutline" class="arrow-icon" />
@@ -326,6 +331,24 @@ ion-content {
   margin: 0;
 }
 
+.template-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.template-plan {
+  display: inline-block;
+  font-family: var(--brand-font-family);
+  font-size: var(--brand-font-size-xs);
+  font-weight: 500;
+  color: var(--brand-tertiary-color, #6c757d);
+  background: var(--brand-gray-10, #f3f4f6);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
 .template-day {
   display: inline-block;
   font-family: var(--brand-font-family);
@@ -335,7 +358,6 @@ ion-content {
   background: var(--brand-primary-light, rgba(249, 115, 22, 0.1));
   padding: 2px 8px;
   border-radius: 4px;
-  margin-top: 4px;
 }
 
 .arrow-icon {

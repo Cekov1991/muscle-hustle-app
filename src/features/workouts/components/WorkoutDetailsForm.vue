@@ -1,6 +1,14 @@
 <template>
   <form @submit.prevent="handleSubmit">
     <ion-list>
+      <!-- Plan Selector -->
+      <PlanSelector
+        :model-value="modelValue.plan_id"
+        @update:model-value="updateField('plan_id', $event)"
+        :required="!isEditMode"
+        :disabled="loading"
+      />
+
       <!-- Workout Name -->
       <ion-item>
         <ion-label position="stacked">Workout Name *</ion-label>
@@ -86,6 +94,7 @@ import {
 import {
   checkmarkOutline
 } from 'ionicons/icons'
+import PlanSelector from './PlanSelector.vue'
 
 export default {
   name: 'WorkoutDetailsForm',
@@ -99,7 +108,8 @@ export default {
     IonSelectOption,
     IonButton,
     IonIcon,
-    IonSpinner
+    IonSpinner,
+    PlanSelector
   },
   props: {
     modelValue: {
