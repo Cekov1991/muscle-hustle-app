@@ -176,6 +176,11 @@ export default {
       type: Boolean,
       default: false
     },
+    mode: {
+      type: String,
+      default: 'create',
+      validator: v => ['create', 'edit'].includes(v)
+    },
     exercise: {
       type: Object,
       default: null
@@ -188,8 +193,8 @@ export default {
   emits: ['close', 'submit'],
   setup(props, { emit }) {
     const { loading } = useWorkouts()
-    // Edit mode is when exercise has pivot data (already in workout)
-    const isEditMode = computed(() => !!(props.exercise && props.exercise.pivot))
+    // Edit mode is explicitly set via prop for clarity
+    const isEditMode = computed(() => props.mode === 'edit')
 
     // Form data
     const formData = ref({
@@ -296,12 +301,12 @@ export default {
 
 <style scoped>
 ion-header {
-  --background: var(--brand-primary);
+  --background: var(--brand-background-color, #ffffff);
 }
 
 ion-toolbar {
-  --background: var(--brand-primary);
-  --color: var(--brand-text-on-primary-color);
+  --background: var(--brand-background-color, #ffffff);
+  --color: var(--brand-primary);
 }
 
 ion-title {
@@ -309,7 +314,7 @@ ion-title {
   font-weight: 700;
   font-size: var(--brand-font-size-lg);
   letter-spacing: -0.5px;
-  color: var(--brand-text-on-primary-color);
+  color: var(--brand-primary);
 }
 
 ion-content {

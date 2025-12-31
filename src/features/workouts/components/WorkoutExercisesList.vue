@@ -21,7 +21,7 @@
         fill="outline"
         @click="$emit('add-exercise')"
       >
-        Add First Exercise
+        <span class="button-text">Add First Exercise</span>
       </ion-button>
     </div>
 

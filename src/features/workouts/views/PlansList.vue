@@ -538,7 +538,12 @@ export default {
 }
 
 ion-header {
-  --background: var(--brand-background-color);
+  --background: var(--brand-background-color, #ffffff);
+}
+
+ion-toolbar {
+  --background: var(--brand-background-color, #ffffff);
+  --color: var(--brand-primary);
 }
 
 ion-title {
@@ -546,6 +551,7 @@ ion-title {
   font-weight: 700;
   font-size: var(--brand-font-size-lg);
   letter-spacing: -0.5px;
+  color: var(--brand-primary);
 }
 
 .plans-list-content {

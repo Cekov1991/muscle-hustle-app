@@ -8,11 +8,48 @@
     color: var(--brand-text-on-primary-color)!important;
 }
 
+.dashed-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 16px 20px;
+    background: transparent;
+    border: 2px dashed var(--brand-gray-30, #d1d5db);
+    border-radius: 16px;
+    cursor: pointer;
+    font-family: var(--brand-font-family);
+    font-weight: 600;
+    font-size: var(--brand-font-size-base);
+    color: var(--brand-primary);
+    transition: all 0.2s ease;
+  }
+  
+  .dashed-button:hover {
+    background: var(--brand-primary-light, rgba(59, 130, 246, 0.08));
+    border-color: var(--brand-primary);
+  }
+  
+  .dashed-button:active {
+    transform: scale(0.98);
+  }
+  
+  .dashed-button ion-icon {
+    font-size: 22px;
+  }
+
 @media (max-width: 768px) {
     .container {
         padding: 10px !important;
     }
 }
+
+@media (prefers-color-scheme: dark) {
+    .dashed-button {
+      border-color: var(--brand-gray-40, #4b5563);
+    }
+  }
 
 /* Hide number input spinners globally */
 input[type="number"]::-webkit-outer-spin-button,

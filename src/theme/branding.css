@@ -175,8 +175,8 @@ body.gym-branded {
 
 /* Toolbar branding */
 .gym-branded ion-toolbar {
-  --background: var(--brand-primary);
-  --color: white;
+  --background: var(--brand-background-color);
+  --color: var(--brand-primary);
 }
 
 /* Button branding */
@@ -317,7 +317,6 @@ body.gym-branded {
 }
 
 /* Text on primary backgrounds */
-.gym-branded ion-toolbar,
 .gym-branded ion-button {
   --color: var(--brand-text-on-primary-color, #ffffff);
 }

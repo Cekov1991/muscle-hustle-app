@@ -99,7 +99,7 @@
             
             <!-- Add Exercise Button (only show if not completed) -->
             <div v-if="!isCompleted" class="add-exercise-section">
-              <button class="add-exercise-button" @click="showAddExercise = true">
+              <button class="dashed-button" @click="showAddExercise = true">
                 <ion-icon :icon="addOutline" />
                 <span>Add Exercise</span>
               </button>
@@ -531,7 +531,12 @@ export default {
 }
 
 ion-header {
-  --background: var(--brand-background-color);
+  --background: var(--brand-background-color, #ffffff);
+}
+
+ion-toolbar {
+  --background: var(--brand-background-color, #ffffff);
+  --color: var(--brand-primary);
 }
 
 ion-title {
@@ -539,6 +544,7 @@ ion-title {
   font-weight: 700;
   font-size: var(--brand-font-size-lg);
   letter-spacing: -0.5px;
+  color: var(--brand-primary);
 }
 
 .cancel-btn {
@@ -687,37 +693,6 @@ ion-title {
   margin-bottom: 24px;
 }
 
-.add-exercise-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 16px 20px;
-  background: transparent;
-  border: 2px dashed var(--brand-gray-30, #d1d5db);
-  border-radius: 16px;
-  cursor: pointer;
-  font-family: var(--brand-font-family);
-  font-weight: 600;
-  font-size: var(--brand-font-size-base);
-  color: var(--brand-primary);
-  transition: all 0.2s ease;
-}
-
-.add-exercise-button:hover {
-  background: var(--brand-primary-light, rgba(59, 130, 246, 0.08));
-  border-color: var(--brand-primary);
-}
-
-.add-exercise-button:active {
-  transform: scale(0.98);
-}
-
-.add-exercise-button ion-icon {
-  font-size: 22px;
-}
-
 /* Complete Section */
 .complete-section {
   padding: 16px 0 32px;
@@ -851,7 +826,7 @@ ion-title {
     border-color: var(--brand-gray-30, #3f3f3f);
   }
   
-  .add-exercise-button {
+  .dashed-button {
     border-color: var(--brand-gray-40, #4b5563);
   }
 }

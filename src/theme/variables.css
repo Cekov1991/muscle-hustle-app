@@ -146,8 +146,8 @@ ion-item {
 
 /* Toolbar */
 ion-toolbar {
-  --background: var(--ion-color-primary);
-  --color: var(--ion-color-primary-contrast);
+  --background: var(--brand-background-color, #ffffff);
+  --color: var(--ion-color-primary);
 }
 
 /* Responsive Design */
@@ -173,8 +173,8 @@ ion-toolbar {
   
   /* Toolbar dark mode styling */
   ion-toolbar {
-    --background: var(--ion-color-primary);
-    --color: var(--ion-color-primary-contrast);
+    --background: var(--brand-background-color, #ffffff);
+    --color: var(--ion-color-primary);
   }
   
   ion-card {

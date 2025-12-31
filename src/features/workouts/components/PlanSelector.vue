@@ -1,5 +1,5 @@
 <template>
-  <ion-item>
+  <ion-item lines="none" class="plan-selector-item">
     <ion-label position="stacked">
       Plan {{ required ? '*' : '' }}
     </ion-label>
@@ -8,7 +8,7 @@
       @ion-change="handleChange"
       :placeholder="placeholder"
       :disabled="loading || disabled"
-      :interface="interface"
+      :interface="selectInterface"
     >
       <ion-select-option :value="null" v-if="!required">None</ion-select-option>
       <ion-select-option 
@@ -61,7 +61,7 @@ export default {
       type: String,
       default: 'Select a plan'
     },
-    interface: {
+    selectInterface: {
       type: String,
       default: 'popover'
     }
@@ -101,30 +101,35 @@ export default {
 </script>
 
 <style scoped>
-ion-item {
-  --padding-start: 16px;
-  --padding-end: 16px;
+.plan-selector-item {
   --background: transparent;
-  --border-color: var(--brand-gray-20, #e5e7eb);
-  font-family: var(--brand-font-family);
+  --border-color: transparent;
+  --inner-padding-start: 6px;
+  --inner-padding-end: 16px;
+  --inner-padding-top: 6px;
+  --inner-padding-bottom: 6px;
+  --min-height: auto;
 }
 
-ion-label {
+.plan-selector-item ion-label {
   font-family: var(--brand-font-family);
-  font-size: var(--brand-font-size-sm);
+  color: var(--brand-gray-50, var(--brand-text-secondary-color));
   font-weight: 600;
-  color: var(--brand-text-primary-color);
+  font-size: var(--brand-font-size-sm);
+  margin-bottom: 4px;
+  letter-spacing: -0.3px;
 }
 
-ion-select {
+.plan-selector-item ion-select {
   font-family: var(--brand-font-family);
+  --color: var(--brand-text-primary-color);
+  --placeholder-color: var(--brand-gray-50, var(--brand-text-secondary-color));
   font-size: var(--brand-font-size-base);
-  color: var(--brand-text-primary-color);
+  font-weight: 600;
 }
 
 .empty-message {
-  padding: 12px 16px;
-  margin-top: -8px;
+  padding: 0 16px 12px 16px;
 }
 
 .empty-message p {
@@ -132,13 +137,6 @@ ion-select {
   font-size: var(--brand-font-size-sm);
   color: var(--brand-text-secondary-color);
   margin: 0;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  ion-item {
-    --border-color: var(--brand-gray-30, #3f3f3f);
-  }
 }
 </style>
 

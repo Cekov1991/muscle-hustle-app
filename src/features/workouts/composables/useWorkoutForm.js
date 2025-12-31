@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref, computed, unref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useWorkouts } from './useWorkouts'
 import { usePlans } from './usePlans'
@@ -22,7 +22,7 @@ export const useWorkoutForm = (workoutId) => {
   })
 
   // Computed properties
-  const isEditMode = computed(() => !!workoutId?.value || !!workoutId)
+  const isEditMode = computed(() => !!unref(workoutId))
   const isFormValid = computed(() => {
     const hasName = formData.value.name.trim().length > 0
     // plan_id is required for new workouts, optional for updates
@@ -40,8 +40,7 @@ export const useWorkoutForm = (workoutId) => {
       await fetchPlans()
       
       if (isEditMode.value) {
-        const id = workoutId?.value || workoutId
-        const workout = await fetchWorkout(id)
+        const workout = await fetchWorkout(unref(workoutId))
         currentWorkout.value = workout
         
         formData.value = {
@@ -91,21 +90,17 @@ export const useWorkoutForm = (workoutId) => {
       data.plan_id = formData.value.plan_id
     }
 
-    try {
-      if (isEditMode.value) {
-        const id = workoutId?.value || workoutId
-        const updated = await updateWorkout(id, data)
-        currentWorkout.value = updated
-        return updated
-      } else {
-        const newWorkout = await createWorkout(data)
-        currentWorkout.value = newWorkout
-        // Navigate to edit mode for the new workout
-        router.replace(`/tabs/workouts/${newWorkout.id}/edit`)
-        return newWorkout
-      }
-    } catch (error) {
-      throw error
+    
+    if (isEditMode.value) {
+      const updated = await updateWorkout(unref(workoutId), data)
+      currentWorkout.value = updated
+      return updated
+    } else {
+      const newWorkout = await createWorkout(data)
+      currentWorkout.value = newWorkout
+      // Navigate to edit mode for the new workout
+      router.replace(`/tabs/workouts/${newWorkout.id}/edit`)
+      return newWorkout
     }
   }
 

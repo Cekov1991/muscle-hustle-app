@@ -1,16 +1,19 @@
 <template>
-  <form @submit.prevent="handleSubmit">
-    <ion-list>
-      <!-- Plan Selector -->
+  <form @submit.prevent="handleSubmit" class="form-container">
+    <!-- Plan Selector -->
+    <div class="field-card">
       <PlanSelector
         :model-value="modelValue.plan_id"
         @update:model-value="updateField('plan_id', $event)"
         :required="!isEditMode"
         :disabled="loading"
+        class="form-item"
       />
+    </div>
 
-      <!-- Workout Name -->
-      <ion-item>
+    <!-- Workout Name -->
+    <div class="field-card">
+      <ion-item lines="none" class="form-item">
         <ion-label position="stacked">Workout Name *</ion-label>
         <ion-input
           :model-value="modelValue.name"
@@ -20,9 +23,11 @@
           required
         ></ion-input>
       </ion-item>
+    </div>
 
-      <!-- Description -->
-      <ion-item>
+    <!-- Description -->
+    <div class="field-card">
+      <ion-item lines="none" class="form-item">
         <ion-label position="stacked">Description</ion-label>
         <ion-textarea
           :model-value="modelValue.description"
@@ -32,9 +37,11 @@
           :disabled="loading"
         ></ion-textarea>
       </ion-item>
+    </div>
 
-      <!-- Day of Week -->
-      <ion-item>
+    <!-- Day of Week -->
+    <div class="field-card">
+      <ion-item lines="none" class="form-item">
         <ion-label position="stacked">Day of Week</ion-label>
         <ion-select
           :model-value="modelValue.day_of_week"
@@ -52,14 +59,15 @@
           <ion-select-option :value="6">Saturday</ion-select-option>
         </ion-select>
       </ion-item>
-    </ion-list>
+    </div>
 
     <!-- Action Buttons -->
-    <div class="action-buttons">
+    <div class="form-actions">
       <ion-button
         expand="block"
         type="submit"
         :disabled="loading || !isValid"
+        class="save-button"
       >
         <ion-spinner v-if="loading" name="crescent" slot="start" />
         <ion-icon v-else :icon="checkmarkOutline" slot="start" />
@@ -71,8 +79,9 @@
         fill="outline"
         @click="$emit('cancel')"
         :disabled="loading"
+        class="cancel-button"
       >
-        Cancel
+        <span class="button-text">Cancel</span>
       </ion-button>
     </div>
   </form>
@@ -80,7 +89,6 @@
 
 <script>
 import {
-  IonList,
   IonItem,
   IonLabel,
   IonInput,
@@ -99,7 +107,6 @@ import PlanSelector from './PlanSelector.vue'
 export default {
   name: 'WorkoutDetailsForm',
   components: {
-    IonList,
     IonItem,
     IonLabel,
     IonInput,
@@ -152,66 +159,85 @@ export default {
 </script>
 
 <style scoped>
-ion-list {
+.form-container {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.field-card {
   background: var(--brand-card-background-color, #fff);
   border-radius: 20px;
-  padding: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-ion-item {
-  --padding-start: 16px;
-  --padding-end: 16px;
+.form-item {
   --background: transparent;
-  --border-color: var(--brand-gray-20, #e5e7eb);
-  font-family: var(--brand-font-family);
+  --border-color: transparent;
+  --inner-padding-start: 6px;
+  --inner-padding-end: 16px;
+  --inner-padding-top: 6px;
+  --inner-padding-bottom: 6px;
+  --min-height: auto;
 }
 
-ion-label {
+.form-item ion-label {
   font-family: var(--brand-font-family);
+  color: var(--brand-gray-50, var(--brand-text-secondary-color));
+  font-weight: 600;
   font-size: var(--brand-font-size-sm);
-  font-weight: 600;
-  color: var(--brand-text-primary-color);
+  margin-bottom: 4px;
+  letter-spacing: -0.3px;
 }
 
-ion-input,
-ion-textarea,
-ion-select {
+.form-item ion-input,
+.form-item ion-textarea,
+.form-item ion-select {
   font-family: var(--brand-font-family);
+  --color: var(--brand-text-primary-color);
+  --placeholder-color: var(--brand-gray-50, var(--brand-text-secondary-color));
   font-size: var(--brand-font-size-base);
-  color: var(--brand-text-primary-color);
-}
-
-ion-input::placeholder,
-ion-textarea::placeholder {
-  color: var(--brand-text-tertiary-color);
-}
-
-.action-buttons {
-  margin-top: 24px;
-  margin-bottom: 24px;
-}
-
-.action-buttons ion-button {
-  margin-bottom: 12px;
-  --border-radius: var(--brand-button-border-radius, 16px);
-  font-family: var(--brand-font-family);
   font-weight: 600;
 }
 
-.action-buttons ion-button[type="submit"] {
+.form-actions {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.save-button {
   --background: var(--brand-primary);
+  --background-hover: var(--brand-primary-shade);
+  --color: var(--brand-text-on-primary-color);
+  font-family: var(--brand-font-family);
+  font-weight: 600;
+  font-size: var(--brand-font-size-base);
+  border-radius: var(--brand-button-border-radius, 16px);
+  height: 48px;
+  letter-spacing: -0.3px;
+}
+
+.cancel-button {
+  font-family: var(--brand-font-family);
+  font-weight: 600;
+  font-size: var(--brand-font-size-base);
+  border-radius: var(--brand-button-border-radius, 16px);
+  height: 48px;
+  letter-spacing: -0.3px;
+}
+
+.save-button:disabled {
+  --background: var(--brand-card-background-color, var(--brand-gray-10));
+  --color: var(--brand-gray-50, var(--brand-text-secondary-color));
 }
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
-  ion-list {
+  .field-card {
     background: var(--brand-card-background-color, #1f1f1f);
-  }
-  
-  ion-item {
-    --border-color: var(--brand-gray-30, #3f3f3f);
   }
 }
 </style>

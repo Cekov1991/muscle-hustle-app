@@ -15,7 +15,7 @@
     </ion-header>
     
     <ion-content fullscreen class="plan-form-content">
-      <div class="container">
+      <div class="form-container">
         <!-- Loading State -->
         <div v-if="initialLoading" class="loading-state">
           <ion-spinner name="crescent"></ion-spinner>
@@ -24,9 +24,9 @@
 
         <!-- Plan Form -->
         <form v-else @submit.prevent="handleSave">
-          <ion-list>
-            <!-- Plan Name -->
-            <ion-item>
+          <!-- Plan Name -->
+          <div class="field-card">
+            <ion-item lines="none" class="form-item">
               <ion-label position="stacked">Plan Name *</ion-label>
               <ion-input
                 v-model="formData.name"
@@ -35,9 +35,11 @@
                 required
               ></ion-input>
             </ion-item>
+          </div>
 
-            <!-- Description -->
-            <ion-item>
+          <!-- Description -->
+          <div class="field-card">
+            <ion-item lines="none" class="form-item">
               <ion-label position="stacked">Description</ion-label>
               <ion-textarea
                 v-model="formData.description"
@@ -46,28 +48,29 @@
                 :disabled="loading"
               ></ion-textarea>
             </ion-item>
+          </div>
 
-            <!-- Active Status -->
-            <ion-item>
+          <!-- Active Status -->
+          <div class="field-card">
+            <ion-item lines="none" class="form-item toggle-item">
               <ion-label>Active Plan</ion-label>
               <ion-toggle
                 v-model="formData.is_active"
                 :disabled="loading"
               ></ion-toggle>
             </ion-item>
-            <ion-item lines="none">
-              <ion-label class="toggle-description">
-                <p>Active plans are highlighted and used as the default when creating workout templates.</p>
-              </ion-label>
-            </ion-item>
-          </ion-list>
+            <div class="toggle-description">
+              <p>Active plans are highlighted and used as the default when creating workout templates.</p>
+            </div>
+          </div>
 
           <!-- Action Buttons -->
-          <div class="action-buttons">
+          <div class="form-actions">
             <ion-button
               expand="block"
               type="submit"
               :disabled="loading || !isFormValid"
+              class="save-button"
             >
               <ion-spinner v-if="loading" name="crescent" slot="start" />
               <ion-icon v-else :icon="checkmarkOutline" slot="start" />
@@ -79,6 +82,7 @@
               fill="outline"
               @click="handleCancel"
               :disabled="loading"
+              class="cancel-button"
             >
               <span class="button-text">Cancel</span>
             </ion-button>
@@ -91,6 +95,7 @@
               color="danger"
               @click="handleDelete"
               :disabled="loading"
+              class="delete-button"
             >
               <ion-icon :icon="trashOutline" slot="start" />
               Delete Plan
@@ -114,21 +119,19 @@ import {
   IonIcon,
   IonBackButton,
   IonSpinner,
-  IonList,
   IonItem,
   IonLabel,
   IonInput,
   IonTextarea,
-  IonToggle,
-  alertController
+  IonToggle
 } from '@ionic/vue'
 import {
   checkmarkOutline,
   trashOutline
 } from 'ionicons/icons'
-import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { usePlans } from '../composables/usePlans'
+import { computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { usePlanForm } from '../composables/usePlanForm'
 
 export default {
   name: 'PlanForm',
@@ -143,7 +146,6 @@ export default {
     IonIcon,
     IonBackButton,
     IonSpinner,
-    IonList,
     IonItem,
     IonLabel,
     IonInput,
@@ -152,109 +154,35 @@ export default {
   },
   setup() {
     const route = useRoute()
-    const router = useRouter()
-    const { fetchPlan, createPlan, updatePlan, deletePlan, loading } = usePlans()
-    
     const planId = computed(() => route.params.id ? parseInt(route.params.id) : null)
-    const isEditMode = computed(() => !!planId.value)
-    const initialLoading = ref(true)
-    
-    // Form data
-    const formData = ref({
-      name: '',
-      description: '',
-      is_active: false
-    })
-    
-    // Computed properties
-    const isFormValid = computed(() => formData.value.name.trim().length > 0)
-    
-    // Initialize form data
-    const initializeForm = async () => {
-      initialLoading.value = true
-      
-      try {
-        if (isEditMode.value) {
-          const plan = await fetchPlan(planId.value)
-          formData.value = {
-            name: plan.name || '',
-            description: plan.description || '',
-            is_active: plan.is_active || false
-          }
-        }
-      } catch (error) {
-        console.error('InitializeForm error:', error)
-        router.back()
-      } finally {
-        initialLoading.value = false
-      }
-    }
-    
-    // Handle save
+
+    const {
+      loading,
+      initialLoading,
+      formData,
+      isEditMode,
+      isFormValid,
+      initializeForm,
+      savePlan,
+      removePlan,
+      cancelForm
+    } = usePlanForm(planId)
+
+    // Handle save with navigation
     const handleSave = async () => {
-      if (!isFormValid.value) return
-      
-      const data = {
-        name: formData.value.name.trim(),
-        description: formData.value.description?.trim() || null,
-        is_active: formData.value.is_active
-      }
-      
       try {
-        if (isEditMode.value) {
-          await updatePlan(planId.value, data)
-        } else {
-          await createPlan(data)
-        }
-        router.back()
+        await savePlan()
+        cancelForm() // Navigate back after successful save
       } catch (error) {
         console.error('Save error:', error)
       }
     }
-    
-    // Handle cancel
-    const handleCancel = () => {
-      router.back()
-    }
-    
-    // Handle delete
-    const handleDelete = async () => {
-      const plan = await fetchPlan(planId.value)
-      const templateCount = plan.workout_templates?.length || 0
-      
-      const alert = await alertController.create({
-        header: 'Delete Plan',
-        message: templateCount > 0
-          ? `Are you sure you want to delete "${plan.name}"? This will also delete all ${templateCount} workout template${templateCount === 1 ? '' : 's'} in this plan. This action cannot be undone.`
-          : `Are you sure you want to delete "${plan.name}"? This action cannot be undone.`,
-        buttons: [
-          {
-            text: 'Cancel',
-            role: 'cancel'
-          },
-          {
-            text: 'Delete',
-            role: 'destructive',
-            handler: async () => {
-              try {
-                await deletePlan(planId.value)
-                router.back()
-              } catch (error) {
-                console.error('Delete error:', error)
-              }
-            }
-          }
-        ]
-      })
-      
-      await alert.present()
-    }
-    
+
     // Initialize on mount
     onMounted(() => {
       initializeForm()
     })
-    
+
     return {
       // State
       loading,
@@ -262,12 +190,12 @@ export default {
       isEditMode,
       formData,
       isFormValid,
-      
+
       // Methods
       handleSave,
-      handleCancel,
-      handleDelete,
-      
+      handleCancel: cancelForm,
+      handleDelete: removePlan,
+
       // Icons
       checkmarkOutline,
       trashOutline
@@ -282,7 +210,12 @@ export default {
 }
 
 ion-header {
-  --background: var(--brand-background-color);
+  --background: var(--brand-background-color, #ffffff);
+}
+
+ion-toolbar {
+  --background: var(--brand-background-color, #ffffff);
+  --color: var(--brand-primary);
 }
 
 ion-title {
@@ -290,16 +223,17 @@ ion-title {
   font-weight: 700;
   font-size: var(--brand-font-size-lg);
   letter-spacing: -0.5px;
+  color: var(--brand-primary);
 }
 
 .plan-form-content {
-  --background: var(--brand-background-color);
+  --background: var(--brand-background-color, #fafafa);
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
+.form-container {
   padding: 16px;
+  max-width: 500px;
+  margin: 0 auto;
 }
 
 .loading-state {
@@ -326,84 +260,118 @@ ion-title {
   margin: 0;
 }
 
-ion-list {
+.field-card {
   background: var(--brand-card-background-color, #fff);
   border-radius: 20px;
-  padding: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-ion-item {
-  --padding-start: 16px;
-  --padding-end: 16px;
+.form-item {
   --background: transparent;
-  --border-color: var(--brand-gray-20, #e5e7eb);
-  font-family: var(--brand-font-family);
+  --border-color: transparent;
+  --inner-padding-start: 6px;
+  --inner-padding-end: 16px;
+  --inner-padding-top: 6px;
+  --inner-padding-bottom: 6px;
+  --min-height: auto;
 }
 
-ion-label {
+.form-item ion-label {
   font-family: var(--brand-font-family);
-  font-size: var(--brand-font-size-sm);
+  color: var(--brand-gray-50, var(--brand-text-secondary-color));
   font-weight: 600;
-  color: var(--brand-text-primary-color);
+  font-size: var(--brand-font-size-sm);
+  margin-bottom: 4px;
+  letter-spacing: -0.3px;
 }
 
-ion-input,
-ion-textarea {
+.form-item ion-input,
+.form-item ion-textarea {
   font-family: var(--brand-font-family);
+  --color: var(--brand-text-primary-color);
+  --placeholder-color: var(--brand-gray-50, var(--brand-text-secondary-color));
   font-size: var(--brand-font-size-base);
-  color: var(--brand-text-primary-color);
+  font-weight: 600;
 }
 
-ion-input::placeholder,
-ion-textarea::placeholder {
-  color: var(--brand-text-tertiary-color);
+.toggle-item {
+  --inner-padding-top: 12px;
+  --inner-padding-bottom: 8px;
+}
+
+.toggle-item ion-label {
+  font-family: var(--brand-font-family);
+  color: var(--brand-text-primary-color);
+  font-weight: 600;
+  font-size: var(--brand-font-size-base);
 }
 
 .toggle-description {
-  font-size: var(--brand-font-size-xs);
-  color: var(--brand-text-secondary-color);
-  font-weight: 400;
-  margin-top: 4px;
+  padding: 0 16px 12px 16px;
 }
 
 .toggle-description p {
+  font-family: var(--brand-font-family);
+  font-size: var(--brand-font-size-xs);
+  color: var(--brand-gray-50, var(--brand-text-secondary-color));
+  font-weight: 400;
   margin: 0;
+  line-height: 1.4;
 }
 
-.action-buttons {
+.form-actions {
   margin-top: 24px;
-  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.action-buttons ion-button {
-  margin-bottom: 12px;
-  --border-radius: var(--brand-button-border-radius, 16px);
+.save-button {
+  --background: var(--brand-primary);
+  --background-hover: var(--brand-primary-shade);
+  --color: var(--brand-text-on-primary-color);
   font-family: var(--brand-font-family);
   font-weight: 600;
+  font-size: var(--brand-font-size-base);
+  border-radius: var(--brand-button-border-radius, 16px);
+  height: 48px;
+  letter-spacing: -0.3px;
 }
 
-.action-buttons ion-button[type="submit"] {
-  --background: var(--brand-primary);
+.cancel-button {
+  font-family: var(--brand-font-family);
+  font-weight: 600;
+  font-size: var(--brand-font-size-base);
+  border-radius: var(--brand-button-border-radius, 16px);
+  height: 48px;
+  letter-spacing: -0.3px;
 }
 
-.action-buttons ion-button[color="danger"] {
+.delete-button {
+  font-family: var(--brand-font-family);
+  font-weight: 600;
+  font-size: var(--brand-font-size-base);
+  border-radius: var(--brand-button-border-radius, 16px);
+  height: 48px;
+  letter-spacing: -0.3px;
   --color: var(--brand-danger-color, #eb445a);
+}
+
+.save-button:disabled {
+  --background: var(--brand-card-background-color, var(--brand-gray-10));
+  --color: var(--brand-gray-50, var(--brand-text-secondary-color));
 }
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
-  .plan-form-page {
+  .plan-form-content {
     --background: var(--brand-background-color, #121212);
   }
   
-  ion-list {
+  .field-card {
     background: var(--brand-card-background-color, #1f1f1f);
-  }
-  
-  ion-item {
-    --border-color: var(--brand-gray-30, #3f3f3f);
   }
 }
 </style>
