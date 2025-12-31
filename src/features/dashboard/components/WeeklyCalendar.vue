@@ -58,7 +58,8 @@
             v-for="day in currentWeek" 
             :key="day.dateStr + '-indicator'"
             class="day-indicator-wrapper"
-            @click="selectedDate = day.dateStr"
+            :class="{ 'clickable': day.hasWorkout }"
+            @click="handleDayClick(day)"
           >
             <div 
               class="day-circle"
@@ -101,7 +102,7 @@ export default {
     IonSpinner,
     IonButton
   },
-  emits: ['retry'],
+  emits: ['retry', 'dayClick'],
   props: {
     workouts: {
       type: Array,
@@ -116,8 +117,16 @@ export default {
       default: null
     }
   },
-  setup(props) {
+  setup(props, { emit }) {
     const selectedDate = ref(new Date().toISOString().split('T')[0])
+    
+    // Find workout session for a specific date
+    const getWorkoutForDate = (dateStr) => {
+      return props.workouts.find(workout => {
+        const workoutDate = workout.date || workout.dateStr
+        return workoutDate === dateStr && workout.completed !== false
+      })
+    }
     
     // Generate current week's dates (Sunday to Saturday)
     const getCurrentWeek = () => {
@@ -157,6 +166,27 @@ export default {
       return currentWeek.value.some(day => day.hasWorkout)
     })
     
+    // Handle day click
+    const handleDayClick = (day) => {
+      if (day.hasWorkout) {
+        const workout = getWorkoutForDate(day.dateStr)
+        if (workout) {
+          // Try to find session_id in various possible locations
+          const sessionId = workout.session_id || workout.id || workout.workout_session_id
+          if (sessionId) {
+            emit('dayClick', {
+              date: day.dateStr,
+              sessionId: sessionId,
+              workout: workout
+            })
+          }
+        }
+      } else {
+        // Still allow selecting the date even if no workout
+        selectedDate.value = day.dateStr
+      }
+    }
+    
     // Watch for changes in workouts prop and regenerate week
     watch(() => props.workouts, () => {
       currentWeek.value = getCurrentWeek()
@@ -166,6 +196,7 @@ export default {
       currentWeek,
       selectedDate,
       hasAnyWorkouts,
+      handleDayClick,
       calendarOutline,
       checkmark,
       refreshOutline
@@ -254,8 +285,16 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  cursor: pointer;
   position: relative;
+}
+
+.day-indicator-wrapper.clickable {
+  cursor: pointer;
+}
+
+.day-indicator-wrapper.clickable:hover .day-circle {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
 }
 
 .day-circle {

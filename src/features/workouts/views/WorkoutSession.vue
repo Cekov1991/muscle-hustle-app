@@ -9,7 +9,7 @@
         </ion-buttons>
         <ion-title>{{ workoutTitle }}</ion-title>
         <ion-buttons slot="end">
-          <ion-button @click="showCancelConfirm = true" color="danger" class="cancel-btn">
+          <ion-button v-if="!isCompleted" @click="showCancelConfirm = true" color="danger" class="cancel-btn">
             Cancel
           </ion-button>
         </ion-buttons>
@@ -97,8 +97,8 @@
               />
             </div>
             
-            <!-- Add Exercise Button -->
-            <div class="add-exercise-section">
+            <!-- Add Exercise Button (only show if not completed) -->
+            <div v-if="!isCompleted" class="add-exercise-section">
               <button class="add-exercise-button" @click="showAddExercise = true">
                 <ion-icon :icon="addOutline" />
                 <span>Add Exercise</span>
@@ -139,8 +139,8 @@
             </div>
           </template>
           
-          <!-- Complete Workout Button - Fixed at bottom -->
-          <div class="complete-section">
+          <!-- Complete Workout Button - Fixed at bottom (only show if not completed) -->
+          <div v-if="!isCompleted" class="complete-section">
             <button 
               class="complete-button"
               :disabled="loading"
@@ -172,8 +172,9 @@
       @select="handleAddExercise"
     />
     
-    <!-- Cancel Confirmation Alert -->
+    <!-- Cancel Confirmation Alert (only for active sessions) -->
     <ion-alert
+      v-if="!isCompleted"
       :is-open="showCancelConfirm"
       header="Cancel Workout?"
       message="This will discard all your logged sets. Are you sure?"
@@ -181,8 +182,9 @@
       @didDismiss="showCancelConfirm = false"
     />
     
-    <!-- Complete Confirmation Alert -->
+    <!-- Complete Confirmation Alert (only for active sessions) -->
     <ion-alert
+      v-if="!isCompleted"
       :is-open="showCompleteConfirm"
       header="Complete Workout?"
       :message="completeMessage"
@@ -194,7 +196,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   IonPage,
@@ -253,6 +255,7 @@ export default {
       loading,
       error,
       progressPercent,
+      isCompleted,
       fetchSession,
       logSet,
       updateSet,
@@ -278,6 +281,9 @@ export default {
     const sessionId = computed(() => route.params.id)
     
     const workoutTitle = computed(() => {
+      if (isCompleted.value) {
+        return 'Completed Workout'
+      }
       if (session.value?.workout_template_id) {
         return 'Workout Session'
       }
@@ -461,6 +467,13 @@ export default {
       }
     ]
     
+    // Watch for session changes to populate notes
+    watch(() => session.value, (newSession) => {
+      if (newSession?.notes) {
+        workoutNotes.value = newSession.notes
+      }
+    }, { immediate: true })
+
     onMounted(() => {
       loadSession()
     })
@@ -483,6 +496,7 @@ export default {
       showCompleteConfirm,
       workoutNotes,
       workoutTitle,
+      isCompleted,
       completedExercises,
       totalSetsLogged,
       completeMessage,

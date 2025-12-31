@@ -22,7 +22,7 @@
         <!-- Weekly Calendar Component -->
         <div class="calendar-wrapper">
           <WeeklyCalendar :workouts="sessions" :loading="calendarLoading" :error="calendarError"
-            @retry="handleCalendarRetry" />
+            @retry="handleCalendarRetry" @dayClick="handleCalendarDayClick" />
         </div>
 
 
@@ -165,8 +165,8 @@ import {
   playOutline,
   chevronForwardOutline
 } from 'ionicons/icons'
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, onActivated, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuth } from '../../auth/composables/useAuth'
 import { useCalendar } from '../composables/useCalendar'
 import { useMetrics } from '../composables/useMetrics'
@@ -190,6 +190,7 @@ export default {
   },
   setup() {
     const router = useRouter()
+    const route = useRoute()
     const { user } = useAuth()
 
     const { sessions, loading: calendarLoading, error: calendarError, fetchCurrentWeek, retryFetch } = useCalendar()
@@ -284,6 +285,34 @@ export default {
       }
     })
 
+    // Refresh calendar when component is activated (when navigating back to dashboard)
+    onActivated(async () => {
+      try {
+        // Refresh calendar and today's data when returning to dashboard
+        await Promise.all([
+          fetchCurrentWeek(),
+          fetchToday()
+        ])
+      } catch (error) {
+        console.error('Failed to refresh data on activation:', error)
+      }
+    })
+
+    // Also watch for route changes to refresh calendar when navigating to dashboard
+    watch(() => route.name, async (newRouteName, oldRouteName) => {
+      // Refresh calendar when navigating to dashboard from workout session
+      if (newRouteName === 'Dashboard' && oldRouteName === 'WorkoutSession') {
+        try {
+          await Promise.all([
+            fetchCurrentWeek(),
+            fetchToday()
+          ])
+        } catch (error) {
+          console.error('Failed to refresh data on route change:', error)
+        }
+      }
+    })
+
     // Start workout handler
     const handleStartWorkout = async () => {
       startingWorkout.value = true
@@ -324,6 +353,13 @@ export default {
       }
     }
 
+    // Handle calendar day click
+    const handleCalendarDayClick = ({ sessionId }) => {
+      if (sessionId) {
+        router.push(`/tabs/workout-session/${sessionId}`)
+      }
+    }
+
     return {
       user,
       partnerName,
@@ -343,6 +379,7 @@ export default {
       handleCalendarRetry,
       handleStartWorkout,
       handleTemplateSelect,
+      handleCalendarDayClick,
       showTemplatePicker,
       startingWorkout,
       workoutButtonText,
