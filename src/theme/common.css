@@ -1,5 +1,7 @@
 .container {
-    padding: 50px 250px !important;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px;
 }
 
 .button-text {
@@ -41,7 +43,7 @@
 
 @media (max-width: 768px) {
     .container {
-        padding: 10px !important;
+        padding: 16px;
     }
 }
 

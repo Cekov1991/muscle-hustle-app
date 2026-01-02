@@ -90,8 +90,56 @@
                 <ion-icon :icon="bodyOutline" />
               </div>
               <div class="stat-info">
-                <p class="stat-value">All Groups</p>
+                <p class="stat-value">{{ muscleGroupCount }} Groups</p>
                 <p class="stat-label">Muscle Balance</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Muscle Groups Breakdown -->
+          <div class="muscle-groups-section" v-if="hasMuscleGroups">
+            <!-- Upper Body -->
+            <div class="muscle-region">
+              <h3 class="region-title">Upper Body</h3>
+              <div class="muscle-grid">
+                <div 
+                  v-for="muscle in upperBodyMuscles" 
+                  :key="muscle.name" 
+                  class="muscle-item"
+                >
+                  <span class="muscle-name">{{ muscle.label }}</span>
+                  <span class="muscle-value">{{ muscle.value }}%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Lower Body -->
+            <div class="muscle-region">
+              <h3 class="region-title">Lower Body</h3>
+              <div class="muscle-grid">
+                <div 
+                  v-for="muscle in lowerBodyMuscles" 
+                  :key="muscle.name" 
+                  class="muscle-item"
+                >
+                  <span class="muscle-name">{{ muscle.label }}</span>
+                  <span class="muscle-value">{{ muscle.value }}%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Core -->
+            <div class="muscle-region">
+              <h3 class="region-title">Core</h3>
+              <div class="muscle-grid">
+                <div 
+                  v-for="muscle in coreMuscles" 
+                  :key="muscle.name" 
+                  class="muscle-item"
+                >
+                  <span class="muscle-name">{{ muscle.label }}</span>
+                  <span class="muscle-value">{{ muscle.value }}%</span>
+                </div>
               </div>
             </div>
           </div>
@@ -173,6 +221,33 @@ import {
 } from 'ionicons/icons'
 import { computed } from 'vue'
 
+// Muscle group organization by body region
+const MUSCLE_GROUP_CONFIG = {
+  upper: [
+    { name: 'chest', label: 'Chest' },
+    { name: 'lats', label: 'Lats' },
+    { name: 'upper back', label: 'Upper Back' },
+    { name: 'lower back', label: 'Lower Back' },
+    { name: 'front delts', label: 'Front Delts' },
+    { name: 'side delts', label: 'Side Delts' },
+    { name: 'rear delts', label: 'Rear Delts' },
+    { name: 'traps', label: 'Traps' },
+    { name: 'biceps', label: 'Biceps' },
+    { name: 'triceps', label: 'Triceps' },
+    { name: 'forearms', label: 'Forearms' }
+  ],
+  lower: [
+    { name: 'quadriceps', label: 'Quadriceps' },
+    { name: 'hamstrings', label: 'Hamstrings' },
+    { name: 'glutes', label: 'Glutes' },
+    { name: 'calves', label: 'Calves' }
+  ],
+  core: [
+    { name: 'abs', label: 'Abs' },
+    { name: 'obliques', label: 'Obliques' }
+  ]
+}
+
 export default {
   name: 'MetricsDetailModal',
   components: {
@@ -241,11 +316,42 @@ export default {
       }
     }
 
+    // Muscle groups computed properties
+    const muscleGroups = computed(() => {
+      return props.selectedMetric?.data?.muscleGroups || {}
+    })
+
+    const hasMuscleGroups = computed(() => {
+      return Object.keys(muscleGroups.value).length > 0
+    })
+
+    const muscleGroupCount = computed(() => {
+      return Object.keys(muscleGroups.value).length
+    })
+
+    const getMuscleGroupValues = (config) => {
+      return config.map(muscle => ({
+        name: muscle.name,
+        label: muscle.label,
+        value: muscleGroups.value[muscle.name] || 0
+      }))
+    }
+
+    const upperBodyMuscles = computed(() => getMuscleGroupValues(MUSCLE_GROUP_CONFIG.upper))
+    const lowerBodyMuscles = computed(() => getMuscleGroupValues(MUSCLE_GROUP_CONFIG.lower))
+    const coreMuscles = computed(() => getMuscleGroupValues(MUSCLE_GROUP_CONFIG.core))
+
     return {
       handleClose,
       modalTitle,
       getLevelClass,
       getTrendClass,
+      // Muscle groups
+      hasMuscleGroups,
+      muscleGroupCount,
+      upperBodyMuscles,
+      lowerBodyMuscles,
+      coreMuscles,
       // Icons
       closeOutline,
       barbellOutline,
@@ -420,5 +526,57 @@ ion-title {
   color: var(--brand-text-secondary-color);
   line-height: 1.5;
   margin: 0;
+}
+
+/* Muscle Groups Section */
+.muscle-groups-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.muscle-region {
+  background: var(--brand-card-background-color, var(--brand-gray-10));
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.region-title {
+  font-family: var(--brand-font-family);
+  font-weight: 600;
+  font-size: var(--brand-font-size-sm);
+  color: var(--brand-primary);
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.muscle-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.muscle-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--brand-background-color, #ffffff);
+  border-radius: 10px;
+}
+
+.muscle-name {
+  font-family: var(--brand-font-family);
+  font-weight: 500;
+  font-size: var(--brand-font-size-sm);
+  color: var(--brand-text-primary-color);
+}
+
+.muscle-value {
+  font-family: var(--brand-font-family);
+  font-weight: 600;
+  font-size: var(--brand-font-size-sm);
+  color: var(--brand-primary);
 }
 </style>

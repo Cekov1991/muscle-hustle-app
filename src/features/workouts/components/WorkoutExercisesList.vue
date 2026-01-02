@@ -34,8 +34,10 @@
       >
         <ion-card-content>
           <div class="exercise-row">
-            <!-- Muscle Group Icon -->
-            <MuscleGroupIcon :category="exercise.category" />
+            <!-- Exercise Icon -->
+            <div class="exercise-icon">
+              <ion-icon :icon="barbellOutline" />
+            </div>
             
             <!-- Exercise Info -->
             <div class="exercise-info">
@@ -75,7 +77,6 @@ import {
 } from 'ionicons/icons'
 import { computed } from 'vue'
 import { formatSetsReps } from '../utils/workoutHelpers'
-import MuscleGroupIcon from '../../../shared/components/MuscleGroupIcon.vue'
 
 export default {
   name: 'WorkoutExercisesList',
@@ -83,8 +84,7 @@ export default {
     IonButton,
     IonIcon,
     IonCard,
-    IonCardContent,
-    MuscleGroupIcon
+    IonCardContent
   },
   props: {
     exercises: {
@@ -201,6 +201,19 @@ export default {
   align-items: center;
   gap: 16px;
   padding: 8px 0;
+}
+
+.exercise-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--brand-primary);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand-text-on-primary-color, #fff);
+  font-size: 24px;
+  flex-shrink: 0;
 }
 
 .exercise-info {

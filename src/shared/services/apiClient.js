@@ -225,6 +225,21 @@ export const fitnessAPI = {
 }
 
 /**
+ * Muscle Groups API endpoints
+ * For granular body part tracking
+ */
+export const muscleGroupsAPI = {
+  // Get all muscle groups
+  getAll: () => api.get('/muscle-groups'),
+  
+  // Get muscle groups filtered by body region (upper/lower/core)
+  getByRegion: (region) => api.get('/muscle-groups', { params: { body_region: region } }),
+  
+  // Get single muscle group with associated exercises
+  getById: (id) => api.get(`/muscle-groups/${id}`)
+}
+
+/**
  * Profile API endpoints
  */
 export const profileAPI = {
