@@ -2,7 +2,7 @@
   <ion-modal :is-open="isOpen" @didDismiss="handleClose">
     <ion-header>
       <ion-toolbar>
-        <ion-title>{{ isEditMode ? 'Edit Exercise' : 'Add Exercise' }}</ion-title>
+        <ion-title>{{ isEditMode ? 'Edit Exercise Targets' : 'Add Exercise and Set Targets' }}</ion-title>
         <ion-buttons slot="end">
           <ion-button @click="handleClose">
             <ion-icon :icon="closeOutline" slot="icon-only" />
@@ -13,14 +13,35 @@
     
     <ion-content>
       <form @submit.prevent="handleSubmit" class="form-container">
-        <!-- Exercise Selection (only when adding) -->
-        <div v-if="!isEditMode" class="field-card">
-          <ion-item lines="none" class="form-item">
-            <ion-label position="stacked">Exercise</ion-label>
+        <!-- Exercise Info Card -->
+        <div class="exercise-info-card">
+          <!-- Exercise Name -->
+          <h2 class="exercise-name">{{ selectedExercise?.name || 'Select an exercise' }}</h2>
+          
+          <!-- Category -->
+          <p v-if="selectedExercise?.category?.name" class="exercise-category">
+            {{ selectedExercise.category.name }}
+          </p>
+
+          <!-- Target Muscle Groups -->
+          <div v-if="selectedExercise?.muscle_groups?.length" class="muscle-groups">
+            <span 
+              v-for="muscle in selectedExercise.muscle_groups" 
+              :key="muscle.id"
+              class="muscle-tag"
+              :class="{ 'primary': muscle.is_primary }"
+            >
+              {{ muscle.name }}
+            </span>
+          </div>
+
+          <!-- Exercise Selection Dropdown (only when no exercise selected) -->
+          <ion-item v-if="!isEditMode && !selectedExercise" lines="none" class="form-item select-item">
             <ion-select
               v-model="formData.exercise_id"
-              placeholder="Select exercise"
+              placeholder="Choose exercise..."
               :disabled="loading"
+              interface="action-sheet"
             >
               <ion-select-option
                 v-for="exercise in availableExercises"
@@ -33,72 +54,64 @@
           </ion-item>
         </div>
 
-        <!-- Exercise Name (read-only when editing) -->
-        <div v-if="isEditMode" class="field-card">
-          <ion-item lines="none" class="form-item">
-            <ion-label position="stacked">Exercise</ion-label>
-            <ion-input
-              :value="selectedExercise?.name || 'Unknown'"
-              readonly
-            ></ion-input>
-          </ion-item>
-        </div>
+        <!-- Form Fields Grid -->
+        <div class="fields-grid">
+          <!-- Target Sets -->
+          <div class="field-card">
+            <ion-item lines="none" class="form-item">
+              <ion-label position="stacked">Target Sets</ion-label>
+              <ion-input
+                v-model.number="formData.target_sets"
+                type="number"
+                min="1"
+                placeholder="4"
+                :disabled="loading"
+              ></ion-input>
+            </ion-item>
+          </div>
 
-        <!-- Target Sets -->
-        <div class="field-card">
-          <ion-item lines="none" class="form-item">
-            <ion-label position="stacked">Target Sets</ion-label>
-            <ion-input
-              v-model.number="formData.target_sets"
-              type="number"
-              min="1"
-              placeholder="e.g., 4"
-              :disabled="loading"
-            ></ion-input>
-          </ion-item>
-        </div>
+          <!-- Target Reps -->
+          <div class="field-card">
+            <ion-item lines="none" class="form-item">
+              <ion-label position="stacked">Target Reps</ion-label>
+              <ion-input
+                v-model.number="formData.target_reps"
+                type="number"
+                min="1"
+                placeholder="8"
+                :disabled="loading"
+              ></ion-input>
+            </ion-item>
+          </div>
 
-        <!-- Target Reps -->
-        <div class="field-card">
-          <ion-item lines="none" class="form-item">
-            <ion-label position="stacked">Target Reps</ion-label>
-            <ion-input
-              v-model.number="formData.target_reps"
-              type="number"
-              min="1"
-              placeholder="e.g., 8"
-              :disabled="loading"
-            ></ion-input>
-          </ion-item>
-        </div>
+          <!-- Target Weight -->
+          <div class="field-card">
+            <ion-item lines="none" class="form-item">
+              <ion-label position="stacked">Target Weight</ion-label>
+              <ion-input
+                v-model.number="formData.target_weight"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="80"
+                :disabled="loading"
+              ></ion-input>
+            </ion-item>
+          </div>
 
-        <!-- Target Weight -->
-        <div class="field-card">
-          <ion-item lines="none" class="form-item">
-            <ion-label position="stacked">Target Weight</ion-label>
-            <ion-input
-              v-model.number="formData.target_weight"
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="e.g., 80.00"
-              :disabled="loading"
-            ></ion-input>
-          </ion-item>
-        </div>
-
-        <!-- Rest Seconds -->
-        <div class="field-card">
-          <ion-item lines="none" class="form-item">
-            <ion-label position="stacked">Rest Time (seconds)</ion-label>
-            <ion-input
-              v-model.number="formData.rest_seconds"
-              type="number"
-              min="0"
-              placeholder="e.g., 90"
-              :disabled="loading"
-            ></ion-input>
-          </ion-item>
+          <!-- Rest Seconds -->
+          <div class="field-card">
+            <ion-item lines="none" class="form-item">
+              <ion-label position="stacked">Rest Time (sec)</ion-label>
+              <ion-input
+                v-model.number="formData.rest_seconds"
+                type="number"
+                min="0"
+                placeholder="90"
+                :disabled="loading"
+              ></ion-input>
+            </ion-item>
+          </div>
         </div>
 
         <!-- Action Buttons -->
@@ -112,16 +125,6 @@
             <ion-spinner v-if="loading" name="crescent" slot="start" />
             <ion-icon v-else :icon="checkmarkOutline" slot="start" />
             {{ isEditMode ? 'Update' : 'Add' }} Exercise
-          </ion-button>
-          
-          <ion-button
-            expand="block"
-            fill="outline"
-            @click="handleClose"
-            :disabled="loading"
-            class="cancel-button"
-          >
-          <span class="button-text"> Cancel </span>
           </ion-button>
         </div>
       </form>
@@ -327,10 +330,17 @@ ion-content {
   margin: 0 auto;
 }
 
+/* Fields Grid Layout */
+.fields-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
 .field-card {
   background: var(--brand-card-background-color, #fff);
   border-radius: 20px;
-  margin-bottom: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
@@ -338,10 +348,10 @@ ion-content {
 .form-item {
   --background: transparent;
   --border-color: transparent;
-  --inner-padding-start: 6px;
+  --inner-padding-start: 16px;
   --inner-padding-end: 16px;
-  --inner-padding-top: 6px;
-  --inner-padding-bottom: 6px;
+  --inner-padding-top: 12px;
+  --inner-padding-bottom: 12px;
   --min-height: auto;
 }
 
@@ -350,7 +360,7 @@ ion-content {
   color: var(--brand-gray-50, var(--brand-text-secondary-color));
   font-weight: 600;
   font-size: var(--brand-font-size-sm);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   letter-spacing: -0.3px;
 }
 
@@ -358,9 +368,67 @@ ion-content {
 .form-item ion-select {
   font-family: var(--brand-font-family);
   --color: var(--brand-text-primary-color);
-  --placeholder-color: var(--brand-gray-50, var(--brand-text-secondary-color));
-  font-size: var(--brand-font-size-base);
+  --placeholder-color: var(--brand-gray-40, #9ca3af);
+  font-size: var(--brand-font-size-xl);
+  font-weight: 700;
+}
+
+/* Exercise Info Card */
+.exercise-info-card {
+  background: var(--brand-card-background-color, #fff);
+  border-radius: 20px;
+  margin-bottom: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.exercise-name {
+  font-family: var(--brand-font-family);
+  font-size: var(--brand-font-size-lg);
+  font-weight: 700;
+  color: var(--brand-text-primary-color);
+  margin: 0 0 4px 0;
+  letter-spacing: -0.3px;
+}
+
+.exercise-category {
+  font-family: var(--brand-font-family);
+  font-size: var(--brand-font-size-sm);
+  color: var(--brand-text-secondary-color);
+  margin: 0 0 12px 0;
+}
+
+.muscle-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--brand-gray-20, #e5e7eb);
+}
+
+.muscle-tag {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-family: var(--brand-font-family);
+  font-size: 12px;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  background: var(--brand-gray-20, #e5e7eb);
+  color: var(--brand-text-secondary-color, #6b7280);
+}
+
+.muscle-tag.primary {
+  background: var(--brand-primary-light, rgba(249, 115, 22, 0.15));
+  color: var(--brand-primary);
+}
+
+.select-item {
+  margin-top: 8px;
+  --padding-start: 0;
+  --inner-padding-start: 0;
 }
 
 .form-actions {
@@ -402,8 +470,23 @@ ion-content {
     --background: var(--brand-background-color, #121212);
   }
   
-  .field-card {
+  .field-card,
+  .exercise-info-card {
     background: var(--brand-card-background-color, #1f1f1f);
+  }
+
+  .muscle-groups {
+    border-top-color: var(--brand-gray-60, #4b5563);
+  }
+
+  .muscle-tag {
+    background: var(--brand-gray-70, #374151);
+    color: var(--brand-gray-30, #d1d5db);
+  }
+
+  .muscle-tag.primary {
+    background: var(--brand-primary-light, rgba(249, 115, 22, 0.2));
+    color: var(--brand-primary);
   }
 }
 </style>

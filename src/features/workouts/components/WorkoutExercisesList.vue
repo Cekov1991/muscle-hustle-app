@@ -2,14 +2,7 @@
   <div class="exercises-section">
     <div class="section-header">
       <h2>Exercises</h2>
-      <ion-button 
-        size="small" 
-        @click="$emit('add-exercise')"
-        :disabled="loading"
-      >
-        <ion-icon :icon="addOutline" slot="start" />
-        Add Exercise
-      </ion-button>
+      
     </div>
 
     <!-- Empty State -->
@@ -45,6 +38,17 @@
               <p class="exercise-sets-reps">
                 {{ formatSetsReps(exercise.pivot) }}
               </p>
+              <!-- Muscle Groups -->
+              <div v-if="exercise.muscle_groups?.length" class="muscle-groups">
+                <span 
+                  v-for="muscle in exercise.muscle_groups" 
+                  :key="muscle.id"
+                  class="muscle-tag"
+                  :class="{ 'primary': muscle.is_primary }"
+                >
+                  {{ muscle.name }}
+                </span>
+              </div>
             </div>
             
             <!-- Three-dot Menu -->
@@ -59,7 +63,15 @@
           </div>
         </ion-card-content>
       </ion-card>
+      <button 
+        @click="$emit('add-exercise')"
+        :disabled="loading"
+        class="dashed-button"
+      >
+        Add Exercise
+      </button>
     </div>
+    
   </div>
 </template>
 
@@ -198,7 +210,7 @@ export default {
 
 .exercise-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 16px;
   padding: 8px 0;
 }
@@ -206,6 +218,7 @@ export default {
 .exercise-icon {
   width: 48px;
   height: 48px;
+  margin-top: 4px;
   background: var(--brand-primary);
   border-radius: 12px;
   display: flex;
@@ -232,11 +245,35 @@ export default {
 }
 
 .exercise-sets-reps {
-  margin: 0;
+  margin: 0 0 6px 0;
   font-family: var(--brand-font-family);
   font-size: var(--brand-font-size-sm);
   color: var(--brand-text-tertiary-color);
   line-height: 1.2;
+}
+
+/* Muscle Groups */
+.muscle-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.muscle-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-family: var(--brand-font-family);
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--brand-gray-20, #e5e7eb);
+  color: var(--brand-text-secondary-color, #6b7280);
+}
+
+.muscle-tag.primary {
+  background: var(--brand-primary-light, rgba(249, 115, 22, 0.15));
+  color: var(--brand-primary);
+  font-weight: 600;
 }
 
 /* Dark mode support */
@@ -245,6 +282,16 @@ export default {
   .exercise-card-compact {
     background: var(--brand-card-background-color, #1f1f1f);
     --background: var(--brand-card-background-color, #1f1f1f);
+  }
+
+  .muscle-tag {
+    background: var(--brand-gray-70, #374151);
+    color: var(--brand-gray-30, #d1d5db);
+  }
+
+  .muscle-tag.primary {
+    background: var(--brand-primary-light, rgba(249, 115, 22, 0.2));
+    color: var(--brand-primary);
   }
 }
 </style>
