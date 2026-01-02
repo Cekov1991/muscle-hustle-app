@@ -10,6 +10,7 @@
   <!-- Exercise Form Modal -->
   <ExerciseFormModal
     :is-open="modals.form"
+    :mode="exerciseFormMode"
     :exercise="selectedExercise"
     :available-exercises="availableExercises"
     @close="closeModals"
@@ -33,7 +34,7 @@ import {
   createOutline,
   trashOutline
 } from 'ionicons/icons'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import ExerciseSelectionModal from './ExerciseSelectionModal.vue'
 import ExerciseFormModal from './ExerciseFormModal.vue'
 import { useExerciseModals } from '../composables/useExerciseModals'
@@ -79,6 +80,14 @@ export default {
       handleExerciseFormSubmit,
       handleExerciseRemove
     } = useExerciseModals(props.workoutId, props.workoutExercises)
+
+    // Track form mode explicitly
+    const exerciseFormMode = ref('create')
+
+    // Update mode when selectedExercise changes
+    watch(selectedExercise, (exercise) => {
+      exerciseFormMode.value = exercise && exercise.pivot ? 'edit' : 'create'
+    })
 
     // Action sheet state
     const showActionSheet = ref(false)
@@ -145,6 +154,7 @@ export default {
       // State
       modals,
       selectedExercise,
+      exerciseFormMode,
       showActionSheet,
       actionSheetButtons,
       

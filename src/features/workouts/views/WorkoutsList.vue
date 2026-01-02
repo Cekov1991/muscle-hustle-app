@@ -62,13 +62,22 @@
                   <ion-icon :icon="ellipsisVertical" slot="icon-only" />
                 </ion-button>
                 </div>
-                <ion-badge 
-                  v-if="workout.day_of_week !== null" 
-                  color="primary"
-                  class="day-badge"
-                >
-                  {{ getDayName(workout.day_of_week) }}
-                </ion-badge>
+                <div class="badges">
+                  <ion-badge 
+                    v-if="workout.plan" 
+                    color="tertiary"
+                    class="plan-badge"
+                  >
+                    {{ workout.plan.name }}
+                  </ion-badge>
+                  <ion-badge 
+                    v-if="workout.day_of_week !== null" 
+                    color="primary"
+                    class="day-badge"
+                  >
+                    {{ getDayName(workout.day_of_week) }}
+                  </ion-badge>
+                </div>
               </div>
             </ion-card-header>
             
@@ -297,7 +306,12 @@ export default {
 }
 
 ion-header {
-  --background: var(--brand-background-color);
+  --background: var(--brand-background-color, #ffffff);
+}
+
+ion-toolbar {
+  --background: var(--brand-background-color, #ffffff);
+  --color: var(--brand-primary);
 }
 
 ion-title {
@@ -305,6 +319,7 @@ ion-title {
   font-weight: 700;
   font-size: var(--brand-font-size-lg);
   letter-spacing: -0.5px;
+  color: var(--brand-primary);
 }
 
 .workouts-list-content {
@@ -426,6 +441,23 @@ ion-title {
   color: var(--brand-text-tertiary-color);
 }
 
+.badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.plan-badge {
+  flex-shrink: 0;
+  --background: var(--brand-tertiary-color, #6c757d);
+  font-family: var(--brand-font-family);
+  font-weight: 600;
+  font-size: var(--brand-font-size-xs);
+  border-radius: 12px;
+  padding: 4px 12px;
+}
+
 .day-badge {
   flex-shrink: 0;
   --background: var(--brand-primary);
@@ -498,7 +530,7 @@ ion-title {
     flex-direction: column;
   }
   
-  .day-badge {
+  .badges {
     align-self: flex-start;
   }
 }

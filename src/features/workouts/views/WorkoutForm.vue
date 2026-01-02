@@ -242,7 +242,12 @@ export default {
 }
 
 ion-header {
-  --background: var(--brand-background-color);
+  --background: var(--brand-background-color, #ffffff);
+}
+
+ion-toolbar {
+  --background: var(--brand-background-color, #ffffff);
+  --color: var(--brand-primary);
 }
 
 ion-title {
@@ -250,14 +255,15 @@ ion-title {
   font-weight: 700;
   font-size: var(--brand-font-size-lg);
   letter-spacing: -0.5px;
+  color: var(--brand-primary);
 }
 
 .workout-form-content {
-  --background: var(--brand-background-color);
+  --background: var(--brand-background-color, #fafafa);
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 500px;
   margin: 0 auto;
   padding: 16px;
 }
@@ -289,6 +295,10 @@ ion-title {
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .workout-form-page {
+    --background: var(--brand-background-color, #121212);
+  }
+  
+  .workout-form-content {
     --background: var(--brand-background-color, #121212);
   }
 }

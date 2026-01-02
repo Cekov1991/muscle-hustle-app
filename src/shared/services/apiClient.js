@@ -236,6 +236,26 @@ export const profileAPI = {
 }
 
 /**
+ * Plans API endpoints
+ */
+export const plansAPI = {
+  // Get all plans
+  getPlans: () => api.get('/plans'),
+  
+  // Get single plan
+  getPlan: (id) => api.get(`/plans/${id}`),
+  
+  // Create plan
+  createPlan: (data) => api.post('/plans', data),
+  
+  // Update plan
+  updatePlan: (id, data) => api.put(`/plans/${id}`, data),
+  
+  // Delete plan
+  deletePlan: (id) => api.delete(`/plans/${id}`)
+}
+
+/**
  * Generic API helpers
  */
 export const apiHelpers = {

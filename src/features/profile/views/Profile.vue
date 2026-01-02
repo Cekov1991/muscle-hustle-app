@@ -136,6 +136,23 @@ export default {
 </script>
 
 <style scoped>
+ion-header {
+  --background: var(--brand-background-color, #ffffff);
+}
+
+ion-toolbar {
+  --background: var(--brand-background-color, #ffffff);
+  --color: var(--brand-primary);
+}
+
+ion-title {
+  font-family: var(--brand-font-family);
+  font-weight: 700;
+  font-size: var(--brand-font-size-lg);
+  letter-spacing: -0.5px;
+  color: var(--brand-primary);
+}
+
 .loading-container {
   display: flex;
   flex-direction: column;

@@ -82,7 +82,7 @@
             @click="handleSaveEdit"
           >
             <ion-spinner v-if="loading" name="crescent" />
-            <span v-else>Save</span>
+            <span class="button-text" v-else>Save</span>
           </button>
           <button 
             class="text-btn cancel-btn"
