@@ -3,7 +3,7 @@
   <ExerciseSelectionModal
     :is-open="modals.selection"
     :exclude-exercise-ids="excludeExerciseIds"
-    @close="closeModals"
+    @close="handleSelectionClose"
     @select="handleExerciseSelected"
   />
 
@@ -13,7 +13,7 @@
     :mode="exerciseFormMode"
     :exercise="selectedExercise"
     :available-exercises="availableExercises"
-    @close="closeModals"
+    @close="handleFormClose"
     @submit="handleExerciseFormSubmit"
   />
 
@@ -102,7 +102,7 @@ export default {
     // Action sheet buttons
     const actionSheetButtons = computed(() => [
       {
-        text: 'Edit',
+        text: 'Edit Targets',
         icon: createOutline,
         handler: () => {
           if (menuExercise.value) {
@@ -150,6 +150,22 @@ export default {
       openExerciseForm(exercise)
     }
 
+    // Separate close handlers to avoid race conditions
+    const handleSelectionClose = () => {
+      // Only close selection if form is not open (user manually closed)
+      if (!modals.form) {
+        closeModals()
+      } else {
+        // Form is open, just make sure selection is closed
+        modals.selection = false
+      }
+    }
+
+    const handleFormClose = () => {
+      // Close everything when form is closed
+      closeModals()
+    }
+
     return {
       // State
       modals,
@@ -164,7 +180,8 @@ export default {
       showExerciseMenu,
       
       // Internal handlers
-      closeModals,
+      handleSelectionClose,
+      handleFormClose,
       handleExerciseSelected,
       handleExerciseFormSubmit: onExerciseFormSubmit
     }

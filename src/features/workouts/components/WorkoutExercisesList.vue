@@ -2,14 +2,7 @@
   <div class="exercises-section">
     <div class="section-header">
       <h2>Exercises</h2>
-      <ion-button 
-        size="small" 
-        @click="$emit('add-exercise')"
-        :disabled="loading"
-      >
-        <ion-icon :icon="addOutline" slot="start" />
-        Add Exercise
-      </ion-button>
+      
     </div>
 
     <!-- Empty State -->
@@ -31,11 +24,22 @@
         v-for="(exercise, index) in sortedExercises" 
         :key="`${exercise.id}-${index}`"
         class="exercise-card-compact"
+        @click="navigateToExercise(exercise)"
       >
         <ion-card-content>
           <div class="exercise-row">
-            <!-- Muscle Group Icon -->
-            <MuscleGroupIcon :category="exercise.category" />
+            <!-- Exercise Image/Icon -->
+            <div class="exercise-thumbnail">
+              <img 
+                v-if="exercise.image_url" 
+                :src="exercise.image_url" 
+                :alt="exercise.name"
+                class="exercise-image"
+              />
+              <div v-else class="exercise-icon-fallback">
+              <ion-icon :icon="barbellOutline" />
+              </div>
+            </div>
             
             <!-- Exercise Info -->
             <div class="exercise-info">
@@ -43,6 +47,17 @@
               <p class="exercise-sets-reps">
                 {{ formatSetsReps(exercise.pivot) }}
               </p>
+              <!-- Muscle Groups -->
+              <div v-if="exercise.muscle_groups?.length" class="muscle-groups">
+                <span 
+                  v-for="muscle in exercise.muscle_groups" 
+                  :key="muscle.id"
+                  class="muscle-tag"
+                  :class="{ 'primary': muscle.is_primary }"
+                >
+                  {{ muscle.name }}
+                </span>
+              </div>
             </div>
             
             <!-- Three-dot Menu -->
@@ -50,14 +65,22 @@
               size="small"
               color="primary"
               fill="clear"
-              @click="$emit('show-exercise-menu', exercise)"
+              @click.stop="$emit('show-exercise-menu', exercise)"
             >
               <ion-icon :icon="ellipsisVertical" slot="icon-only" />
             </ion-button>
           </div>
         </ion-card-content>
       </ion-card>
+      <button 
+        @click="$emit('add-exercise')"
+        :disabled="loading"
+        class="dashed-button"
+      >
+        Add Exercise
+      </button>
     </div>
+    
   </div>
 </template>
 
@@ -74,8 +97,8 @@ import {
   ellipsisVertical
 } from 'ionicons/icons'
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { formatSetsReps } from '../utils/workoutHelpers'
-import MuscleGroupIcon from '../../../shared/components/MuscleGroupIcon.vue'
 
 export default {
   name: 'WorkoutExercisesList',
@@ -83,8 +106,7 @@ export default {
     IonButton,
     IonIcon,
     IonCard,
-    IonCardContent,
-    MuscleGroupIcon
+    IonCardContent
   },
   props: {
     exercises: {
@@ -98,6 +120,8 @@ export default {
   },
   emits: ['add-exercise', 'show-exercise-menu'],
   setup(props) {
+    const router = useRouter()
+
     // Sorted exercises by order
     const sortedExercises = computed(() => {
       return [...props.exercises].sort((a, b) => {
@@ -107,9 +131,15 @@ export default {
       })
     })
 
+    // Navigate to exercise detail page
+    const navigateToExercise = (exercise) => {
+      router.push(`/tabs/exercises/${exercise.id}`)
+    }
+
     return {
       sortedExercises,
       formatSetsReps,
+      navigateToExercise,
       // Icons
       addOutline,
       barbellOutline,
@@ -185,6 +215,7 @@ export default {
   --background: var(--brand-card-background-color, #fff);
   border: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
 }
 
 .exercise-card-compact:hover {
@@ -198,9 +229,35 @@ export default {
 
 .exercise-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 16px;
   padding: 8px 0;
+}
+
+.exercise-thumbnail {
+  width: 48px;
+  height: 48px;
+  margin-top: 4px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.exercise-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.exercise-icon-fallback {
+  width: 100%;
+  height: 100%;
+  background: var(--brand-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand-text-on-primary-color, #fff);
+  font-size: 24px;
 }
 
 .exercise-info {
@@ -219,11 +276,35 @@ export default {
 }
 
 .exercise-sets-reps {
-  margin: 0;
+  margin: 0 0 6px 0;
   font-family: var(--brand-font-family);
   font-size: var(--brand-font-size-sm);
   color: var(--brand-text-tertiary-color);
   line-height: 1.2;
+}
+
+/* Muscle Groups */
+.muscle-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.muscle-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-family: var(--brand-font-family);
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--brand-gray-20, #e5e7eb);
+  color: var(--brand-text-secondary-color, #6b7280);
+}
+
+.muscle-tag.primary {
+  background: var(--brand-primary-light, rgba(249, 115, 22, 0.15));
+  color: var(--brand-primary);
+  font-weight: 600;
 }
 
 /* Dark mode support */
@@ -232,6 +313,16 @@ export default {
   .exercise-card-compact {
     background: var(--brand-card-background-color, #1f1f1f);
     --background: var(--brand-card-background-color, #1f1f1f);
+  }
+
+  .muscle-tag {
+    background: var(--brand-gray-70, #374151);
+    color: var(--brand-gray-30, #d1d5db);
+  }
+
+  .muscle-tag.primary {
+    background: var(--brand-primary-light, rgba(249, 115, 22, 0.2));
+    color: var(--brand-primary);
   }
 }
 </style>

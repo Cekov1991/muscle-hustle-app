@@ -6,11 +6,7 @@
           <ion-back-button default-href="/tabs/workouts"></ion-back-button>
         </ion-buttons>
         <ion-title>{{ isEditMode ? 'Edit Workout' : 'New Workout' }}</ion-title>
-        <ion-buttons slot="end">
-          <ion-button @click="handleSave" :disabled="loading || !isFormValid">
-            <ion-icon :icon="checkmarkOutline" slot="icon-only" />
-          </ion-button>
-        </ion-buttons>
+        
       </ion-toolbar>
     </ion-header>
     

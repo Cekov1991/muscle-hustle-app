@@ -208,8 +208,10 @@ export default {
 
     // Handle exercise selection
     const handleSelectExercise = (exercise) => {
+      searchQuery.value = ''
       emit('select', exercise)
-      handleClose()
+      // Note: Don't call handleClose() here - the parent component 
+      // handles closing the selection modal and opening the form modal
     }
 
     // Handle close

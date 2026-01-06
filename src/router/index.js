@@ -93,6 +93,14 @@ const routes = [
         meta: { 
           title: 'Workout'
         }
+      },
+      {
+        path: 'exercises/:id',
+        name: 'ExerciseDetail',
+        component: () => import('../features/workouts/views/ExerciseDetail.vue'),
+        meta: {
+          title: 'Exercise Details'
+        }
       }
     ]
   },

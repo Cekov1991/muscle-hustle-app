@@ -6,7 +6,7 @@ import { useApiError } from '../../../shared/composables/useApiError'
 const metricsState = reactive({
   metrics: {
     strengthScore: { current: 0, level: '', recentGain: 0 },
-    strengthBalance: { percentage: 0, level: '', recentChange: 0 },
+    strengthBalance: { percentage: 0, level: '', recentChange: 0, muscleGroups: {} },
     weeklyProgress: { percentage: 0, trend: '' }
   },
   loading: false,
@@ -37,7 +37,8 @@ export const useMetrics = () => {
           strengthBalance: {
             percentage: apiData.strength_balance?.percentage || 0,
             level: apiData.strength_balance?.level || '',
-            recentChange: apiData.strength_balance?.recent_change || 0
+            recentChange: apiData.strength_balance?.recent_change || 0,
+            muscleGroups: apiData.strength_balance?.muscle_groups || {}
           },
           weeklyProgress: {
             percentage: apiData.weekly_progress?.percentage || 0,
@@ -60,7 +61,7 @@ export const useMetrics = () => {
         console.warn('Ngrok connectivity issue, showing empty metrics state instead of error')
         metricsState.metrics = {
           strengthScore: { current: 0, level: 'N/A', recentGain: 0 },
-          strengthBalance: { percentage: 0, level: 'N/A', recentChange: 0 },
+          strengthBalance: { percentage: 0, level: 'N/A', recentChange: 0, muscleGroups: {} },
           weeklyProgress: { percentage: 0, trend: 'N/A' }
         }
         return metricsState.metrics
@@ -77,7 +78,7 @@ export const useMetrics = () => {
   const clearMetrics = () => {
     metricsState.metrics = {
       strengthScore: { current: 0, level: '', recentGain: 0 },
-      strengthBalance: { percentage: 0, level: '', recentChange: 0 },
+      strengthBalance: { percentage: 0, level: '', recentChange: 0, muscleGroups: {} },
       weeklyProgress: { percentage: 0, trend: '' }
     }
     metricsState.error = null
