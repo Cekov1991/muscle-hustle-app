@@ -24,12 +24,21 @@
         v-for="(exercise, index) in sortedExercises" 
         :key="`${exercise.id}-${index}`"
         class="exercise-card-compact"
+        @click="navigateToExercise(exercise)"
       >
         <ion-card-content>
           <div class="exercise-row">
-            <!-- Exercise Icon -->
-            <div class="exercise-icon">
+            <!-- Exercise Image/Icon -->
+            <div class="exercise-thumbnail">
+              <img 
+                v-if="exercise.image_url" 
+                :src="exercise.image_url" 
+                :alt="exercise.name"
+                class="exercise-image"
+              />
+              <div v-else class="exercise-icon-fallback">
               <ion-icon :icon="barbellOutline" />
+              </div>
             </div>
             
             <!-- Exercise Info -->
@@ -56,7 +65,7 @@
               size="small"
               color="primary"
               fill="clear"
-              @click="$emit('show-exercise-menu', exercise)"
+              @click.stop="$emit('show-exercise-menu', exercise)"
             >
               <ion-icon :icon="ellipsisVertical" slot="icon-only" />
             </ion-button>
@@ -88,6 +97,7 @@ import {
   ellipsisVertical
 } from 'ionicons/icons'
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { formatSetsReps } from '../utils/workoutHelpers'
 
 export default {
@@ -110,6 +120,8 @@ export default {
   },
   emits: ['add-exercise', 'show-exercise-menu'],
   setup(props) {
+    const router = useRouter()
+
     // Sorted exercises by order
     const sortedExercises = computed(() => {
       return [...props.exercises].sort((a, b) => {
@@ -119,9 +131,15 @@ export default {
       })
     })
 
+    // Navigate to exercise detail page
+    const navigateToExercise = (exercise) => {
+      router.push(`/tabs/exercises/${exercise.id}`)
+    }
+
     return {
       sortedExercises,
       formatSetsReps,
+      navigateToExercise,
       // Icons
       addOutline,
       barbellOutline,
@@ -197,6 +215,7 @@ export default {
   --background: var(--brand-card-background-color, #fff);
   border: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
 }
 
 .exercise-card-compact:hover {
@@ -215,18 +234,30 @@ export default {
   padding: 8px 0;
 }
 
-.exercise-icon {
+.exercise-thumbnail {
   width: 48px;
   height: 48px;
   margin-top: 4px;
-  background: var(--brand-primary);
   border-radius: 12px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.exercise-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.exercise-icon-fallback {
+  width: 100%;
+  height: 100%;
+  background: var(--brand-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--brand-text-on-primary-color, #fff);
   font-size: 24px;
-  flex-shrink: 0;
 }
 
 .exercise-info {
