@@ -13,7 +13,7 @@
             <div class="partner-logo" :style="partnerLogoStyle"></div>
           </div>
           <div class="profile-info">
-            <h1 class="partner-name">{{ partnerName || 'UpLift' }}</h1>
+            <h1 class="partner-name">{{ partnerName || appName }}</h1>
           </div>
         </div>
       </div>
@@ -169,6 +169,7 @@ import { ref, computed, onMounted, onActivated, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuth } from '../../auth/composables/useAuth'
 import { useCalendar } from '../composables/useCalendar'
+import { appConfig } from '../../../config/app'
 import { useMetrics } from '../composables/useMetrics'
 import { useWorkoutSession } from '../../workouts/composables/useWorkoutSession'
 import WeeklyCalendar from '../components/WeeklyCalendar.vue'
@@ -360,9 +361,13 @@ export default {
       }
     }
 
+    // App name from config (uses VITE_APP_NAME env var)
+    const appName = appConfig.name
+
     return {
       user,
       partnerName,
+      appName,
       partnerLogoStyle,
       backgroundImage,
       metrics,

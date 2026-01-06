@@ -3,6 +3,8 @@
  * Extracted from useBranding.js for better organization and testability
  */
 
+import { appConfig } from '../../config/app'
+
 // Default color palette (hex format) - Ulpift design
 export const DEFAULT_PALETTE = {
   // Light mode colors
@@ -51,7 +53,7 @@ export const DEFAULT_PALETTE = {
 
 // Default branding configuration
 export const DEFAULT_BRANDING = {
-  partnerName: 'Fitness App',
+  partnerName: appConfig.name,
   fontFamily: 'Nunito',
   backgroundPattern: null,
   logo: null

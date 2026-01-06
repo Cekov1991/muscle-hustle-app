@@ -1,6 +1,6 @@
 // App Configuration
 export const appConfig = {
-  name: 'Fitness App',
+  name: import.meta.env.VITE_APP_NAME || 'FitNation',
   version: '1.0.0',
   
   // API Configuration

@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router'
 import { useAuth } from '../features/auth/composables/useAuth'
+import { appConfig } from '../config/app'
 
 const routes = [
   {
@@ -127,7 +128,7 @@ router.beforeEach(async (to, from, next) => {
   
   // Set page title
   if (to.meta.title) {
-    document.title = `${to.meta.title} | Fitness App`
+    document.title = `${to.meta.title} | ${appConfig.name}`
   }
   
   // Handle authentication requirements
