@@ -403,7 +403,10 @@ export default {
 .fitness-assessment {
   font-family: var(--brand-font-family);
   background: var(--brand-background-color, #fafafa);
-  min-height: 100vh;
+}
+
+.dashboard-content {
+  --overflow: auto;
 }
 
 /* Profile Header */
