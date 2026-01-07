@@ -5,7 +5,7 @@
 
 import { appConfig } from '../../config/app'
 
-// Default color palette (hex format) - Ulpift design
+// Default color palette (hex format) - Fitnation design
 export const DEFAULT_PALETTE = {
   // Light mode colors
   primary: '#f97316',              // pulse-orange

@@ -219,7 +219,7 @@ export default {
       }
       // Fallback to default logo
       return {
-        backgroundImage: `url(/assets/ulpift-logo.png)`
+        backgroundImage: `url(/assets/fitnation-logo.png)`
       }
     })
 

@@ -1,5 +1,5 @@
 <template>
-  <ion-page class="ulpift-login">
+  <ion-page class="fitnation-login">
     <!-- Header with background image -->
     <div class="login-header-bg">
       <div class="header-gradient-overlay"></div>
@@ -8,11 +8,11 @@
       <div class="header-content">
         <div class="logo-container">
           <div class="logo-badge">
-            <img src="/assets/ulpift-logo.png" alt="Ulpift Logo" class="logo" />
+            <img src="/assets/fitnation-logo.png" alt="Fitnation Logo" class="logo" />
           </div>
         </div>
         <div class="header-text">
-          <h1 class="main-title">Sign In To Ulpift</h1>
+          <h1 class="main-title">Sign In To Fitnation</h1>
           <p class="subtitle">Let's personalize your fitness journey</p>
         </div>
       </div>
@@ -284,7 +284,7 @@ export default {
 </script>
 
 <style scoped>
-.ulpift-login {
+.fitnation-login {
   font-family: var(--brand-font-family);
   background: var(--brand-background-color);
   overflow: hidden;
@@ -292,14 +292,14 @@ export default {
 
 /* Mobile-first: rounded design for small screens */
 @media (max-width: 768px) {
-  .ulpift-login {
+  .fitnation-login {
     border-radius: 40px;
   }
 }
 
 /* Desktop: full-width design */
 @media (min-width: 769px) {
-  .ulpift-login {
+  .fitnation-login {
     border-radius: 0;
     min-height: 100vh;
   }
@@ -654,12 +654,12 @@ export default {
 
 /* Desktop: Add subtle shadow for web presentation */
 @media (min-width: 769px) {
-  .ulpift-login {
+  .fitnation-login {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   }
   
   /* Add a subtle backdrop for better desktop presentation */
-  .ulpift-login::before {
+  .fitnation-login::before {
     content: '';
     position: fixed;
     top: 0;

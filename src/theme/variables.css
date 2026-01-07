@@ -3,7 +3,7 @@ http://ionicframework.com/docs/theming/ */
 
 /** Ionic CSS Variables **/
 :root {
-  /** Primary color - Pulse orange (Ulpift) **/
+  /** Primary color - Pulse orange (Fitnation) **/
   --ion-color-primary: #f97316;
   --ion-color-primary-rgb: 249, 115, 22;
   --ion-color-primary-contrast: #ffffff;
@@ -11,7 +11,7 @@ http://ionicframework.com/docs/theming/ */
   --ion-color-primary-shade: #d86513;
   --ion-color-primary-tint: #fa812d;
 
-  /** Secondary color - Sandow gray 100 (Ulpift) **/
+  /** Secondary color - Sandow gray 100 (Fitnation) **/
   --ion-color-secondary: #111214;
   --ion-color-secondary-rgb: 17, 18, 20;
   --ion-color-secondary-contrast: #ffffff;
@@ -51,7 +51,7 @@ http://ionicframework.com/docs/theming/ */
   --ion-color-danger-shade: #5a110c;
   --ion-color-danger-tint: #7a1a16;
 
-  /** Dark color - Sandow gray 100 (Ulpift text primary) **/
+  /** Dark color - Sandow gray 100 (Fitnation text primary) **/
   --ion-color-dark: #111214;
   --ion-color-dark-rgb: 17, 18, 20;
   --ion-color-dark-contrast: #ffffff;
@@ -59,7 +59,7 @@ http://ionicframework.com/docs/theming/ */
   --ion-color-dark-shade: #0f1011;
   --ion-color-dark-tint: #292a2c;
 
-  /** Medium color - Sandow gray 80 (Ulpift text secondary) **/
+  /** Medium color - Sandow gray 80 (Fitnation text secondary) **/
   --ion-color-medium: #393c43;
   --ion-color-medium-rgb: 57, 60, 67;
   --ion-color-medium-contrast: #ffffff;
@@ -67,7 +67,7 @@ http://ionicframework.com/docs/theming/ */
   --ion-color-medium-shade: #32353a;
   --ion-color-medium-tint: #4d5059;
 
-  /** Light color - Sandow gray 10 (Ulpift) **/
+  /** Light color - Sandow gray 10 (Fitnation) **/
   --ion-color-light: #f3f3f4;
   --ion-color-light-rgb: 243, 243, 244;
   --ion-color-light-contrast: #000000;
@@ -160,7 +160,7 @@ ion-toolbar {
 /* Dark mode specific styles */
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Adjust colors for better dark mode contrast - Ulpift palette */
+    /* Adjust colors for better dark mode contrast - Fitnation palette */
     --ion-color-primary: #fa812d;  /* Lighter tint of pulse-orange */
     --ion-color-secondary: #292a2c; /* Lighter tint of sandow-gray-100 */
     --ion-color-tertiary: #7e57ff;
