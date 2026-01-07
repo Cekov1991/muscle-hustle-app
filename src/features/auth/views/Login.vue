@@ -12,7 +12,7 @@
           </div>
         </div>
         <div class="header-text">
-          <h1 class="main-title">Sign In To Fitnation</h1>
+          <h1 class="main-title">Sign In To FitNation</h1>
           <p class="subtitle">Let's personalize your fitness journey</p>
         </div>
       </div>
