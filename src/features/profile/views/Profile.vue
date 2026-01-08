@@ -29,6 +29,20 @@
         <div v-else class="profile-container">
           <!-- Profile Form -->
           <AccountInfo :profile="profile" :loading="saving" @update="handleProfileUpdate" />
+          
+          <!-- Logout Section -->
+          <div class="logout-section">
+            <ion-button 
+              expand="block" 
+              color="danger" 
+              fill="outline"
+              @click="handleLogout"
+              :disabled="loggingOut"
+            >
+              <ion-icon :icon="logOutOutline" slot="start"></ion-icon>
+              {{ loggingOut ? 'Logging out...' : 'Log Out' }}
+            </ion-button>
+          </div>
         </div>
       </div>
     </ion-content>
@@ -48,10 +62,13 @@ import {
 } from '@ionic/vue'
 import {
   alertCircleOutline,
-  refreshOutline
+  refreshOutline,
+  logOutOutline
 } from 'ionicons/icons'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useProfile } from '../composables/useProfile'
+import { useAuth } from '../../auth/composables/useAuth'
 import { useToast } from '../../../shared/composables/useToast'
 import AccountInfo from '../components/AccountInfo.vue'
 
@@ -69,7 +86,11 @@ export default {
     AccountInfo
   },
   setup() {
+    const router = useRouter()
     const { showSuccess, showError } = useToast()
+    const { logout } = useAuth()
+    const loggingOut = ref(false)
+    
     const {
       profile,
       loading,
@@ -116,20 +137,37 @@ export default {
       }
     }
 
+    // Handle logout
+    const handleLogout = async () => {
+      loggingOut.value = true
+      try {
+        await logout()
+        router.replace({ name: 'Login' })
+      } catch (error) {
+        console.error('Logout failed:', error)
+        await showError('Failed to log out. Please try again.')
+      } finally {
+        loggingOut.value = false
+      }
+    }
+
     return {
       // State
       profile,
       loading,
       error,
       saving,
+      loggingOut,
 
       // Methods
       handleRetry,
       handleProfileUpdate,
+      handleLogout,
 
       // Icons
       alertCircleOutline,
-      refreshOutline
+      refreshOutline,
+      logOutOutline
     }
   }
 }
@@ -196,5 +234,16 @@ ion-title {
   margin: 0;
   color: var(--brand-text-secondary);
   font-size: 14px;
+}
+
+.logout-section {
+  padding: 24px 16px;
+  margin-top: 24px;
+  border-top: 1px solid var(--ion-color-light-shade, #e0e0e0);
+}
+
+.logout-section ion-button {
+  --border-radius: 8px;
+  font-weight: 600;
 }
 </style>
