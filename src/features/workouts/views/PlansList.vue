@@ -77,7 +77,6 @@
                   v-for="template in activePlan.workout_templates" 
                   :key="template.id"
                   class="template-item"
-                  @click="handleEditWorkout(template.id)"
                 >
                   <span class="template-name">{{ template.name }}</span>
                   <ion-button 
@@ -143,7 +142,6 @@
                   v-for="template in plan.workout_templates" 
                   :key="template.id"
                   class="template-item"
-                  @click="handleEditWorkout(template.id)"
                 >
                   <span class="template-name">{{ template.name }}</span>
                   <ion-button 
@@ -190,6 +188,25 @@
       :buttons="workoutActionSheetButtons"
       @didDismiss="showWorkoutActionSheet = false"
     ></ion-action-sheet>
+
+    <!-- Workout Form Modal -->
+    <WorkoutFormModal
+      :is-open="showWorkoutFormModal"
+      :plan-id="selectedPlanIdForAdd"
+      :workout="selectedWorkoutForEdit"
+      @close="handleWorkoutModalClose"
+      @created="handleWorkoutCreated"
+      @updated="handleWorkoutUpdated"
+    />
+
+    <!-- Plan Form Modal -->
+    <PlanFormModal
+      :is-open="showPlanFormModal"
+      :plan="selectedPlanForEdit"
+      @close="handlePlanModalClose"
+      @created="handlePlanCreated"
+      @updated="handlePlanUpdated"
+    />
   </ion-page>
 </template>
 
@@ -217,12 +234,16 @@ import {
   ellipsisHorizontal,
   checkmarkOutline,
   closeOutline,
-  informationCircleOutline
+  informationCircleOutline,
+  playOutline
 } from 'ionicons/icons'
 import { onMounted, watch, ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { usePlans } from '../composables/usePlans'
 import { useWorkouts } from '../composables/useWorkouts'
+import { useWorkoutSession } from '../composables/useWorkoutSession'
+import WorkoutFormModal from '../components/WorkoutFormModal.vue'
+import PlanFormModal from '../components/PlanFormModal.vue'
 
 export default {
   name: 'PlansList',
@@ -238,13 +259,16 @@ export default {
     IonSpinner,
     IonRefresher,
     IonRefresherContent,
-    IonActionSheet
+    IonActionSheet,
+    WorkoutFormModal,
+    PlanFormModal
   },
   setup() {
     const router = useRouter()
     const route = useRoute()
     const { plans, loading, fetchPlans, deletePlan, updatePlan } = usePlans()
     const { deleteWorkout } = useWorkouts()
+    const { startSession } = useWorkoutSession()
     
     // Plan action sheet state
     const showPlanActionSheet = ref(false)
@@ -253,6 +277,15 @@ export default {
     // Workout action sheet state
     const showWorkoutActionSheet = ref(false)
     const menuWorkout = ref(null)
+    
+    // Workout form modal state
+    const showWorkoutFormModal = ref(false)
+    const selectedPlanIdForAdd = ref(null)
+    const selectedWorkoutForEdit = ref(null)
+    
+    // Plan form modal state
+    const showPlanFormModal = ref(false)
+    const selectedPlanForEdit = ref(null)
     
     // Computed: Active plan
     const activePlan = computed(() => {
@@ -293,7 +326,7 @@ export default {
           icon: createOutline,
           handler: () => {
             if (menuPlan.value) {
-              handleEditPlan(menuPlan.value.id)
+              handleEditPlan(menuPlan.value)
             }
           }
         }
@@ -346,11 +379,29 @@ export default {
     // Workout action sheet buttons
     const workoutActionSheetButtons = computed(() => [
       {
+        text: 'Start Workout',
+        icon: playOutline,
+        handler: async () => {
+          if (menuWorkout.value) {
+            await handleStartWorkout(menuWorkout.value.id)
+          }
+        }
+      },
+      {
+        text: 'Add Exercises',
+        icon: addOutline,
+        handler: () => {
+          if (menuWorkout.value) {
+            handleEditWorkout(menuWorkout.value.id)
+          }
+        }
+      },
+      {
         text: 'Edit',
         icon: createOutline,
         handler: () => {
           if (menuWorkout.value) {
-            handleEditWorkout(menuWorkout.value.id)
+            handleEditWorkoutModal(menuWorkout.value)
           }
         }
       },
@@ -402,14 +453,36 @@ export default {
       }
     }
 
-    // Navigate to add plan
+    // Open plan form modal to add plan
     const handleAddPlan = () => {
-      router.push('/tabs/plans/new')
+      selectedPlanForEdit.value = null
+      showPlanFormModal.value = true
     }
 
-    // Navigate to edit plan
-    const handleEditPlan = (id) => {
-      router.push(`/tabs/plans/${id}/edit`)
+    // Open plan form modal to edit plan
+    const handleEditPlan = (plan) => {
+      selectedPlanForEdit.value = plan
+      showPlanFormModal.value = true
+    }
+    
+    // Handle plan modal close
+    const handlePlanModalClose = () => {
+      showPlanFormModal.value = false
+      selectedPlanForEdit.value = null
+    }
+    
+    // Handle plan created
+    const handlePlanCreated = async () => {
+      showPlanFormModal.value = false
+      selectedPlanForEdit.value = null
+      await fetchPlans()
+    }
+    
+    // Handle plan updated
+    const handlePlanUpdated = async () => {
+      showPlanFormModal.value = false
+      selectedPlanForEdit.value = null
+      await fetchPlans()
     }
     
     // Navigate to edit workout
@@ -417,9 +490,54 @@ export default {
       router.push(`/tabs/workouts/${id}/edit`)
     }
     
-    // Navigate to add workout (with pre-selected plan)
+    // Open workout form modal to add workout (with pre-selected plan)
     const handleAddWorkout = (planId) => {
-      router.push(`/tabs/workouts/new?plan_id=${planId}`)
+      selectedPlanIdForAdd.value = planId
+      selectedWorkoutForEdit.value = null
+      showWorkoutFormModal.value = true
+    }
+    
+    // Open workout form modal to edit workout
+    const handleEditWorkoutModal = (workout) => {
+      selectedWorkoutForEdit.value = workout
+      selectedPlanIdForAdd.value = null
+      showWorkoutFormModal.value = true
+    }
+    
+    // Handle workout modal close
+    const handleWorkoutModalClose = () => {
+      showWorkoutFormModal.value = false
+      selectedPlanIdForAdd.value = null
+      selectedWorkoutForEdit.value = null
+    }
+    
+    // Handle workout created - navigate to edit page to add exercises
+    const handleWorkoutCreated = async (workout) => {
+      showWorkoutFormModal.value = false
+      selectedPlanIdForAdd.value = null
+      selectedWorkoutForEdit.value = null
+      await fetchPlans() // Refresh to show new workout in list
+      router.push(`/tabs/workouts/${workout.id}/edit`)
+    }
+    
+    // Handle workout updated - just refresh the list
+    const handleWorkoutUpdated = async () => {
+      showWorkoutFormModal.value = false
+      selectedPlanIdForAdd.value = null
+      selectedWorkoutForEdit.value = null
+      await fetchPlans() // Refresh to show updated workout
+    }
+    
+    // Handle start workout - create a session and navigate to it
+    const handleStartWorkout = async (templateId) => {
+      try {
+        const newSession = await startSession(templateId)
+        if (newSession?.id) {
+          router.push(`/tabs/workout-session/${newSession.id}`)
+        }
+      } catch (error) {
+        console.error('Failed to start workout:', error)
+      }
     }
 
     // Handle toggle active
@@ -518,6 +636,19 @@ export default {
       planActionSheetButtons,
       workoutActionSheetButtons,
       getTemplateCount,
+      // Workout form modal
+      showWorkoutFormModal,
+      selectedPlanIdForAdd,
+      selectedWorkoutForEdit,
+      handleWorkoutModalClose,
+      handleWorkoutCreated,
+      handleWorkoutUpdated,
+      // Plan form modal
+      showPlanFormModal,
+      selectedPlanForEdit,
+      handlePlanModalClose,
+      handlePlanCreated,
+      handlePlanUpdated,
       // Icons
       addOutline,
       calendarOutline,
@@ -526,7 +657,8 @@ export default {
       ellipsisHorizontal,
       checkmarkOutline,
       closeOutline,
-      informationCircleOutline
+      informationCircleOutline,
+      playOutline
     }
   }
 }
@@ -749,23 +881,10 @@ ion-title {
   align-items: center;
   padding: 12px 0;
   border-bottom: 1px solid var(--brand-gray-15, #f0f0f0);
-  cursor: pointer;
-  transition: background-color 0.15s ease;
 }
 
 .template-item:last-child {
   border-bottom: none;
-}
-
-.template-item:hover {
-  background-color: var(--brand-gray-10, #f9fafb);
-  margin: 0 -16px;
-  padding-left: 16px;
-  padding-right: 8px;
-}
-
-.template-item:active {
-  background-color: var(--brand-gray-15, #f3f4f6);
 }
 
 .template-name {
@@ -837,10 +956,6 @@ ion-title {
   
   .template-item {
     border-bottom-color: var(--brand-gray-25, #2a2a2a);
-  }
-  
-  .template-item:hover {
-    background-color: var(--brand-gray-20, #2a2a2a);
   }
   
   .badge-secondary {

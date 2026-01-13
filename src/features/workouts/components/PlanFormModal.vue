@@ -1,29 +1,19 @@
 <template>
-  <ion-page class="plan-form-page">
+  <ion-modal :is-open="isOpen" @didDismiss="handleClose">
     <ion-header>
       <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-back-button default-href="/tabs/plans"></ion-back-button>
-        </ion-buttons>
-        <ion-title>{{ isEditMode ? 'Edit Plan' : 'New Plan' }}</ion-title>
+        <ion-title>{{ isEditMode ? 'Edit Plan' : 'Create Plan' }}</ion-title>
         <ion-buttons slot="end">
-          <ion-button @click="handleSave" :disabled="loading || !isFormValid">
-            <ion-icon :icon="checkmarkOutline" slot="icon-only" />
+          <ion-button @click="handleClose">
+            <ion-icon :icon="closeOutline" slot="icon-only" />
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
     
-    <ion-content fullscreen class="plan-form-content">
-      <div class="form-container">
-        <!-- Loading State -->
-        <div v-if="initialLoading" class="loading-state">
-          <ion-spinner name="crescent"></ion-spinner>
-          <p>Loading plan...</p>
-        </div>
-
-        <!-- Plan Form -->
-        <form v-else @submit.prevent="handleSave">
+    <ion-content>
+      <div class="modal-content">
+        <form @submit.prevent="handleSubmit">
           <!-- Plan Name -->
           <div class="field-card">
             <ion-item lines="none" class="form-item">
@@ -60,7 +50,7 @@
               ></ion-toggle>
             </ion-item>
             <div class="toggle-description">
-              <p>Active plans are highlighted and used as the default when creating workout templates.</p>
+              <p>Active plans are highlighted and used as the default when creating workouts.</p>
             </div>
           </div>
 
@@ -80,36 +70,22 @@
             <ion-button
               expand="block"
               fill="outline"
-              @click="handleCancel"
+              @click="handleClose"
               :disabled="loading"
               class="cancel-button"
             >
               <span class="button-text">Cancel</span>
             </ion-button>
-
-            <!-- Delete Button (only in edit mode) -->
-            <ion-button
-              v-if="isEditMode"
-              expand="block"
-              fill="outline"
-              color="danger"
-              @click="handleDelete"
-              :disabled="loading"
-              class="delete-button"
-            >
-              <ion-icon :icon="trashOutline" slot="start" />
-              Delete Plan
-            </ion-button>
           </div>
         </form>
       </div>
     </ion-content>
-  </ion-page>
+  </ion-modal>
 </template>
 
 <script>
 import {
-  IonPage,
+  IonModal,
   IonHeader,
   IonToolbar,
   IonTitle,
@@ -117,26 +93,21 @@ import {
   IonButton,
   IonButtons,
   IonIcon,
-  IonBackButton,
-  IonSpinner,
   IonItem,
   IonLabel,
   IonInput,
   IonTextarea,
-  IonToggle
+  IonToggle,
+  IonSpinner
 } from '@ionic/vue'
-import {
-  checkmarkOutline,
-  trashOutline
-} from 'ionicons/icons'
-import { computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { usePlanForm } from '../composables/usePlanForm'
+import { closeOutline, checkmarkOutline } from 'ionicons/icons'
+import { ref, computed, watch } from 'vue'
+import { usePlans } from '../composables/usePlans'
 
 export default {
-  name: 'PlanForm',
+  name: 'PlanFormModal',
   components: {
-    IonPage,
+    IonModal,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -144,71 +115,107 @@ export default {
     IonButton,
     IonButtons,
     IonIcon,
-    IonBackButton,
-    IonSpinner,
     IonItem,
     IonLabel,
     IonInput,
     IonTextarea,
-    IonToggle
+    IonToggle,
+    IonSpinner
   },
-  setup() {
-    const route = useRoute()
-    const planId = computed(() => route.params.id ? parseInt(route.params.id) : null)
+  props: {
+    isOpen: {
+      type: Boolean,
+      default: false
+    },
+    plan: {
+      type: Object,
+      default: null
+    }
+  },
+  emits: ['close', 'created', 'updated'],
+  setup(props, { emit }) {
+    const { loading, createPlan, updatePlan } = usePlans()
 
-    const {
-      loading,
-      initialLoading,
-      formData,
-      isEditMode,
-      isFormValid,
-      initializeForm,
-      savePlan,
-      removePlan,
-      cancelForm
-    } = usePlanForm(planId)
+    // Determine if we're in edit mode
+    const isEditMode = computed(() => !!props.plan?.id)
 
-    // Handle save with navigation
-    const handleSave = async () => {
+    // Form data
+    const formData = ref({
+      name: '',
+      description: '',
+      is_active: false
+    })
+
+    // Form validation
+    const isFormValid = computed(() => formData.value.name?.trim().length > 0)
+
+    // Initialize form when modal opens or plan changes
+    watch([() => props.isOpen, () => props.plan], ([isOpen, plan]) => {
+      if (isOpen) {
+        if (plan?.id) {
+          // Edit mode - populate from plan data
+          formData.value = {
+            name: plan.name || '',
+            description: plan.description || '',
+            is_active: plan.is_active || false
+          }
+        } else {
+          // Create mode - reset form
+          formData.value = {
+            name: '',
+            description: '',
+            is_active: false
+          }
+        }
+      }
+    }, { immediate: true })
+
+    // Handle form submission
+    const handleSubmit = async () => {
+      if (!isFormValid.value) return
+
       try {
-        await savePlan()
-        cancelForm() // Navigate back after successful save
+        const data = {
+          name: formData.value.name.trim(),
+          description: formData.value.description?.trim() || null,
+          is_active: formData.value.is_active
+        }
+
+        if (isEditMode.value) {
+          // Update existing plan
+          const updated = await updatePlan(props.plan.id, data)
+          emit('updated', updated)
+        } else {
+          // Create new plan
+          const created = await createPlan(data)
+          emit('created', created)
+        }
       } catch (error) {
-        console.error('Save error:', error)
+        console.error('PlanFormModal: Error saving plan:', error)
+        // Error is already handled in composable with toast
       }
     }
 
-    // Initialize on mount
-    onMounted(() => {
-      initializeForm()
-    })
+    // Handle close
+    const handleClose = () => {
+      emit('close')
+    }
 
     return {
-      // State
       loading,
-      initialLoading,
       isEditMode,
       formData,
       isFormValid,
-
-      // Methods
-      handleSave,
-      handleCancel: cancelForm,
-      handleDelete: removePlan,
-
-      // Icons
-      checkmarkOutline,
-      trashOutline
+      handleSubmit,
+      handleClose,
+      closeOutline,
+      checkmarkOutline
     }
   }
 }
 </script>
 
 <style scoped>
-.plan-form-page {
-  --background: var(--brand-background-color, #fafafa);
-}
-
 ion-header {
   --background: var(--brand-background-color, #ffffff);
 }
@@ -226,38 +233,14 @@ ion-title {
   color: var(--brand-primary);
 }
 
-.plan-form-content {
+ion-content {
   --background: var(--brand-background-color, #fafafa);
 }
 
-.form-container {
+.modal-content {
   padding: 16px;
   max-width: 500px;
   margin: 0 auto;
-}
-
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 300px;
-  text-align: center;
-  padding: 24px;
-}
-
-.loading-state ion-spinner {
-  --color: var(--brand-primary);
-  width: 40px;
-  height: 40px;
-  margin-bottom: 16px;
-}
-
-.loading-state p {
-  font-family: var(--brand-font-family);
-  font-size: var(--brand-font-size-base);
-  color: var(--brand-text-secondary-color);
-  margin: 0;
 }
 
 .field-card {
@@ -271,10 +254,10 @@ ion-title {
 .form-item {
   --background: transparent;
   --border-color: transparent;
-  --inner-padding-start: 6px;
+  --inner-padding-start: 16px;
   --inner-padding-end: 16px;
-  --inner-padding-top: 6px;
-  --inner-padding-bottom: 6px;
+  --inner-padding-top: 12px;
+  --inner-padding-bottom: 12px;
   --min-height: auto;
 }
 
@@ -349,16 +332,6 @@ ion-title {
   letter-spacing: -0.3px;
 }
 
-.delete-button {
-  font-family: var(--brand-font-family);
-  font-weight: 600;
-  font-size: var(--brand-font-size-base);
-  border-radius: var(--brand-button-border-radius, 16px);
-  height: 48px;
-  letter-spacing: -0.3px;
-  --color: var(--brand-danger-color, #eb445a);
-}
-
 .save-button:disabled {
   --background: var(--brand-card-background-color, var(--brand-gray-10));
   --color: var(--brand-gray-50, var(--brand-text-secondary-color));
@@ -366,7 +339,7 @@ ion-title {
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
-  .plan-form-content {
+  ion-content {
     --background: var(--brand-background-color, #121212);
   }
   

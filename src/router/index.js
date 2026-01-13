@@ -64,22 +64,6 @@ const routes = [
         }
       },
       {
-        path: 'plans/new',
-        name: 'PlanNew',
-        component: () => import('../features/workouts/views/PlanForm.vue'),
-        meta: { 
-          title: 'New Plan'
-        }
-      },
-      {
-        path: 'plans/:id/edit',
-        name: 'PlanEdit',
-        component: () => import('../features/workouts/views/PlanForm.vue'),
-        meta: { 
-          title: 'Edit Plan'
-        }
-      },
-      {
         path: 'profile',
         name: 'Profile',
         component: () => import('../features/profile/views/Profile.vue'),

@@ -1,15 +1,5 @@
 <template>
   <div class="workout-summary-card">
-    <div class="summary-header">
-      <div></div>
-      <ion-button 
-        size="small"
-        color="primary"
-        fill="clear" 
-        @click="$emit('showMenu')">
-        <ion-icon :icon="ellipsisVertical" />
-      </ion-button>
-    </div>
     <div class="summary-content">
       <h1 class="workout-title">{{ workout?.name || 'New Workout' }}</h1>
       <p class="workout-meta">{{ workoutMeta }}</p>
@@ -18,30 +8,16 @@
 </template>
 
 <script>
-import {
-  IonButton,
-  IonIcon
-} from '@ionic/vue'
-import {
-  informationCircleOutline,
-  shareOutline,
-  ellipsisVertical
-} from 'ionicons/icons'
 import { computed } from 'vue'
 
 export default {
   name: 'WorkoutSummaryCard',
-  components: {
-    IonButton,
-    IonIcon
-  },
   props: {
     workout: {
       type: Object,
       default: null
     }
   },
-  emits: ['showMenu'],
   setup(props) {
     // Workout meta info for display
     const workoutMeta = computed(() => {
@@ -49,11 +25,7 @@ export default {
     })
 
     return {
-      workoutMeta,
-      // Icons
-      informationCircleOutline,
-      shareOutline,
-      ellipsisVertical
+      workoutMeta
     }
   }
 }
@@ -74,13 +46,6 @@ export default {
 .workout-summary-card:hover {
   transform: scale(1.01);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.summary-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
 }
 
 .workout-title {

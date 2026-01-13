@@ -20,20 +20,8 @@
 
         <!-- Workout Summary Card -->
         <WorkoutSummaryCard 
-          v-if="!initialLoading && !editMode"
-          :workout="{ ...currentWorkout, ...formData }"
-          @show-menu="handleShowWorkoutMenu"
-        />
-
-        <!-- Workout Details Form -->
-        <WorkoutDetailsForm
-          v-if="!initialLoading && editMode"
-          v-model="formData"
-          :loading="loading"
-          :is-edit-mode="isEditMode"
-          :is-valid="isFormValid"
-          @submit="handleSave"
-          @cancel="handleCancel"
+          v-if="!initialLoading"
+          :workout="currentWorkout"
         />
 
         <!-- Exercises Section -->
@@ -79,9 +67,7 @@ import {
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useWorkouts } from '../composables/useWorkouts'
-import { useWorkoutForm } from '../composables/useWorkoutForm'
 import WorkoutSummaryCard from '../components/WorkoutSummaryCard.vue'
-import WorkoutDetailsForm from '../components/WorkoutDetailsForm.vue'
 import WorkoutExercisesList from '../components/WorkoutExercisesList.vue'
 import ExerciseModals from '../components/ExerciseModals.vue'
 
@@ -99,7 +85,6 @@ export default {
     IonBackButton,
     IonSpinner,
     WorkoutSummaryCard,
-    WorkoutDetailsForm,
     WorkoutExercisesList,
     ExerciseModals
   },
@@ -110,29 +95,17 @@ export default {
     
     const workoutId = computed(() => route.params.id ? parseInt(route.params.id) : null)
     
-    // Use workout form composable
-    const {
-      editMode,
-      initialLoading,
-      currentWorkout,
-      formData,
-      isEditMode,
-      isFormValid,
-      initializeForm,
-      saveWorkout,
-      cancelForm
-    } = useWorkoutForm(workoutId)
-
-    // Workout exercises
+    // State
+    const initialLoading = ref(true)
+    const currentWorkout = ref(null)
     const workoutExercises = ref([])
-    
-    // Exercise modals ref
     const exerciseModalsRef = ref(null)
 
-    // Available exercises for selection
+    // Computed
+    const isEditMode = computed(() => !!workoutId.value)
     const availableExercises = computed(() => exercises?.value || [])
 
-    // Initialize form and fetch data
+    // Initialize and fetch data
     const initialize = async () => {
       initialLoading.value = true
 
@@ -144,12 +117,11 @@ export default {
           console.log('Exercises fetched:', exercises?.value?.length || 0)
         }
 
-        // Initialize form data and fetch workout if editing
-        await initializeForm()
-        
-        // Set workout exercises if we have a current workout
-        if (currentWorkout.value) {
-          workoutExercises.value = currentWorkout.value.exercises || []
+        // Fetch workout if editing
+        if (workoutId.value) {
+          const workout = await fetchWorkout(workoutId.value)
+          currentWorkout.value = workout
+          workoutExercises.value = workout.exercises || []
         }
       } catch (error) {
         console.error('Initialize error:', error)
@@ -158,40 +130,13 @@ export default {
       }
     }
 
-    // Handle save
-    const handleSave = async () => {
-      try {
-        const result = await saveWorkout()
-        if (result) {
-          currentWorkout.value = result
-          workoutExercises.value = result.exercises || []
-          editMode.value = false
-        }
-      } catch (error) {
-        console.error('Save error:', error)
-      }
-    }
-
-    // Handle cancel
-    const handleCancel = () => {
-      if (editMode.value) {
-        editMode.value = false
-      } else {
-        cancelForm()
-      }
-    }
-
-    // Handle workout menu
-    const handleShowWorkoutMenu = () => {
-      editMode.value = true
-    }
-
     // Handle exercise updated
     const handleExerciseUpdated = async () => {
       // Refresh workout to get updated exercises
       if (currentWorkout.value?.id) {
         try {
           const updated = await fetchWorkout(currentWorkout.value.id)
+          currentWorkout.value = updated
           workoutExercises.value = updated.exercises || []
         } catch (error) {
           console.error('Error refreshing workout:', error)
@@ -210,19 +155,13 @@ export default {
       loading,
       initialLoading,
       isEditMode,
-      editMode,
-      formData,
       workoutExercises,
       availableExercises,
       currentWorkout,
-      isFormValid,
       exerciseModalsRef,
       workoutId,
       
       // Methods
-      handleSave,
-      handleCancel,
-      handleShowWorkoutMenu,
       handleExerciseUpdated,
       
       // Icons
